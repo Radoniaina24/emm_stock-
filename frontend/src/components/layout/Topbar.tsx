@@ -12,7 +12,7 @@ export function Topbar({ title }: { title: string }) {
   const { collapsed, toggle: toggleSidebar } = useSidebar()
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-border/50 bg-background/80 px-4 shadow-sm backdrop-blur-xl lg:px-6">
+    <header className="sticky top-0 z-40 flex h-16 min-h-16 shrink-0 items-center gap-4 border-b border-border/50 bg-background/80 px-4 shadow-sm backdrop-blur-xl lg:px-6">
       <Button
         variant="ghost"
         size="icon"

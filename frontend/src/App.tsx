@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom"
 import { AuthProvider } from "@/lib/auth"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
+import { Toaster } from "@/components/ui/toast"
 import { BadgesPage } from "@/pages/composants/BadgesPage"
 import { BoutonsPage } from "@/pages/composants/BoutonsPage"
 import { CartesPage } from "@/pages/composants/CartesPage"
@@ -134,6 +135,7 @@ function App() {
             />
           </Route>
         </Routes>
+        <Toaster richColors closeButton />
       </AuthProvider>
     </BrowserRouter>
   )

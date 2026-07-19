@@ -3,7 +3,6 @@ import { Outlet } from "react-router-dom"
 import { Sidebar } from "@/components/layout/Sidebar"
 import { Topbar } from "@/components/layout/Topbar"
 import { SidebarProvider } from "@/lib/sidebar"
-import { Toaster } from "@/components/ui/toast"
 
 export function DashboardLayout() {
   return (
@@ -17,7 +16,6 @@ export function DashboardLayout() {
           </main>
         </div>
       </div>
-      <Toaster richColors closeButton />
     </SidebarProvider>
   )
 }
