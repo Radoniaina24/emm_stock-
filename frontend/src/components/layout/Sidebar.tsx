@@ -18,10 +18,10 @@ import {
   History,
   Layers,
   LayoutDashboard,
-  MapPin,
   LifeBuoy,
   List,
   Lock,
+  MapPin,
   Package,
   Plus,
   Ruler,
@@ -101,7 +101,7 @@ function NavItem({
       title={collapsed ? label : undefined}
       className={({ isActive }) =>
         cn(
-          "group/nav-item flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium transition-colors",
+          "flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium transition-colors",
           collapsed && "justify-center",
           isActive
             ? "bg-sidebar-accent text-sidebar-accent-foreground"
@@ -143,6 +143,63 @@ function SubNavItem({
   )
 }
 
+function MenuSection({
+  label,
+  icon: Icon,
+  open,
+  onToggle,
+  isActive,
+  collapsed,
+  children,
+}: {
+  label: string
+  icon: typeof LayoutDashboard
+  open: boolean
+  onToggle: () => void
+  isActive: boolean
+  collapsed: boolean
+  children: React.ReactNode
+}) {
+  if (collapsed) {
+    return (
+      <NavItem
+        to={`/dashboard/${label.toLowerCase()}`}
+        icon={Icon}
+        label={label}
+        collapsed={collapsed}
+        end
+      />
+    )
+  }
+
+  return (
+    <div>
+      <button
+        onClick={onToggle}
+        className={cn(
+          "flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium transition-colors",
+          isActive
+            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+            : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
+        )}
+      >
+        <Icon className="size-4 shrink-0" />
+        <span className="flex-1 truncate text-left">{label}</span>
+        {open ? (
+          <ChevronDown className="size-3.5 shrink-0 text-muted-foreground/60" />
+        ) : (
+          <ChevronRight className="size-3.5 shrink-0 text-muted-foreground/60" />
+        )}
+      </button>
+      {open ? (
+        <div className="ml-4 mt-0.5 space-y-0.5 border-l border-sidebar-border pl-2">
+          {children}
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
 export function Sidebar() {
   const { collapsed } = useSidebar()
   const location = useLocation()
@@ -173,11 +230,7 @@ export function Sidebar() {
         collapsed ? "w-16" : "w-64"
       )}
     >
-      <div
-        className={cn(
-          "flex h-16 items-center gap-2 border-b border-sidebar-border px-3"
-        )}
-      >
+      <div className="flex h-16 items-center gap-2 border-b border-sidebar-border px-3">
         <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
           <Boxes className="size-5" />
         </div>
@@ -188,176 +241,81 @@ export function Sidebar() {
         ) : null}
       </div>
 
-      <nav className="flex-1 space-y-6 overflow-y-auto p-4">
-        <div className="space-y-1">
-          {!collapsed ? (
-            <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-              Général
-            </p>
-          ) : null}
-          {mainNav.map((item) => (
-            <NavItem
+      <nav className="flex-1 space-y-1 overflow-y-auto p-4">
+        {mainNav.map((item) => (
+          <NavItem
+            key={item.to}
+            to={item.to}
+            icon={item.icon}
+            label={item.label}
+            collapsed={collapsed}
+            end={item.to === "/dashboard"}
+          />
+        ))}
+
+        <MenuSection
+          label="Produits"
+          icon={Package}
+          open={produitsOpen}
+          onToggle={() => setProduitsOpen(!produitsOpen)}
+          isActive={isProduitsActive}
+          collapsed={collapsed}
+        >
+          {produitsSubNav.map((item) => (
+            <SubNavItem
               key={item.to}
               to={item.to}
               icon={item.icon}
               label={item.label}
-              collapsed={collapsed}
-              end={item.to === "/dashboard"}
             />
           ))}
-        </div>
+        </MenuSection>
 
-        {!collapsed ? (
-          <div className="space-y-1">
-            <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-              Produits
-            </p>
-            <button
-              onClick={() => setProduitsOpen(!produitsOpen)}
-              className={cn(
-                "flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium transition-colors",
-                isProduitsActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
-              )}
-            >
-              <Package className="size-4 shrink-0" />
-              <span className="flex-1 truncate text-left">Produits</span>
-              {produitsOpen ? (
-                <ChevronDown className="size-3.5 shrink-0 text-muted-foreground/60" />
-              ) : (
-                <ChevronRight className="size-3.5 shrink-0 text-muted-foreground/60" />
-              )}
-            </button>
-            {produitsOpen ? (
-              <div className="ml-4 space-y-0.5 border-l border-sidebar-border pl-2">
-                {produitsSubNav.map((item) => (
-                  <SubNavItem
-                    key={item.to}
-                    to={item.to}
-                    icon={item.icon}
-                    label={item.label}
-                  />
-                ))}
-              </div>
-            ) : null}
-          </div>
-        ) : (
-          <NavItem
-            to="/dashboard/produits"
-            icon={Package}
-            label="Produits"
-            collapsed={collapsed}
-            end
-          />
-        )}
-
-        {!collapsed ? (
-          <div className="space-y-1">
-            <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-              Stock
-            </p>
-            <button
-              onClick={() => setStockOpen(!stockOpen)}
-              className={cn(
-                "flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium transition-colors",
-                isStockActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
-              )}
-            >
-              <Warehouse className="size-4 shrink-0" />
-              <span className="flex-1 truncate text-left">Stock</span>
-              {stockOpen ? (
-                <ChevronDown className="size-3.5 shrink-0 text-muted-foreground/60" />
-              ) : (
-                <ChevronRight className="size-3.5 shrink-0 text-muted-foreground/60" />
-              )}
-            </button>
-            {stockOpen ? (
-              <div className="ml-4 space-y-0.5 border-l border-sidebar-border pl-2">
-                {stockSubNav.map((item) => (
-                  <SubNavItem
-                    key={item.to}
-                    to={item.to}
-                    icon={item.icon}
-                    label={item.label}
-                  />
-                ))}
-              </div>
-            ) : null}
-          </div>
-        ) : (
-          <NavItem
-            to="/dashboard/stock"
-            icon={Warehouse}
-            label="Stock"
-            collapsed={collapsed}
-            end
-          />
-        )}
-
-        {!collapsed ? (
-          <div className="space-y-1">
-            <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-              Entrepôts
-            </p>
-            <button
-              onClick={() => setEntrepotsOpen(!entrepotsOpen)}
-              className={cn(
-                "flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium transition-colors",
-                isEntrepotsActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
-              )}
-            >
-              <Building2 className="size-4 shrink-0" />
-              <span className="flex-1 truncate text-left">Entrepôts</span>
-              {entrepotsOpen ? (
-                <ChevronDown className="size-3.5 shrink-0 text-muted-foreground/60" />
-              ) : (
-                <ChevronRight className="size-3.5 shrink-0 text-muted-foreground/60" />
-              )}
-            </button>
-            {entrepotsOpen ? (
-              <div className="ml-4 space-y-0.5 border-l border-sidebar-border pl-2">
-                {entrepotsSubNav.map((item) => (
-                  <SubNavItem
-                    key={item.to}
-                    to={item.to}
-                    icon={item.icon}
-                    label={item.label}
-                  />
-                ))}
-              </div>
-            ) : null}
-          </div>
-        ) : (
-          <NavItem
-            to="/dashboard/entrepots"
-            icon={Building2}
-            label="Entrepôts"
-            collapsed={collapsed}
-            end
-          />
-        )}
-
-        <div className="space-y-1">
-          {!collapsed ? (
-            <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-              Support
-            </p>
-          ) : null}
-          {secondaryNav.map((item) => (
-            <NavItem
+        <MenuSection
+          label="Stock"
+          icon={Warehouse}
+          open={stockOpen}
+          onToggle={() => setStockOpen(!stockOpen)}
+          isActive={isStockActive}
+          collapsed={collapsed}
+        >
+          {stockSubNav.map((item) => (
+            <SubNavItem
               key={item.to}
               to={item.to}
               icon={item.icon}
               label={item.label}
-              collapsed={collapsed}
             />
           ))}
-        </div>
+        </MenuSection>
+
+        <MenuSection
+          label="Entrepôts"
+          icon={Building2}
+          open={entrepotsOpen}
+          onToggle={() => setEntrepotsOpen(!entrepotsOpen)}
+          isActive={isEntrepotsActive}
+          collapsed={collapsed}
+        >
+          {entrepotsSubNav.map((item) => (
+            <SubNavItem
+              key={item.to}
+              to={item.to}
+              icon={item.icon}
+              label={item.label}
+            />
+          ))}
+        </MenuSection>
+
+        {secondaryNav.map((item) => (
+          <NavItem
+            key={item.to}
+            to={item.to}
+            icon={item.icon}
+            label={item.label}
+            collapsed={collapsed}
+          />
+        ))}
       </nav>
 
       <div className="border-t border-sidebar-border p-4">
