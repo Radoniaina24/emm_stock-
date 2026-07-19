@@ -263,6 +263,17 @@ function SubNavItem({
   )
 }
 
+function SidebarGroupLabel({ label, collapsed }: { label: string; collapsed: boolean }) {
+  if (collapsed) return null
+  return (
+    <div className="px-2 pt-4 pb-1">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+        {label}
+      </span>
+    </div>
+  )
+}
+
 function MenuSection({
   label,
   icon: Icon,
@@ -439,6 +450,8 @@ export function Sidebar() {
           />
         ))}
 
+        <SidebarGroupLabel label="Gestion" collapsed={collapsed} />
+
         <MenuSection
           label="Produits"
           icon={Package}
@@ -565,6 +578,8 @@ export function Sidebar() {
           ))}
         </MenuSection>
 
+        <SidebarGroupLabel label="Achats & Approvisionnement" collapsed={collapsed} />
+
         <MenuSection
           label="Achats"
           icon={ShoppingCart}
@@ -600,6 +615,8 @@ export function Sidebar() {
             />
           ))}
         </MenuSection>
+
+        <SidebarGroupLabel label="Ventes & Clients" collapsed={collapsed} />
 
         <MenuSection
           label="Clients"
@@ -637,6 +654,8 @@ export function Sidebar() {
           ))}
         </MenuSection>
 
+        <SidebarGroupLabel label="Analyse & Rapports" collapsed={collapsed} />
+
         <MenuSection
           label="Rapports"
           icon={BarChart3}
@@ -654,6 +673,8 @@ export function Sidebar() {
             />
           ))}
         </MenuSection>
+
+        <SidebarGroupLabel label="Système" collapsed={collapsed} />
 
         <MenuSection
           label="Administration"
