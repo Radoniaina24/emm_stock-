@@ -1,4 +1,5 @@
-import { Search, Mail, Lock, EyeOff, AlertCircle, Check, AlertTriangle } from "lucide-react"
+import { useState } from "react"
+import { Check, ChevronDown, Mail, Lock, EyeOff, AlertCircle, AlertTriangle, Search, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -16,6 +17,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  ComboboxChip,
+  ComboboxChipRemove,
+  ComboboxChips,
+  ComboboxClear,
+  ComboboxEmpty,
+  ComboboxIcon,
+  ComboboxInput,
+  ComboboxInputGroup,
+  ComboboxItem,
+  ComboboxItemIndicator,
+  ComboboxList,
+  ComboboxPopup,
+  ComboboxRoot,
+  ComboboxTrigger,
+} from "@/components/ui/combobox"
 
 export function FormulairesPage() {
   return (
@@ -200,6 +217,82 @@ export function FormulairesPage() {
           </div>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Multiselect avec recherche</CardTitle>
+          <CardDescription>Sélection multiple avec filtrage, chips et état vide.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <MultiSelectDemo />
+        </CardContent>
+      </Card>
     </div>
+  )
+}
+
+const categories = [
+  "Électronique",
+  "Vêtements",
+  "Alimentation",
+  "Boissons",
+  "Mobilier",
+  "Papeterie",
+  "Hygiène",
+  "Entretien",
+  "Jouets",
+  "Sport",
+  "Informatique",
+  "Librairie",
+]
+
+function MultiSelectDemo() {
+  const [selected, setSelected] = useState<string[]>([])
+
+  return (
+    <ComboboxRoot
+      multiple
+      items={categories}
+      value={selected}
+      onValueChange={(val) => setSelected(val ?? [])}
+    >
+      <ComboboxInputGroup>
+        <ComboboxChips>
+          {selected.map((item) => (
+            <ComboboxChip key={item}>
+              <span>{item}</span>
+              <ComboboxChipRemove>
+                <X className="size-2.5" />
+              </ComboboxChipRemove>
+            </ComboboxChip>
+          ))}
+        </ComboboxChips>
+        <ComboboxInput placeholder="Rechercher une catégorie…" />
+        {selected.length > 0 && (
+          <ComboboxClear>
+            <X className="size-3" />
+          </ComboboxClear>
+        )}
+        <ComboboxTrigger>
+          <ComboboxIcon>
+            <ChevronDown className="size-3" />
+          </ComboboxIcon>
+        </ComboboxTrigger>
+      </ComboboxInputGroup>
+
+      <ComboboxPopup>
+        <ComboboxList>
+          {(item: string) => (
+            <ComboboxItem value={item}>
+              {item}
+              <ComboboxItemIndicator>
+                <Check className="size-3" />
+              </ComboboxItemIndicator>
+            </ComboboxItem>
+          )}
+        </ComboboxList>
+        <ComboboxEmpty>Aucune catégorie trouvée</ComboboxEmpty>
+      </ComboboxPopup>
+    </ComboboxRoot>
   )
 }

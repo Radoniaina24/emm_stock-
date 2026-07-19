@@ -10,6 +10,7 @@ import {
   Bell,
   Boxes,
   Building2,
+  Calendar,
   CheckCircle,
   ChevronDown,
   ChevronRight,
@@ -204,6 +205,7 @@ const composantsSubNav = [
   { label: "Badges", icon: Tag, to: "/dashboard/composants/badges" },
   { label: "Cartes", icon: LayoutDashboard, to: "/dashboard/composants/cartes" },
   { label: "Tableaux", icon: List, to: "/dashboard/composants/tableaux" },
+  { label: "Dates", icon: Calendar, to: "/dashboard/composants/date" },
   { label: "Icônes", icon: Star, to: "/dashboard/composants/icones" },
 ]
 
