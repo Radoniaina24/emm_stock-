@@ -221,16 +221,23 @@ function NavItem({
       title={collapsed ? label : undefined}
       className={({ isActive }) =>
         cn(
-          "flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium transition-colors",
-          collapsed && "justify-center",
+          "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+          collapsed && "justify-center px-2",
           isActive
-            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+            ? "bg-gradient-to-r from-sidebar-primary/15 to-transparent text-sidebar-primary shadow-sm ring-1 ring-sidebar-primary/10"
             : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
         )
       }
     >
-      <Icon className="size-4 shrink-0" />
-      {!collapsed ? <span className="truncate">{label}</span> : null}
+      {({ isActive }) => (
+        <>
+          {!collapsed && isActive && (
+            <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-sidebar-primary" />
+          )}
+          <Icon className={cn("size-4 shrink-0 transition-transform", !collapsed && "group-hover:scale-110")} />
+          {!collapsed ? <span className="truncate">{label}</span> : null}
+        </>
+      )}
     </NavLink>
   )
 }
@@ -250,14 +257,17 @@ function SubNavItem({
       end
       className={({ isActive }) =>
         cn(
-          "flex items-center gap-3 rounded-md px-2 py-1.5 text-sm font-medium transition-colors",
+          "group flex items-center gap-3 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200",
           isActive
-            ? "bg-sidebar-accent/80 text-sidebar-accent-foreground"
+            ? "bg-gradient-to-r from-sidebar-primary/10 to-transparent text-sidebar-primary"
             : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
         )
       }
     >
-      <Icon className="size-3.5 shrink-0 text-muted-foreground/70" />
+      <Icon className={cn(
+        "size-3.5 shrink-0 transition-all duration-200",
+        "text-muted-foreground/70 group-hover:text-sidebar-accent-foreground"
+      )} />
       <span className="truncate">{label}</span>
     </NavLink>
   )
@@ -266,10 +276,12 @@ function SubNavItem({
 function SidebarGroupLabel({ label, collapsed }: { label: string; collapsed: boolean }) {
   if (collapsed) return null
   return (
-    <div className="px-2 pt-4 pb-1">
-      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+    <div className="flex items-center gap-2 px-3 pt-5 pb-1.5">
+      <span className="h-px flex-1 bg-gradient-to-r from-sidebar-border/60 to-transparent" />
+      <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/40">
         {label}
       </span>
+      <span className="h-px flex-1 bg-gradient-to-l from-sidebar-border/60 to-transparent" />
     </div>
   )
 }
@@ -308,25 +320,33 @@ function MenuSection({
       <button
         onClick={onToggle}
         className={cn(
-          "flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm font-medium transition-colors",
+          "group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
           isActive
-            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+            ? "bg-gradient-to-r from-sidebar-primary/15 to-transparent text-sidebar-primary shadow-sm ring-1 ring-sidebar-primary/10"
             : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
         )}
       >
-        <Icon className="size-4 shrink-0" />
+        <Icon className="size-4 shrink-0 transition-transform group-hover:scale-110" />
         <span className="flex-1 truncate text-left">{label}</span>
-        {open ? (
-          <ChevronDown className="size-3.5 shrink-0 text-muted-foreground/60" />
-        ) : (
-          <ChevronRight className="size-3.5 shrink-0 text-muted-foreground/60" />
-        )}
-      </button>
-      {open ? (
-        <div className="ml-4 mt-0.5 space-y-0.5 border-l border-sidebar-border pl-2">
-          {children}
+        <div className={cn(
+          "flex size-5 items-center justify-center rounded-md transition-all duration-200",
+          open ? "bg-sidebar-primary/10" : "group-hover:bg-sidebar-accent"
+        )}>
+          {open ? (
+            <ChevronDown className="size-3 text-muted-foreground/60" />
+          ) : (
+            <ChevronRight className="size-3 text-muted-foreground/60" />
+          )}
         </div>
-      ) : null}
+      </button>
+      <div
+        className={cn(
+          "ml-4 mt-1 space-y-1 overflow-hidden border-l-2 border-sidebar-primary/20 pl-3 transition-all duration-300",
+          open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        )}
+      >
+        {children}
+      </div>
     </div>
   )
 }
@@ -423,18 +443,23 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "hidden shrink-0 flex-col border-r bg-sidebar shadow-lg transition-[width] duration-300 ease-in-out lg:flex",
+        "hidden shrink-0 flex-col border-r bg-gradient-to-b from-sidebar to-sidebar/95 shadow-2xl transition-all duration-300 ease-in-out lg:flex",
         collapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="flex h-16 items-center gap-2 border-b border-sidebar-border px-3">
-        <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+      <div className="flex h-16 items-center gap-3 border-b border-sidebar-border/50 px-3">
+        <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 text-sidebar-primary-foreground shadow-md ring-1 ring-white/10">
           <Boxes className="size-5" />
         </div>
         {!collapsed ? (
-          <span className="truncate text-lg font-semibold tracking-tight text-sidebar-foreground">
-            StockFlow
-          </span>
+          <div className="flex flex-col">
+            <span className="truncate text-base font-bold tracking-tight text-sidebar-foreground">
+              StockFlow
+            </span>
+            <span className="truncate text-[10px] font-medium text-muted-foreground/50">
+              Gestion de stock
+            </span>
+          </div>
         ) : null}
       </div>
 
@@ -723,28 +748,31 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div className="border-t border-sidebar-border p-4">
+      <div className="border-t border-sidebar-border/50 p-3">
         {collapsed ? (
           <div className="flex justify-center">
             <div
               title="Admin"
-              className="flex size-9 items-center justify-center rounded-full bg-sidebar-primary text-sm font-semibold text-sidebar-primary-foreground"
+              className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 text-sm font-bold text-sidebar-primary-foreground shadow-sm ring-1 ring-white/10"
             >
-              A
+              AD
             </div>
           </div>
         ) : (
-          <div className="flex items-center gap-3 rounded-md bg-sidebar-accent/60 p-3">
-            <div className="flex size-9 items-center justify-center rounded-full bg-sidebar-primary text-sm font-semibold text-sidebar-primary-foreground">
-              A
+          <div className="group flex items-center gap-3 rounded-xl bg-sidebar-accent/40 p-3 transition-all duration-200 hover:bg-sidebar-accent/60">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 text-sm font-bold text-sidebar-primary-foreground shadow-sm ring-1 ring-white/10">
+              AD
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-sidebar-foreground">
-                Admin
+              <p className="truncate text-sm font-semibold text-sidebar-foreground">
+                Administrateur
               </p>
-              <p className="truncate text-xs text-muted-foreground">
+              <p className="truncate text-xs text-muted-foreground/70">
                 admin@stockflow.app
               </p>
+            </div>
+            <div className="flex size-6 items-center justify-center rounded-md opacity-0 transition-opacity group-hover:opacity-100">
+              <Settings className="size-3.5 text-muted-foreground/50" />
             </div>
           </div>
         )}
