@@ -468,6 +468,7 @@ export function LandingPage() {
               <Button
                 size="lg"
                 variant="secondary"
+                nativeButton={false}
                 render={<Link to="/dashboard" />}
               >
                 Ouvrir le backoffice
