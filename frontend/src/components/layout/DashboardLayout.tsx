@@ -7,7 +7,7 @@ import { SidebarProvider } from "@/lib/sidebar"
 export function DashboardLayout() {
   return (
     <SidebarProvider>
-      <div className="flex min-h-svh bg-muted/30">
+      <div className="flex min-h-svh bg-muted/40">
         <Sidebar />
         <div className="flex min-w-0 flex-1 flex-col">
           <Topbar title="Tableau de bord" />
