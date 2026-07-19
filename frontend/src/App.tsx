@@ -46,18 +46,70 @@ function App() {
             <Route path="entrepots/emplacements" element={<div className="text-muted-foreground">Emplacements</div>} />
             <Route path="entrepots/transferts" element={<div className="text-muted-foreground">Transferts entre entrepôts</div>} />
             <Route path="entrepots/capacite" element={<div className="text-muted-foreground">Capacité de stockage</div>} />
-            <Route
-              path="fournisseurs"
-              element={<div className="text-muted-foreground">Fournisseurs — à venir</div>}
-            />
-            <Route
-              path="rapports"
-              element={<div className="text-muted-foreground">Rapports — à venir</div>}
-            />
-            <Route
-              path="parametres"
-              element={<div className="text-muted-foreground">Paramètres — à venir</div>}
-            />
+            <Route path="entrees/nouvelle" element={<div className="text-muted-foreground">Nouvelle réception</div>} />
+            <Route path="entrees/bons" element={<div className="text-muted-foreground">Bons de réception</div>} />
+            <Route path="entrees/receptions-fournisseurs" element={<div className="text-muted-foreground">Réceptions fournisseurs</div>} />
+            <Route path="entrees/historique" element={<div className="text-muted-foreground">Historique des entrées</div>} />
+            <Route path="entrees/controle-qualite" element={<div className="text-muted-foreground">Contrôle qualité</div>} />
+            <Route path="sorties/nouvelle" element={<div className="text-muted-foreground">Nouvelle sortie</div>} />
+            <Route path="sorties/bons" element={<div className="text-muted-foreground">Bons de sortie</div>} />
+            <Route path="sorties/ventes" element={<div className="text-muted-foreground">Ventes</div>} />
+            <Route path="sorties/consommation-interne" element={<div className="text-muted-foreground">Consommation interne</div>} />
+            <Route path="sorties/retours" element={<div className="text-muted-foreground">Retours</div>} />
+            <Route path="sorties/historique" element={<div className="text-muted-foreground">Historique des sorties</div>} />
+            <Route path="mouvements" element={<div className="text-muted-foreground">Tous les mouvements</div>} />
+            <Route path="mouvements/entrees" element={<div className="text-muted-foreground">Entrées</div>} />
+            <Route path="mouvements/sorties" element={<div className="text-muted-foreground">Sorties</div>} />
+            <Route path="mouvements/transferts" element={<div className="text-muted-foreground">Transferts</div>} />
+            <Route path="mouvements/ajustements" element={<div className="text-muted-foreground">Ajustements</div>} />
+            <Route path="mouvements/historique" element={<div className="text-muted-foreground">Historique complet</div>} />
+            <Route path="inventaire/nouveau" element={<div className="text-muted-foreground">Nouvel inventaire</div>} />
+            <Route path="inventaire/en-cours" element={<div className="text-muted-foreground">Inventaires en cours</div>} />
+            <Route path="inventaire/termines" element={<div className="text-muted-foreground">Inventaires terminés</div>} />
+            <Route path="inventaire/ecarts" element={<div className="text-muted-foreground">Écarts d'inventaire</div>} />
+            <Route path="inventaire/historique" element={<div className="text-muted-foreground">Historique</div>} />
+            <Route path="achats/commandes-fournisseurs" element={<div className="text-muted-foreground">Commandes fournisseurs</div>} />
+            <Route path="achats/demandes-achat" element={<div className="text-muted-foreground">Demandes d'achat</div>} />
+            <Route path="achats/bons-commande" element={<div className="text-muted-foreground">Bons de commande</div>} />
+            <Route path="achats/receptions" element={<div className="text-muted-foreground">Réceptions</div>} />
+            <Route path="achats/factures-fournisseurs" element={<div className="text-muted-foreground">Factures fournisseurs</div>} />
+            <Route path="fournisseurs" element={<div className="text-muted-foreground">Liste fournisseurs</div>} />
+            <Route path="fournisseurs/contacts" element={<div className="text-muted-foreground">Contacts</div>} />
+            <Route path="fournisseurs/historique-achats" element={<div className="text-muted-foreground">Historique achats</div>} />
+            <Route path="fournisseurs/evaluation" element={<div className="text-muted-foreground">Évaluation fournisseurs</div>} />
+            <Route path="fournisseurs/documents" element={<div className="text-muted-foreground">Documents</div>} />
+            <Route path="clients" element={<div className="text-muted-foreground">Liste clients</div>} />
+            <Route path="clients/commandes" element={<div className="text-muted-foreground">Commandes clients</div>} />
+            <Route path="clients/historique-achats" element={<div className="text-muted-foreground">Historique achats</div>} />
+            <Route path="clients/retours" element={<div className="text-muted-foreground">Retours clients</div>} />
+            <Route path="clients/factures" element={<div className="text-muted-foreground">Factures clients</div>} />
+            <Route path="ventes/commandes-clients" element={<div className="text-muted-foreground">Commandes clients</div>} />
+            <Route path="ventes/bons-livraison" element={<div className="text-muted-foreground">Bons de livraison</div>} />
+            <Route path="ventes/factures" element={<div className="text-muted-foreground">Factures</div>} />
+            <Route path="ventes/retours" element={<div className="text-muted-foreground">Retours clients</div>} />
+            <Route path="ventes/historique" element={<div className="text-muted-foreground">Historique ventes</div>} />
+            <Route path="rapports/stock" element={<div className="text-muted-foreground">Rapport stock</div>} />
+            <Route path="rapports/mouvements" element={<div className="text-muted-foreground">Rapport mouvements</div>} />
+            <Route path="rapports/ventes" element={<div className="text-muted-foreground">Rapport ventes</div>} />
+            <Route path="rapports/achats" element={<div className="text-muted-foreground">Rapport achats</div>} />
+            <Route path="rapports/produits-populaires" element={<div className="text-muted-foreground">Produits populaires</div>} />
+            <Route path="rapports/rotation-stocks" element={<div className="text-muted-foreground">Rotation des stocks</div>} />
+            <Route path="rapports/marge" element={<div className="text-muted-foreground">Marge</div>} />
+            <Route path="rapports/export" element={<div className="text-muted-foreground">Export Excel/PDF</div>} />
+            <Route path="administration/utilisateurs" element={<div className="text-muted-foreground">Utilisateurs</div>} />
+            <Route path="administration/roles" element={<div className="text-muted-foreground">Rôles</div>} />
+            <Route path="administration/permissions" element={<div className="text-muted-foreground">Permissions</div>} />
+            <Route path="administration/journal" element={<div className="text-muted-foreground">Journal d'activité</div>} />
+            <Route path="administration/securite" element={<div className="text-muted-foreground">Paramètres sécurité</div>} />
+            <Route path="administration/connexions" element={<div className="text-muted-foreground">Connexions</div>} />
+            <Route path="parametres/infos-entreprise" element={<div className="text-muted-foreground">Informations entreprise</div>} />
+            <Route path="parametres/devise" element={<div className="text-muted-foreground">Devise</div>} />
+            <Route path="parametres/taxes" element={<div className="text-muted-foreground">Taxes</div>} />
+            <Route path="parametres/tva" element={<div className="text-muted-foreground">TVA</div>} />
+            <Route path="parametres/numerotation" element={<div className="text-muted-foreground">Numérotation documents</div>} />
+            <Route path="parametres/notifications" element={<div className="text-muted-foreground">Notifications</div>} />
+            <Route path="parametres/sauvegarde" element={<div className="text-muted-foreground">Sauvegarde</div>} />
+            <Route path="parametres/configuration" element={<div className="text-muted-foreground">Configuration générale</div>} />
             <Route
               path="aide"
               element={<div className="text-muted-foreground">Aide — à venir</div>}
