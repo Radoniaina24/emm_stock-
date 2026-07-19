@@ -443,7 +443,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "hidden shrink-0 flex-col border-r bg-gradient-to-b from-sidebar to-sidebar/95 shadow-2xl transition-all duration-300 ease-in-out lg:flex",
+        "hidden h-svh shrink-0 flex-col border-r bg-gradient-to-b from-sidebar to-sidebar/95 shadow-2xl transition-all duration-300 ease-in-out lg:flex",
         collapsed ? "w-16" : "w-64"
       )}
     >
@@ -463,7 +463,7 @@ export function Sidebar() {
         ) : null}
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto p-4">
+      <nav className="flex-1 space-y-1 overflow-y-auto scrollbar-hidden p-4 [scrollbar-gutter:stable]">
         {mainNav.map((item) => (
           <NavItem
             key={item.to}
