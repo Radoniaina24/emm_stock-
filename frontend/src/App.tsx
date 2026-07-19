@@ -8,6 +8,7 @@ import { BoutonsPage } from "@/pages/composants/BoutonsPage"
 import { CartesPage } from "@/pages/composants/CartesPage"
 import { ComponentShowcase } from "@/pages/ComponentShowcase"
 import { DatePage } from "@/pages/composants/DatePage"
+import { ToastPage } from "@/pages/composants/ToastPage"
 import { FormulairesPage } from "@/pages/composants/FormulairesPage"
 import { IconesPage } from "@/pages/composants/IconesPage"
 import { TableauxPage } from "@/pages/composants/TableauxPage"
@@ -126,6 +127,7 @@ function App() {
             <Route path="composants/tableaux" element={<TableauxPage />} />
             <Route path="composants/icones" element={<IconesPage />} />
             <Route path="composants/date" element={<DatePage />} />
+            <Route path="composants/toast" element={<ToastPage />} />
             <Route
               path="aide"
               element={<div className="text-muted-foreground">Aide — à venir</div>}
