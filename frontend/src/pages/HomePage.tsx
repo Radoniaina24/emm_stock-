@@ -6,8 +6,6 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Footer } from "@/components/layout/Footer"
-import { Header } from "@/components/layout/Header"
 import { StatCard } from "@/components/dashboard/StatCard"
 import { StockTable } from "@/components/dashboard/StockTable"
 
@@ -30,37 +28,29 @@ const stockItems: StockItem[] = [
 
 export function HomePage() {
   return (
-    <div className="flex min-h-svh flex-col">
-      <Header />
+    <div className="mx-auto w-full max-w-6xl space-y-6">
+      <div className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight">Tableau de bord</h1>
+          <p className="text-sm text-muted-foreground">
+            Bienvenue Admin, voici l'état de votre inventaire en temps réel.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline">Exporter</Button>
+          <Button>Ajouter un produit</Button>
+        </div>
+      </div>
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-        <section className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Tableau de bord
-            </h1>
-            <p className="mt-1 text-muted-foreground">
-              Suivez l'état de votre inventaire en temps réel.
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline">Exporter</Button>
-            <Button>Ajouter un produit</Button>
-          </div>
-        </section>
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <StatCard key={stat.label} {...stat} />
+        ))}
+      </section>
 
-        <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
-            <StatCard key={stat.label} {...stat} />
-          ))}
-        </section>
-
-        <section>
-          <StockTable items={stockItems} />
-        </section>
-      </main>
-
-      <Footer />
+      <section>
+        <StockTable items={stockItems} />
+      </section>
     </div>
   )
 }

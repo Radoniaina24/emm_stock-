@@ -40,21 +40,31 @@ function formatPrice(value: number) {
   }).format(value)
 }
 
+function initials(name: string) {
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+}
+
 export function StockTable({ items }: { items: StockItem[] }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Mouvements récents</CardTitle>
-        <CardDescription>
-          Aperçu des produits suivis dans votre inventaire.
-        </CardDescription>
+    <Card className="shadow-xs">
+      <CardHeader className="flex-row items-center justify-between gap-4 space-y-0">
+        <div className="space-y-1.5">
+          <CardTitle>Inventaire produits</CardTitle>
+          <CardDescription>
+            {items.length} produits suivis dans votre stock.
+          </CardDescription>
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-0">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Référence</TableHead>
-              <TableHead>Produit</TableHead>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="pl-6">Produit</TableHead>
               <TableHead>Catégorie</TableHead>
               <TableHead className="text-right">Quantité</TableHead>
               <TableHead className="text-right">Prix unitaire</TableHead>
@@ -66,10 +76,19 @@ export function StockTable({ items }: { items: StockItem[] }) {
               const status = statusConfig[item.status]
               return (
                 <TableRow key={item.reference}>
-                  <TableCell className="font-mono text-xs text-muted-foreground">
-                    {item.reference}
+                  <TableCell className="pl-6">
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-xs font-semibold text-muted-foreground">
+                        {initials(item.name)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate font-medium">{item.name}</p>
+                        <p className="font-mono text-xs text-muted-foreground">
+                          {item.reference}
+                        </p>
+                      </div>
+                    </div>
                   </TableCell>
-                  <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell className="text-muted-foreground">
                     {item.category}
                   </TableCell>
