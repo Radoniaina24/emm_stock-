@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd gestion_stock && npm install && npm run build",
+  "outputDirectory": "gestion_stock/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
