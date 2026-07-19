@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom"
 import {
   ArrowRight,
+  Activity,
   BarChart3,
   Bell,
   BookOpen,
@@ -12,6 +13,8 @@ import {
   Phone,
   ShieldCheck,
   Smartphone,
+  Timer,
+  TrendingDown,
   Truck,
   Send,
   Globe,
@@ -63,9 +66,9 @@ const features = [
 ]
 
 const advantages = [
-  { value: "99,9 %", label: "Disponibilité du service" },
-  { value: "— 35 %", label: "Ruptures de stock évitées" },
-  { value: "2 min", label: "Pour réceptionner une livraison" },
+  { value: "99,9 %", label: "Disponibilité du service", icon: Activity, color: "text-primary" },
+  { value: "— 35 %", label: "Ruptures de stock évitées", icon: TrendingDown, color: "text-success" },
+  { value: "2 min", label: "Pour réceptionner une livraison", icon: Timer, color: "text-warning" },
 ]
 
 const pricingPlans = [
@@ -166,19 +169,16 @@ export function LandingPage() {
         <section className="relative overflow-hidden">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,color-mix(in_oklch,var(--primary)_12%,transparent),transparent)]"
+            className="pointer-events-none absolute inset-0 -z-10 bg-cover bg-center"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1600&q=80')",
+            }}
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-24 left-1/2 -z-10 -translate-x-1/2 blur-3xl"
-          >
-            <div className="flex gap-24">
-              <span className="size-56 rounded-full bg-primary/30" />
-              <span className="size-56 rounded-full bg-success/30" />
-              <span className="size-56 rounded-full bg-warning/30" />
-              <span className="size-56 rounded-full bg-destructive/30" />
-            </div>
-          </div>
+            className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background/85 via-background/55 to-background"
+          />
           <div className="mx-auto max-w-6xl px-4 py-24 text-center sm:py-32">
             <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border bg-background/60 px-3 py-1 text-sm text-muted-foreground shadow-sm backdrop-blur">
               <PackageCheck className="size-4 text-success" />
@@ -209,11 +209,19 @@ export function LandingPage() {
 
         {/* Avantages */}
         <section className="border-y bg-muted/30">
-          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-12 sm:grid-cols-3">
+          <div className="mx-auto grid max-w-6xl grid-cols-1 divide-y divide-border px-4 py-12 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
             {advantages.map((item) => (
-              <div key={item.label} className="text-center">
-                <p className="text-3xl font-bold tracking-tight">{item.value}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{item.label}</p>
+              <div
+                key={item.label}
+                className="flex flex-col items-center gap-3 px-4 py-4 text-center transition-transform duration-300 hover:-translate-y-1"
+              >
+                <div className={"flex size-11 items-center justify-center rounded-full bg-background shadow-sm " + item.color}>
+                  <item.icon className="size-5" />
+                </div>
+                <p className="bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent">
+                  {item.value}
+                </p>
+                <p className="text-sm text-muted-foreground">{item.label}</p>
               </div>
             ))}
           </div>
@@ -387,7 +395,7 @@ export function LandingPage() {
                 </li>
                 <li className="flex items-center gap-3">
                   <Phone className="size-5 text-primary" />
-                  <span>+33 1 23 45 67 89</span>
+                  <span>+261 32 91 907 96</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <MapPin className="size-5 text-primary" />
@@ -466,28 +474,6 @@ export function LandingPage() {
                 <ArrowRight className="size-4" />
               </Button>
             </div>
-          </div>
-        </section>
-
-        {/* Réseaux sociaux */}
-        <section className="border-t bg-muted/30">
-          <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-10 text-center">
-            <h2 className="text-lg font-semibold">Suivez-nous</h2>
-            <div className="flex items-center gap-3">
-              {socials.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="flex size-10 items-center justify-center rounded-full border bg-card text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
-                >
-                  <social.icon className="size-5" />
-                </a>
-              ))}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Actualités, conseils et nouveautés de StockFlow.
-            </p>
           </div>
         </section>
       </main>
