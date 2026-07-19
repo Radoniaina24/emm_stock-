@@ -4,7 +4,7 @@ import { fr } from "date-fns/locale"
 import { Calendar, CalendarIcon, Clock } from "lucide-react"
 import type { DateRange } from "react-day-picker"
 
-import { DatePicker } from "@/components/ui/date-picker"
+import { DatePicker, type RangePreset } from "@/components/ui/date-picker"
 import { MonthPicker } from "@/components/ui/month-picker"
 import { TimePicker } from "@/components/ui/time-picker"
 import { YearPicker } from "@/components/ui/year-picker"
@@ -18,6 +18,45 @@ import {
 
 const inputClass =
   "h-9 w-full rounded-lg border border-border/60 bg-background px-3 text-sm text-foreground outline-none transition-all duration-200 focus:border-primary/30 focus:shadow-sm focus:ring-2 focus:ring-primary/10"
+
+const RANGE_PRESETS: RangePreset[] = [
+  {
+    label: "7 jours",
+    getValue: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setDate(start.getDate() - 6)
+      return { from: start, to: end }
+    },
+  },
+  {
+    label: "30 jours",
+    getValue: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setDate(start.getDate() - 29)
+      return { from: start, to: end }
+    },
+  },
+  {
+    label: "90 jours",
+    getValue: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setDate(start.getDate() - 89)
+      return { from: start, to: end }
+    },
+  },
+  {
+    label: "1 an",
+    getValue: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setFullYear(start.getFullYear() - 1)
+      return { from: start, to: end }
+    },
+  },
+]
 
 export function DatePage() {
   const [date, setDate] = useState<Date | undefined>(undefined)
@@ -38,7 +77,7 @@ export function DatePage() {
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold tracking-tight">Dates & Heures</h1>
         <p className="text-sm text-muted-foreground">
-          DatePicker, Calendar et champs natifs pour les dates.
+          DatePicker, Calendar et champs natifs pour les dates et intervalles.
         </p>
       </div>
 
@@ -83,22 +122,16 @@ export function DatePage() {
             <Calendar className="size-4 text-primary" />
             <CardTitle>Intervalle de dates</CardTitle>
           </div>
-          <CardDescription>Sélection d'une plage avec début et fin.</CardDescription>
+          <CardDescription>Sélection d'une plage avec préréglages, navigation clavier et locale française.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-1.5">
-          <label className="text-sm font-medium">Période</label>
+        <CardContent className="space-y-4">
           <DatePicker
             mode="range"
             selected={range}
             onSelect={(selected) => setRange(selected as DateRange | undefined)}
             placeholder="Choisir une période"
+            presets={RANGE_PRESETS}
           />
-          {range?.from && (
-            <p className="text-xs text-muted-foreground/60">
-              Du {format(range.from, "PP", { locale: fr })}
-              {range.to && <span> au {format(range.to, "PP", { locale: fr })}</span>}
-            </p>
-          )}
         </CardContent>
       </Card>
 
