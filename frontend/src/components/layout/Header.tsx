@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom"
-import { Boxes } from "lucide-react"
+import { Boxes, LogOut } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/lib/auth"
 
 const navLinks = [
   { label: "Tableau de bord", href: "#" },
@@ -11,6 +12,8 @@ const navLinks = [
 ]
 
 export function Header() {
+  const { logout } = useAuth()
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
@@ -40,6 +43,15 @@ export function Header() {
             Retour au site
           </Button>
           <Button size="sm">Nouveau produit</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={logout}
+            aria-label="Se déconnecter"
+          >
+            <LogOut className="size-4" />
+            Déconnexion
+          </Button>
         </div>
       </div>
     </header>
