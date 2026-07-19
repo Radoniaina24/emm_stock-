@@ -71,7 +71,7 @@ const advantages = [
 const pricingPlans = [
   {
     name: "Découverte",
-    price: "0 €",
+    price: "0 Ar",
     period: "/ mois",
     description: "Parfait pour tester StockFlow en solo.",
     features: ["Jusqu'à 100 produits", "1 entrepôt", "Alertes par e-mail", "Support communautaire"],
@@ -80,7 +80,7 @@ const pricingPlans = [
   },
   {
     name: "Pro",
-    price: "29 €",
+    price: "145 000 Ar",
     period: "/ mois",
     description: "Pour les équipes qui pilotent leur croissance.",
     features: ["Produits illimités", "Entrepôts illimités", "Alertes & tableaux de bord", "Rôles et permissions", "Support prioritaire"],
@@ -122,6 +122,40 @@ const socials = [
   { icon: Globe, label: "LinkedIn", href: "#" },
 ]
 
+function SectionHeading({
+  eyebrow,
+  title,
+  description,
+  align = "center",
+}: {
+  eyebrow?: string
+  title: string
+  description?: string
+  align?: "center" | "left"
+}) {
+  return (
+    <div
+      className={
+        "max-w-2xl " + (align === "center" ? "mx-auto text-center" : "text-left")
+      }
+    >
+      {eyebrow ? <Badge variant="secondary">{eyebrow}</Badge> : null}
+      <h2
+        className={
+          "mt-4 text-3xl font-bold tracking-tight sm:text-4xl " +
+          (align === "center" ? "mx-auto" : "")
+        }
+      >
+        {title}
+      </h2>
+      {description ? (
+        <p className="mt-3 text-muted-foreground">{description}</p>
+      ) : null}
+    </div>
+  )
+}
+
+
 export function LandingPage() {
   return (
     <div className="flex min-h-svh flex-col">
@@ -129,28 +163,47 @@ export function LandingPage() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="mx-auto max-w-6xl px-4 py-20 text-center sm:py-28">
-          <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border bg-muted/50 px-3 py-1 text-sm text-muted-foreground">
-            <PackageCheck className="size-4" />
-            La gestion de stock, simplifiée
+        <section className="relative overflow-hidden">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,color-mix(in_oklch,var(--primary)_12%,transparent),transparent)]"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-24 left-1/2 -z-10 -translate-x-1/2 blur-3xl"
+          >
+            <div className="flex gap-24">
+              <span className="size-56 rounded-full bg-primary/30" />
+              <span className="size-56 rounded-full bg-success/30" />
+              <span className="size-56 rounded-full bg-warning/30" />
+              <span className="size-56 rounded-full bg-destructive/30" />
+            </div>
           </div>
-          <h1 className="mx-auto max-w-3xl text-4xl font-bold tracking-tight sm:text-6xl">
-            Pilotez votre inventaire avec{" "}
-            <span className="text-primary">StockFlow</span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            StockFlow centralise votre gestion des stocks, de la réception à
-            l'expédition. Gagnez du temps, évitez les ruptures et prenez les
-            meilleures décisions, en toute simplicité.
-          </p>
-          <div className="mt-8 flex justify-center gap-3">
-            <Button size="lg" render={<Link to="/dashboard" />}>
-              Accéder au backoffice
-              <ArrowRight className="size-4" />
-            </Button>
-            <Button size="lg" variant="outline" render={<a href="#fonctionnalites" />}>
-              Découvrir
-            </Button>
+          <div className="mx-auto max-w-6xl px-4 py-24 text-center sm:py-32">
+            <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border bg-background/60 px-3 py-1 text-sm text-muted-foreground shadow-sm backdrop-blur">
+              <PackageCheck className="size-4 text-success" />
+              La gestion de stock, simplifiée
+            </div>
+            <h1 className="mx-auto max-w-3xl text-balance text-4xl font-bold tracking-tight sm:text-6xl">
+              Pilotez votre inventaire avec{" "}
+              <span className="bg-gradient-to-r from-primary via-primary to-success bg-clip-text text-transparent">
+                StockFlow
+              </span>
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-balance text-muted-foreground">
+              StockFlow centralise votre gestion des stocks, de la réception à
+              l'expédition. Gagnez du temps, évitez les ruptures et prenez les
+              meilleures décisions, en toute simplicité.
+            </p>
+            <div className="mt-9 flex flex-wrap justify-center gap-3">
+              <Button size="lg" render={<Link to="/dashboard" />}>
+                Accéder au backoffice
+                <ArrowRight className="size-4" />
+              </Button>
+              <Button size="lg" variant="outline" render={<a href="#fonctionnalites" />}>
+                Découvrir
+              </Button>
+            </div>
           </div>
         </section>
 
@@ -170,16 +223,12 @@ export function LandingPage() {
         <section id="a-propos" className="mx-auto max-w-6xl px-4 py-20">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
-              <Badge variant="secondary">À propos</Badge>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight">
-                Une solution née des besoins réels des entrepôts
-              </h2>
-              <p className="mt-4 text-muted-foreground">
-                StockFlow est né d'un constat simple : la gestion de stock reste
-                trop souvent manuelle, fragmentée et source d'erreurs coûteuses.
-                Nous avons conçu un outil clair, rapide et fiable pour aider les
-                équipes à reprendre le contrôle de leur inventaire.
-              </p>
+              <SectionHeading
+                align="left"
+                eyebrow="À propos"
+                title="Une solution née des besoins réels des entrepôts"
+                description="StockFlow est né d'un constat simple : la gestion de stock reste trop souvent manuelle, fragmentée et source d'erreurs coûteuses. Nous avons conçu un outil clair, rapide et fiable pour aider les équipes à reprendre le contrôle de leur inventaire."
+              />
               <ul className="mt-6 space-y-3">
                 {[
                   "Conçu pour les PME et les équipes logistiques",
@@ -194,26 +243,21 @@ export function LandingPage() {
               </ul>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-xl border bg-card p-6">
-                <Boxes className="size-6 text-primary" />
-                <p className="mt-3 text-2xl font-bold">+2 000</p>
-                <p className="text-sm text-muted-foreground">entrepôts suivis</p>
-              </div>
-              <div className="rounded-xl border bg-card p-6">
-                <PackageCheck className="size-6 text-success" />
-                <p className="mt-3 text-2xl font-bold">5 M+</p>
-                <p className="text-sm text-muted-foreground">mouvements / an</p>
-              </div>
-              <div className="rounded-xl border bg-card p-6">
-                <ShieldCheck className="size-6 text-warning" />
-                <p className="mt-3 text-2xl font-bold">RGPD</p>
-                <p className="text-sm text-muted-foreground">conforme</p>
-              </div>
-              <div className="rounded-xl border bg-card p-6">
-                <MapPin className="size-6 text-destructive" />
-                <p className="mt-3 text-2xl font-bold">12</p>
-                <p className="text-sm text-muted-foreground">pays desservis</p>
-              </div>
+              {[
+                { icon: Boxes, color: "text-primary", value: "+2 000", label: "entrepôts suivis" },
+                { icon: PackageCheck, color: "text-success", value: "5 M+", label: "mouvements / an" },
+                { icon: ShieldCheck, color: "text-warning", value: "RGPD", label: "conforme" },
+                { icon: MapPin, color: "text-destructive", value: "12", label: "pays desservis" },
+              ].map((stat) => (
+                <div
+                  key={stat.label}
+                  className="rounded-xl border bg-card p-6 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+                >
+                  <stat.icon className={"size-6 " + stat.color} />
+                  <p className="mt-3 text-2xl font-bold">{stat.value}</p>
+                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -221,23 +265,18 @@ export function LandingPage() {
         {/* Fonctionnalités */}
         <section id="fonctionnalites" className="border-t bg-muted/30 py-20">
           <div className="mx-auto max-w-6xl px-4">
-            <div className="mx-auto max-w-2xl text-center">
-              <Badge variant="secondary">Fonctionnalités</Badge>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight">
-                Tout ce qu'il vous faut
-              </h2>
-              <p className="mt-3 text-muted-foreground">
-                Une suite complète pour gérer votre stock, pensée pour les équipes
-                opérationnelles.
-              </p>
-            </div>
+            <SectionHeading
+              eyebrow="Fonctionnalités"
+              title="Tout ce qu'il vous faut"
+              description="Une suite complète pour gérer votre stock, pensée pour les équipes opérationnelles."
+            />
             <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {features.map((feature) => (
                 <div
                   key={feature.title}
-                  className="rounded-xl border bg-card p-6 transition-shadow hover:shadow-sm"
+                  className="group rounded-xl border bg-card p-6 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
                 >
-                  <div className="mb-4 flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <div className="mb-4 flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                     <feature.icon className="size-5" />
                   </div>
                   <h3 className="font-semibold">{feature.title}</h3>
@@ -252,23 +291,19 @@ export function LandingPage() {
 
         {/* Tarifs */}
         <section id="tarifs" className="mx-auto max-w-6xl px-4 py-20">
-          <div className="mx-auto max-w-2xl text-center">
-            <Badge variant="secondary">Tarifs</Badge>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight">
-              Un tarif adapté à votre taille
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              Sans engagement, passez d'un plan à l'autre à tout moment.
-            </p>
-          </div>
+          <SectionHeading
+            eyebrow="Tarifs"
+            title="Un tarif adapté à votre taille"
+            description="Sans engagement, passez d'un plan à l'autre à tout moment."
+          />
           <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
             {pricingPlans.map((plan) => (
               <div
                 key={plan.name}
                 className={
-                  "flex flex-col rounded-2xl border bg-card p-6 " +
+                  "flex flex-col rounded-2xl border bg-card p-6 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-lg " +
                   (plan.highlighted
-                    ? "border-primary ring-1 ring-primary"
+                    ? "relative border-primary ring-1 ring-primary lg:-mt-4 lg:mb-4"
                     : "")
                 }
               >
@@ -308,24 +343,19 @@ export function LandingPage() {
         {/* Documentation */}
         <section id="documentation" className="border-t bg-muted/30 py-20">
           <div className="mx-auto max-w-6xl px-4">
-            <div className="mx-auto max-w-2xl text-center">
-              <Badge variant="secondary">Documentation</Badge>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight">
-                Apprenez à maîtriser StockFlow
-              </h2>
-              <p className="mt-3 text-muted-foreground">
-                Guides, références et bonnes pratiques pour tirer le meilleur
-                parti de la plateforme.
-              </p>
-            </div>
+            <SectionHeading
+              eyebrow="Documentation"
+              title="Apprenez à maîtriser StockFlow"
+              description="Guides, références et bonnes pratiques pour tirer le meilleur parti de la plateforme."
+            />
             <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
               {docs.map((doc) => (
                 <a
                   key={doc.title}
                   href="#"
-                  className="group rounded-xl border bg-card p-6 transition-shadow hover:shadow-sm"
+                  className="group rounded-xl border bg-card p-6 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
                 >
-                  <div className="mb-4 flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <div className="mb-4 flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                     <doc.icon className="size-5" />
                   </div>
                   <h3 className="font-semibold group-hover:text-primary">
@@ -344,13 +374,12 @@ export function LandingPage() {
         <section id="contact" className="mx-auto max-w-6xl px-4 py-20">
           <div className="grid gap-12 lg:grid-cols-2">
             <div>
-              <Badge variant="secondary">Contact</Badge>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight">
-                Une question ? Écrivez-nous
-              </h2>
-              <p className="mt-3 text-muted-foreground">
-                Notre équipe répond sous 24 h ouvre en jours ouvrés.
-              </p>
+              <SectionHeading
+                align="left"
+                eyebrow="Contact"
+                title="Une question ? Écrivez-nous"
+                description="Notre équipe répond sous 24 h ouvre en jours ouvrés."
+              />
               <ul className="mt-6 space-y-4">
                 <li className="flex items-center gap-3">
                   <Mail className="size-5 text-primary" />
@@ -412,14 +441,22 @@ export function LandingPage() {
 
         {/* CTA */}
         <section className="mx-auto max-w-6xl px-4 pb-24">
-          <div className="rounded-2xl border bg-primary px-8 py-14 text-center text-primary-foreground">
-            <h2 className="text-3xl font-bold tracking-tight">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-success px-8 py-16 text-center text-primary-foreground">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-white/10 blur-2xl"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -bottom-20 -left-10 size-64 rounded-full bg-black/10 blur-2xl"
+            />
+            <h2 className="relative text-3xl font-bold tracking-tight sm:text-4xl">
               Prêt à organiser votre stock ?
             </h2>
-            <p className="mx-auto mt-3 max-w-xl text-primary-foreground/80">
+            <p className="relative mx-auto mt-3 max-w-xl text-primary-foreground/80">
               Rejoignez les équipes qui pilotent leur inventaire avec StockFlow.
             </p>
-            <div className="mt-8 flex justify-center">
+            <div className="relative mt-8 flex justify-center">
               <Button
                 size="lg"
                 variant="secondary"
