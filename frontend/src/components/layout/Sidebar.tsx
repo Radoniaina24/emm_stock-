@@ -299,6 +299,13 @@ function SidebarGroupLabel({ label, collapsed }: { label: string; collapsed: boo
   )
 }
 
+function slugify(label: string) {
+  return label
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+}
+
 function MenuSection({
   label,
   icon: Icon,
@@ -319,7 +326,7 @@ function MenuSection({
   if (collapsed) {
     return (
       <NavItem
-        to={`/dashboard/${label.toLowerCase()}`}
+        to={`/dashboard/${slugify(label)}`}
         icon={Icon}
         label={label}
         collapsed={collapsed}

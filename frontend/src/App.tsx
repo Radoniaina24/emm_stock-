@@ -56,11 +56,13 @@ function App() {
             <Route path="entrepots/emplacements" element={<div className="text-muted-foreground">Emplacements</div>} />
             <Route path="entrepots/transferts" element={<div className="text-muted-foreground">Transferts entre entrepôts</div>} />
             <Route path="entrepots/capacite" element={<div className="text-muted-foreground">Capacité de stockage</div>} />
+            <Route path="entrees" element={<div className="text-muted-foreground">Liste des réceptions</div>} />
             <Route path="entrees/nouvelle" element={<div className="text-muted-foreground">Nouvelle réception</div>} />
             <Route path="entrees/bons" element={<div className="text-muted-foreground">Bons de réception</div>} />
             <Route path="entrees/receptions-fournisseurs" element={<div className="text-muted-foreground">Réceptions fournisseurs</div>} />
             <Route path="entrees/historique" element={<div className="text-muted-foreground">Historique des entrées</div>} />
             <Route path="entrees/controle-qualite" element={<div className="text-muted-foreground">Contrôle qualité</div>} />
+            <Route path="sorties" element={<div className="text-muted-foreground">Liste des sorties</div>} />
             <Route path="sorties/nouvelle" element={<div className="text-muted-foreground">Nouvelle sortie</div>} />
             <Route path="sorties/bons" element={<div className="text-muted-foreground">Bons de sortie</div>} />
             <Route path="sorties/ventes" element={<div className="text-muted-foreground">Ventes</div>} />
@@ -73,11 +75,13 @@ function App() {
             <Route path="mouvements/transferts" element={<div className="text-muted-foreground">Transferts</div>} />
             <Route path="mouvements/ajustements" element={<div className="text-muted-foreground">Ajustements</div>} />
             <Route path="mouvements/historique" element={<div className="text-muted-foreground">Historique complet</div>} />
+            <Route path="inventaire" element={<div className="text-muted-foreground">Vue d'ensemble inventaire</div>} />
             <Route path="inventaire/nouveau" element={<div className="text-muted-foreground">Nouvel inventaire</div>} />
             <Route path="inventaire/en-cours" element={<div className="text-muted-foreground">Inventaires en cours</div>} />
             <Route path="inventaire/termines" element={<div className="text-muted-foreground">Inventaires terminés</div>} />
             <Route path="inventaire/ecarts" element={<div className="text-muted-foreground">Écarts d'inventaire</div>} />
             <Route path="inventaire/historique" element={<div className="text-muted-foreground">Historique</div>} />
+            <Route path="achats" element={<div className="text-muted-foreground">Vue d'ensemble achats</div>} />
             <Route path="achats/commandes-fournisseurs" element={<div className="text-muted-foreground">Commandes fournisseurs</div>} />
             <Route path="achats/demandes-achat" element={<div className="text-muted-foreground">Demandes d'achat</div>} />
             <Route path="achats/bons-commande" element={<div className="text-muted-foreground">Bons de commande</div>} />
@@ -93,11 +97,13 @@ function App() {
             <Route path="clients/historique-achats" element={<div className="text-muted-foreground">Historique achats</div>} />
             <Route path="clients/retours" element={<div className="text-muted-foreground">Retours clients</div>} />
             <Route path="clients/factures" element={<div className="text-muted-foreground">Factures clients</div>} />
+            <Route path="ventes" element={<div className="text-muted-foreground">Vue d'ensemble ventes</div>} />
             <Route path="ventes/commandes-clients" element={<div className="text-muted-foreground">Commandes clients</div>} />
             <Route path="ventes/bons-livraison" element={<div className="text-muted-foreground">Bons de livraison</div>} />
             <Route path="ventes/factures" element={<div className="text-muted-foreground">Factures</div>} />
             <Route path="ventes/retours" element={<div className="text-muted-foreground">Retours clients</div>} />
             <Route path="ventes/historique" element={<div className="text-muted-foreground">Historique ventes</div>} />
+            <Route path="rapports" element={<div className="text-muted-foreground">Vue d'ensemble rapports</div>} />
             <Route path="rapports/stock" element={<div className="text-muted-foreground">Rapport stock</div>} />
             <Route path="rapports/mouvements" element={<div className="text-muted-foreground">Rapport mouvements</div>} />
             <Route path="rapports/ventes" element={<div className="text-muted-foreground">Rapport ventes</div>} />
@@ -106,12 +112,14 @@ function App() {
             <Route path="rapports/rotation-stocks" element={<div className="text-muted-foreground">Rotation des stocks</div>} />
             <Route path="rapports/marge" element={<div className="text-muted-foreground">Marge</div>} />
             <Route path="rapports/export" element={<div className="text-muted-foreground">Export Excel/PDF</div>} />
+            <Route path="administration" element={<div className="text-muted-foreground">Administration</div>} />
             <Route path="administration/utilisateurs" element={<div className="text-muted-foreground">Utilisateurs</div>} />
             <Route path="administration/roles" element={<div className="text-muted-foreground">Rôles</div>} />
             <Route path="administration/permissions" element={<div className="text-muted-foreground">Permissions</div>} />
             <Route path="administration/journal" element={<div className="text-muted-foreground">Journal d'activité</div>} />
             <Route path="administration/securite" element={<div className="text-muted-foreground">Paramètres sécurité</div>} />
             <Route path="administration/connexions" element={<div className="text-muted-foreground">Connexions</div>} />
+            <Route path="parametres" element={<div className="text-muted-foreground">Paramètres</div>} />
             <Route path="parametres/infos-entreprise" element={<div className="text-muted-foreground">Informations entreprise</div>} />
             <Route path="parametres/devise" element={<div className="text-muted-foreground">Devise</div>} />
             <Route path="parametres/taxes" element={<div className="text-muted-foreground">Taxes</div>} />
