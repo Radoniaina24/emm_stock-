@@ -17,6 +17,7 @@ import {
   ClipboardList,
   Clock,
   Coins,
+  Component,
   Download,
   Factory,
   File,
@@ -195,6 +196,15 @@ const parametresSubNav = [
   { label: "Notifications", icon: Bell, to: "/dashboard/parametres/notifications" },
   { label: "Sauvegarde", icon: HardDrive, to: "/dashboard/parametres/sauvegarde" },
   { label: "Configuration générale", icon: Settings, to: "/dashboard/parametres/configuration" },
+]
+
+const composantsSubNav = [
+  { label: "Boutons", icon: Component, to: "/dashboard/composants/boutons" },
+  { label: "Formulaires", icon: FileText, to: "/dashboard/composants/formulaires" },
+  { label: "Badges", icon: Tag, to: "/dashboard/composants/badges" },
+  { label: "Cartes", icon: LayoutDashboard, to: "/dashboard/composants/cartes" },
+  { label: "Tableaux", icon: List, to: "/dashboard/composants/tableaux" },
+  { label: "Icônes", icon: Star, to: "/dashboard/composants/icones" },
 ]
 
 const secondaryNav = [
@@ -396,6 +406,9 @@ export function Sidebar() {
   const [parametresOpen, setParametresOpen] = useState(
     location.pathname.startsWith("/dashboard/parametres")
   )
+  const [composantsOpen, setComposantsOpen] = useState(
+    location.pathname.startsWith("/dashboard/composants")
+  )
 
   const isProduitsActive =
     location.pathname === "/dashboard/produits" ||
@@ -439,6 +452,9 @@ export function Sidebar() {
   const isParametresActive =
     location.pathname === "/dashboard/parametres" ||
     location.pathname.startsWith("/dashboard/parametres/")
+  const isComposantsActive =
+    location.pathname === "/dashboard/composants" ||
+    location.pathname.startsWith("/dashboard/composants/")
 
   return (
     <aside
@@ -728,6 +744,24 @@ export function Sidebar() {
           collapsed={collapsed}
         >
           {parametresSubNav.map((item) => (
+            <SubNavItem
+              key={item.to}
+              to={item.to}
+              icon={item.icon}
+              label={item.label}
+            />
+          ))}
+        </MenuSection>
+
+        <MenuSection
+          label="Composants"
+          icon={Component}
+          open={composantsOpen}
+          onToggle={() => setComposantsOpen(!composantsOpen)}
+          isActive={isComposantsActive}
+          collapsed={collapsed}
+        >
+          {composantsSubNav.map((item) => (
             <SubNavItem
               key={item.to}
               to={item.to}

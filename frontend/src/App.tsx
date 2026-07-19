@@ -3,6 +3,13 @@ import { BrowserRouter, Route, Routes } from "react-router-dom"
 import { AuthProvider } from "@/lib/auth"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
+import { BadgesPage } from "@/pages/composants/BadgesPage"
+import { BoutonsPage } from "@/pages/composants/BoutonsPage"
+import { CartesPage } from "@/pages/composants/CartesPage"
+import { ComponentShowcase } from "@/pages/ComponentShowcase"
+import { FormulairesPage } from "@/pages/composants/FormulairesPage"
+import { IconesPage } from "@/pages/composants/IconesPage"
+import { TableauxPage } from "@/pages/composants/TableauxPage"
 import { HomePage } from "@/pages/HomePage"
 import { LandingPage } from "@/pages/LandingPage"
 import { LoginPage } from "@/pages/LoginPage"
@@ -110,6 +117,13 @@ function App() {
             <Route path="parametres/notifications" element={<div className="text-muted-foreground">Notifications</div>} />
             <Route path="parametres/sauvegarde" element={<div className="text-muted-foreground">Sauvegarde</div>} />
             <Route path="parametres/configuration" element={<div className="text-muted-foreground">Configuration générale</div>} />
+            <Route path="composants" element={<ComponentShowcase />} />
+            <Route path="composants/boutons" element={<BoutonsPage />} />
+            <Route path="composants/formulaires" element={<FormulairesPage />} />
+            <Route path="composants/badges" element={<BadgesPage />} />
+            <Route path="composants/cartes" element={<CartesPage />} />
+            <Route path="composants/tableaux" element={<TableauxPage />} />
+            <Route path="composants/icones" element={<IconesPage />} />
             <Route
               path="aide"
               element={<div className="text-muted-foreground">Aide — à venir</div>}
