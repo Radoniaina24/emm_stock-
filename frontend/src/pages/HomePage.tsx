@@ -13,7 +13,7 @@ import type { StockItem } from "@/components/dashboard/StockTable"
 
 const stats = [
   { label: "Produits totals", value: "1 248", hint: "+12 ce mois", icon: Boxes, trend: "up" as const },
-  { label: "Valeur du stock", value: "84 320 €", hint: "+4,2 %", icon: TrendingUp, trend: "up" as const },
+  { label: "Valeur du stock", value: "84 320 Ar", hint: "+4,2 %", icon: TrendingUp, trend: "up" as const },
   { label: "En rupture", value: "7", hint: "-3 cette semaine", icon: PackageX, trend: "down" as const },
   { label: "Réceptionnés", value: "312", hint: "+8 %", icon: PackageCheck, trend: "up" as const },
 ]

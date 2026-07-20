@@ -11,9 +11,53 @@ const STORAGE_KEY = "stockflow_token"
 const ADMIN_EMAIL = "admin@stockflow.app"
 const ADMIN_PASSWORD = "admin123"
 
+export type User = {
+  id: string
+  name: string
+  email: string
+  role: string
+  avatar: string
+  phone: string
+  department: string
+  joinedAt: string
+  stats: {
+    productsManaged: number
+    stockValue: string
+    monthlyOrders: number
+    suppliers: number
+  }
+  permissions: string[]
+}
+
+const MOCK_USER: User = {
+  id: "usr_001",
+  name: "Thomas Martin",
+  email: "admin@stockflow.app",
+  role: "Administrateur",
+  avatar: "TM",
+  phone: "+33 6 12 34 56 78",
+  department: "Direction des opérations",
+  joinedAt: "2023-09-01",
+  stats: {
+    productsManaged: 1248,
+    stockValue: "2 847 500 Ar",
+    monthlyOrders: 342,
+    suppliers: 58,
+  },
+  permissions: [
+    "Gestion des produits",
+    "Gestion des stocks",
+    "Gestion des utilisateurs",
+    "Gestion des fournisseurs",
+    "Rapports et analyses",
+    "Paramètres système",
+  ],
+}
+
 type AuthContextValue = {
   isAuthenticated: boolean
   token: string | null
+  user: User | null
   login: (email: string, password: string) => Promise<void>
   logout: () => void
 }
@@ -35,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return {
       isAuthenticated: token !== null,
       token,
+      user: token !== null ? MOCK_USER : null,
       login: async (email: string, password: string) => {
         if (!email || !password) {
           throw new Error("Veuillez remplir tous les champs.")

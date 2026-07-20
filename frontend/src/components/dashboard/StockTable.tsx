@@ -36,8 +36,10 @@ const statusConfig: Record<
 function formatPrice(value: number) {
   return new Intl.NumberFormat("fr-FR", {
     style: "currency",
-    currency: "EUR",
-  }).format(value)
+    currency: "MGA",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value).replace("MGA", "Ar")
 }
 
 function initials(name: string) {

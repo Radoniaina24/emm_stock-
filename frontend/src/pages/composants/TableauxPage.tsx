@@ -153,7 +153,7 @@ const columns: ColumnDef<Product>[] = [
     header: "Prix vente",
     cell: ({ row }) => {
       const v = row.getValue<number>("price")
-      return <span className="tabular-nums">{v.toFixed(2).replace(".", ",")} €</span>
+      return <span className="tabular-nums">{v.toFixed(2).replace(".", ",")} Ar</span>
     },
   },
   {
@@ -161,7 +161,7 @@ const columns: ColumnDef<Product>[] = [
     header: "Prix achat",
     cell: ({ row }) => {
       const v = row.getValue<number>("costPrice")
-      return <span className="tabular-nums text-muted-foreground">{v.toFixed(2).replace(".", ",")} €</span>
+      return <span className="tabular-nums text-muted-foreground">{v.toFixed(2).replace(".", ",")} Ar</span>
     },
   },
   {

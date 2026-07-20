@@ -18,6 +18,7 @@ import { SpinnerPage } from "@/pages/composants/SpinnerPage"
 import { TableauxPage } from "@/pages/composants/TableauxPage"
 import { HomePage } from "@/pages/HomePage"
 import { LandingPage } from "@/pages/LandingPage"
+import { ProfilePage } from "@/pages/ProfilePage"
 import { LoginPage } from "@/pages/LoginPage"
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
             }
           >
             <Route index element={<HomePage />} />
+            <Route path="profil" element={<ProfilePage />} />
             <Route path="produits" element={<div className="text-muted-foreground">Liste des produits</div>} />
             <Route path="produits/ajouter" element={<div className="text-muted-foreground">Ajouter un produit</div>} />
             <Route path="produits/categories" element={<div className="text-muted-foreground">Catégories</div>} />

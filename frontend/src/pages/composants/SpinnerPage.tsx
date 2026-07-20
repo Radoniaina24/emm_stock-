@@ -40,7 +40,7 @@ function OverlayDemo() {
         </div>
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: "CA du jour", value: "12 450 €" },
+            { label: "CA du jour", value: "12 450 Ar" },
             { label: "Commandes", value: "48" },
             { label: "Taux de conversion", value: "12,5 %" },
           ].map((stat) => (

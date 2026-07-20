@@ -64,7 +64,7 @@ function InfoModalExample() {
         <ModalContent>
           <div className="grid grid-cols-2 gap-4 rounded-xl bg-muted/50 p-4">
             {[
-              { label: "Prix unitaire", value: "2 499,00 €" },
+              { label: "Prix unitaire", value: "2 499,00 Ar" },
               { label: "Catégorie", value: "Informatique" },
               { label: "Marque", value: "Apple" },
               { label: "Seuil d'alerte", value: "5 unités" },
@@ -118,7 +118,7 @@ function ConfirmDeleteModalExample() {
               <div>
                 <p className="text-sm font-medium text-destructive">Facture #INV-2024-0891</p>
                 <p className="mt-0.5 text-xs text-destructive/70">
-                  Client : SARL Dupont • Montant : 12 450,00 € • Date : 15/03/2024
+                  Client : SARL Dupont • Montant : 12 450,00 Ar • Date : 15/03/2024
                 </p>
               </div>
             </div>

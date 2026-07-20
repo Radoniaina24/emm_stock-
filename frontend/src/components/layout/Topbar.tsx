@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { ChevronRight, LogOut, Moon, PanelLeftClose, PanelLeftOpen, Search, Sun, User } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -10,6 +10,7 @@ export function Topbar({ title }: { title: string }) {
   const { logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const { collapsed, toggle: toggleSidebar } = useSidebar()
+  const navigate = useNavigate()
 
   return (
     <header className="sticky top-0 z-40 flex h-16 min-h-16 shrink-0 items-center gap-4 border-b border-border/50 bg-background/80 px-4 shadow-sm backdrop-blur-xl lg:px-6">
@@ -59,6 +60,7 @@ export function Topbar({ title }: { title: string }) {
         <Button
           variant="ghost"
           size="icon"
+          onClick={() => navigate("/dashboard/profil")}
           className="size-8 rounded-full text-muted-foreground/60 hover:text-foreground"
         >
           <User className="size-4" />
