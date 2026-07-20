@@ -12,6 +12,7 @@ import { DatePage } from "@/pages/composants/DatePage"
 import { ToastPage } from "@/pages/composants/ToastPage"
 import { FormulairesPage } from "@/pages/composants/FormulairesPage"
 import { IconesPage } from "@/pages/composants/IconesPage"
+import { ModalPage } from "@/pages/composants/ModalPage"
 import { TableauxPage } from "@/pages/composants/TableauxPage"
 import { HomePage } from "@/pages/HomePage"
 import { LandingPage } from "@/pages/LandingPage"
@@ -136,6 +137,7 @@ function App() {
             <Route path="composants/tableaux" element={<TableauxPage />} />
             <Route path="composants/icones" element={<IconesPage />} />
             <Route path="composants/date" element={<DatePage />} />
+            <Route path="composants/modal" element={<ModalPage />} />
             <Route path="composants/toast" element={<ToastPage />} />
             <Route
               path="aide"
