@@ -207,6 +207,8 @@ const composantsSubNav = [
   { label: "Tableaux", icon: List, to: "/dashboard/composants/tableaux" },
   { label: "Dates", icon: Calendar, to: "/dashboard/composants/date" },
   { label: "Modal", icon: LayoutDashboard, to: "/dashboard/composants/modal" },
+  { label: "Skeleton", icon: LayoutDashboard, to: "/dashboard/composants/skeleton" },
+  { label: "Spinner", icon: LayoutDashboard, to: "/dashboard/composants/spinner" },
   { label: "Toasts", icon: Bell, to: "/dashboard/composants/toast" },
   { label: "Icônes", icon: Star, to: "/dashboard/composants/icones" },
 ]

@@ -24,6 +24,8 @@ Il est interdit de créer des éléments HTML bruts ( `<div>`, `<button>`, `<inp
 | Toast / notification | `toast()` + `<Toaster>` | `@/components/ui` |
 | Tableau de données | `<DataTable>` | `@/components/ui` |
 | Calendrier | `<Calendar>` | `@/components/ui` |
+| Skeleton (loading) | `<Skeleton>` | `@/components/ui` |
+| Spinner (loading) | `<Spinner>`, `<SpinnerWithLabel>`, `<OverlaySpinner>`, `<FullPageSpinner>` | `@/components/ui` |
 
 ## Import simplifié
 
