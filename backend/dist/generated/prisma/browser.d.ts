@@ -3,6 +3,7 @@ export { Prisma };
 export * as $Enums from './enums';
 export * from './enums';
 export type User = Prisma.UserModel;
+export type UserProfile = Prisma.UserProfileModel;
 export type Category = Prisma.CategoryModel;
 export type Brand = Prisma.BrandModel;
 export type Unit = Prisma.UnitModel;

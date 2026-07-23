@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InventoryLineOrderByRelevanceFieldEnum = exports.InventoryOrderByRelevanceFieldEnum = exports.MovementOrderByRelevanceFieldEnum = exports.ExitLineOrderByRelevanceFieldEnum = exports.ExitOrderByRelevanceFieldEnum = exports.EntryLineOrderByRelevanceFieldEnum = exports.EntryOrderByRelevanceFieldEnum = exports.SupplierOrderByRelevanceFieldEnum = exports.StockOrderByRelevanceFieldEnum = exports.ZoneOrderByRelevanceFieldEnum = exports.WarehouseOrderByRelevanceFieldEnum = exports.ProductOrderByRelevanceFieldEnum = exports.UnitOrderByRelevanceFieldEnum = exports.BrandOrderByRelevanceFieldEnum = exports.CategoryOrderByRelevanceFieldEnum = exports.UserOrderByRelevanceFieldEnum = exports.NullsOrder = exports.SortOrder = exports.InventoryLineScalarFieldEnum = exports.InventoryScalarFieldEnum = exports.MovementScalarFieldEnum = exports.ExitLineScalarFieldEnum = exports.ExitScalarFieldEnum = exports.EntryLineScalarFieldEnum = exports.EntryScalarFieldEnum = exports.SupplierScalarFieldEnum = exports.StockScalarFieldEnum = exports.ZoneScalarFieldEnum = exports.WarehouseScalarFieldEnum = exports.ProductScalarFieldEnum = exports.UnitScalarFieldEnum = exports.BrandScalarFieldEnum = exports.CategoryScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
+exports.InventoryLineOrderByRelevanceFieldEnum = exports.InventoryOrderByRelevanceFieldEnum = exports.MovementOrderByRelevanceFieldEnum = exports.ExitLineOrderByRelevanceFieldEnum = exports.ExitOrderByRelevanceFieldEnum = exports.EntryLineOrderByRelevanceFieldEnum = exports.EntryOrderByRelevanceFieldEnum = exports.SupplierOrderByRelevanceFieldEnum = exports.StockOrderByRelevanceFieldEnum = exports.ZoneOrderByRelevanceFieldEnum = exports.WarehouseOrderByRelevanceFieldEnum = exports.ProductOrderByRelevanceFieldEnum = exports.UnitOrderByRelevanceFieldEnum = exports.BrandOrderByRelevanceFieldEnum = exports.CategoryOrderByRelevanceFieldEnum = exports.UserProfileOrderByRelevanceFieldEnum = exports.NullsOrder = exports.UserOrderByRelevanceFieldEnum = exports.SortOrder = exports.InventoryLineScalarFieldEnum = exports.InventoryScalarFieldEnum = exports.MovementScalarFieldEnum = exports.ExitLineScalarFieldEnum = exports.ExitScalarFieldEnum = exports.EntryLineScalarFieldEnum = exports.EntryScalarFieldEnum = exports.SupplierScalarFieldEnum = exports.StockScalarFieldEnum = exports.ZoneScalarFieldEnum = exports.WarehouseScalarFieldEnum = exports.ProductScalarFieldEnum = exports.UnitScalarFieldEnum = exports.BrandScalarFieldEnum = exports.CategoryScalarFieldEnum = exports.UserProfileScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/index-browser"));
 exports.Decimal = runtime.Decimal;
 exports.NullTypes = {
@@ -46,6 +46,7 @@ exports.JsonNull = runtime.JsonNull;
 exports.AnyNull = runtime.AnyNull;
 exports.ModelName = {
     User: 'User',
+    UserProfile: 'UserProfile',
     Category: 'Category',
     Brand: 'Brand',
     Unit: 'Unit',
@@ -70,14 +71,32 @@ exports.TransactionIsolationLevel = runtime.makeStrictEnum({
 });
 exports.UserScalarFieldEnum = {
     id: 'id',
-    name: 'name',
     email: 'email',
     password: 'password',
     role: 'role',
-    phone: 'phone',
-    avatar: 'avatar',
-    department: 'department',
     isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+exports.UserProfileScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    firstName: 'firstName',
+    lastName: 'lastName',
+    displayName: 'displayName',
+    profilePhoto: 'profilePhoto',
+    phone: 'phone',
+    secondaryPhone: 'secondaryPhone',
+    birthDate: 'birthDate',
+    gender: 'gender',
+    address: 'address',
+    city: 'city',
+    region: 'region',
+    country: 'country',
+    postalCode: 'postalCode',
+    jobTitle: 'jobTitle',
+    department: 'department',
+    signature: 'signature',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
@@ -225,19 +244,34 @@ exports.SortOrder = {
     asc: 'asc',
     desc: 'desc'
 };
+exports.UserOrderByRelevanceFieldEnum = {
+    id: 'id',
+    email: 'email',
+    password: 'password',
+    role: 'role'
+};
 exports.NullsOrder = {
     first: 'first',
     last: 'last'
 };
-exports.UserOrderByRelevanceFieldEnum = {
+exports.UserProfileOrderByRelevanceFieldEnum = {
     id: 'id',
-    name: 'name',
-    email: 'email',
-    password: 'password',
-    role: 'role',
+    userId: 'userId',
+    firstName: 'firstName',
+    lastName: 'lastName',
+    displayName: 'displayName',
+    profilePhoto: 'profilePhoto',
     phone: 'phone',
-    avatar: 'avatar',
-    department: 'department'
+    secondaryPhone: 'secondaryPhone',
+    gender: 'gender',
+    address: 'address',
+    city: 'city',
+    region: 'region',
+    country: 'country',
+    postalCode: 'postalCode',
+    jobTitle: 'jobTitle',
+    department: 'department',
+    signature: 'signature'
 };
 exports.CategoryOrderByRelevanceFieldEnum = {
     id: 'id',

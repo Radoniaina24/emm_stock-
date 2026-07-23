@@ -11,22 +11,46 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid()) @db.VarChar(30)
-  name      String   @db.VarChar(100)
   email     String   @unique @db.VarChar(100)
   password  String   @db.VarChar(255)
   role      String   @default("Gestionnaire") @db.VarChar(50)
-  phone     String?  @db.VarChar(30)
-  avatar    String?  @db.VarChar(255)
-  department String? @db.VarChar(100)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  entries    Entry[]
-  exits      Exit[]
+  profile     UserProfile?
+  entries     Entry[]
+  exits       Exit[]
   inventories Inventory[]
 
   @@map("users")
+}
+
+model UserProfile {
+  id             String    @id @default(cuid()) @db.VarChar(30)
+  userId         String    @unique @map("user_id") @db.VarChar(30)
+  firstName      String    @map("first_name") @db.VarChar(100)
+  lastName       String    @map("last_name") @db.VarChar(100)
+  displayName    String    @map("display_name") @db.VarChar(150)
+  profilePhoto   String?   @map("profile_photo") @db.VarChar(255)
+  phone          String?   @db.VarChar(30)
+  secondaryPhone String?   @map("secondary_phone") @db.VarChar(30)
+  birthDate      DateTime? @map("birth_date") @db.Date
+  gender         String?   @db.VarChar(20)
+  address        String?   @db.VarChar(255)
+  city           String?   @db.VarChar(100)
+  region         String?   @db.VarChar(100)
+  country        String?   @db.VarChar(100)
+  postalCode     String?   @map("postal_code") @db.VarChar(20)
+  jobTitle       String?   @map("job_title") @db.VarChar(100)
+  department     String?   @db.VarChar(100)
+  signature      String?   @db.Text
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
 }
 
 model Category {

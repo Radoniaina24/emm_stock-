@@ -11,11 +11,11 @@ export declare class JwtStrategy extends JwtStrategy_base {
     private readonly prisma;
     constructor(prisma: PrismaService);
     validate(payload: JwtPayload): Promise<{
-        name: string;
-        email: string;
         id: string;
+        email: string;
         role: string;
-        isActive: boolean;
+        isActive: true;
+        name: string;
     }>;
 }
 export {};

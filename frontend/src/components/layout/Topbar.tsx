@@ -1,13 +1,14 @@
 import { Link, useNavigate } from "react-router-dom"
-import { ChevronRight, LogOut, Moon, PanelLeftClose, PanelLeftOpen, Search, Sun, User } from "lucide-react"
+import { ChevronRight, LogOut, Moon, PanelLeftClose, PanelLeftOpen, Search, Sun } from "lucide-react"
 
+import { UserAvatar } from "@/components/avatar/UserAvatar"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/use-auth"
 import { useTheme } from "@/lib/theme"
 import { useSidebar } from "@/lib/sidebar"
 
 export function Topbar({ title }: { title: string }) {
-  const { logout, isLoggingOut } = useAuth()
+  const { logout, isLoggingOut, user } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const { collapsed, toggle: toggleSidebar } = useSidebar()
   const navigate = useNavigate()
@@ -57,14 +58,14 @@ export function Topbar({ title }: { title: string }) {
 
         <div className="mx-1.5 h-5 w-px bg-border/50" />
 
-        <Button
-          variant="ghost"
-          size="icon"
+        <button
+          type="button"
           onClick={() => navigate("/dashboard/profil")}
-          className="size-8 rounded-full text-muted-foreground/60 hover:text-foreground"
+          aria-label="Mon profil"
+          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-[10px] font-semibold text-white ring-1 ring-border/60 transition-opacity hover:opacity-90"
         >
-          <User className="size-4" />
-        </Button>
+          {user ? <UserAvatar user={user} /> : null}
+        </button>
 
         <Button
           variant="outline"

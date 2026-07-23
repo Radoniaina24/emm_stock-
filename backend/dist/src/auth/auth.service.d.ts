@@ -7,32 +7,13 @@ export declare class AuthService {
     private readonly jwt;
     constructor(prisma: PrismaService, jwt: JwtService);
     register(dto: RegisterDto): Promise<{
-        user: {
-            email: string;
-            id: string;
-            name: string;
-            role: string;
-        };
+        user: import("../users/user.mapper.js").AuthUserDto;
         token: string;
     }>;
     login(dto: LoginDto): Promise<{
-        user: {
-            id: string;
-            name: string;
-            email: string;
-            role: string;
-        };
+        user: import("../users/user.mapper.js").AuthUserDto;
         token: string;
     }>;
-    me(userId: string): Promise<{
-        email: string;
-        id: string;
-        name: string;
-        role: string;
-        phone: string | null;
-        avatar: string | null;
-        department: string | null;
-        createdAt: Date;
-    } | null>;
+    me(userId: string): Promise<import("../users/user.mapper.js").AuthUserDto>;
     private signToken;
 }

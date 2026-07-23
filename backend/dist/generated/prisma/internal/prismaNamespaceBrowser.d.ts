@@ -12,6 +12,7 @@ export declare const JsonNull: import("@prisma/client-runtime-utils").JsonNullCl
 export declare const AnyNull: import("@prisma/client-runtime-utils").AnyNullClass;
 export declare const ModelName: {
     readonly User: "User";
+    readonly UserProfile: "UserProfile";
     readonly Category: "Category";
     readonly Brand: "Brand";
     readonly Unit: "Unit";
@@ -38,18 +39,37 @@ export declare const TransactionIsolationLevel: {
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel];
 export declare const UserScalarFieldEnum: {
     readonly id: "id";
-    readonly name: "name";
     readonly email: "email";
     readonly password: "password";
     readonly role: "role";
-    readonly phone: "phone";
-    readonly avatar: "avatar";
-    readonly department: "department";
     readonly isActive: "isActive";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum];
+export declare const UserProfileScalarFieldEnum: {
+    readonly id: "id";
+    readonly userId: "userId";
+    readonly firstName: "firstName";
+    readonly lastName: "lastName";
+    readonly displayName: "displayName";
+    readonly profilePhoto: "profilePhoto";
+    readonly phone: "phone";
+    readonly secondaryPhone: "secondaryPhone";
+    readonly birthDate: "birthDate";
+    readonly gender: "gender";
+    readonly address: "address";
+    readonly city: "city";
+    readonly region: "region";
+    readonly country: "country";
+    readonly postalCode: "postalCode";
+    readonly jobTitle: "jobTitle";
+    readonly department: "department";
+    readonly signature: "signature";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type UserProfileScalarFieldEnum = (typeof UserProfileScalarFieldEnum)[keyof typeof UserProfileScalarFieldEnum];
 export declare const CategoryScalarFieldEnum: {
     readonly id: "id";
     readonly name: "name";
@@ -210,22 +230,38 @@ export declare const SortOrder: {
     readonly desc: "desc";
 };
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder];
+export declare const UserOrderByRelevanceFieldEnum: {
+    readonly id: "id";
+    readonly email: "email";
+    readonly password: "password";
+    readonly role: "role";
+};
+export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum];
 export declare const NullsOrder: {
     readonly first: "first";
     readonly last: "last";
 };
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder];
-export declare const UserOrderByRelevanceFieldEnum: {
+export declare const UserProfileOrderByRelevanceFieldEnum: {
     readonly id: "id";
-    readonly name: "name";
-    readonly email: "email";
-    readonly password: "password";
-    readonly role: "role";
+    readonly userId: "userId";
+    readonly firstName: "firstName";
+    readonly lastName: "lastName";
+    readonly displayName: "displayName";
+    readonly profilePhoto: "profilePhoto";
     readonly phone: "phone";
-    readonly avatar: "avatar";
+    readonly secondaryPhone: "secondaryPhone";
+    readonly gender: "gender";
+    readonly address: "address";
+    readonly city: "city";
+    readonly region: "region";
+    readonly country: "country";
+    readonly postalCode: "postalCode";
+    readonly jobTitle: "jobTitle";
     readonly department: "department";
+    readonly signature: "signature";
 };
-export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum];
+export type UserProfileOrderByRelevanceFieldEnum = (typeof UserProfileOrderByRelevanceFieldEnum)[keyof typeof UserProfileOrderByRelevanceFieldEnum];
 export declare const CategoryOrderByRelevanceFieldEnum: {
     readonly id: "id";
     readonly name: "name";

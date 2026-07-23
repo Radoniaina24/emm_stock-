@@ -5,29 +5,10 @@ import { LoginDto } from "./dto/login.dto.js";
 export declare class AuthController {
     private readonly auth;
     constructor(auth: AuthService);
-    register(dto: RegisterDto, res: Response): Promise<{
-        email: string;
-        id: string;
-        name: string;
-        role: string;
-    }>;
-    login(dto: LoginDto, res: Response): Promise<{
-        id: string;
-        name: string;
-        email: string;
-        role: string;
-    }>;
+    register(dto: RegisterDto, res: Response): Promise<import("../users/user.mapper.js").AuthUserDto>;
+    login(dto: LoginDto, res: Response): Promise<import("../users/user.mapper.js").AuthUserDto>;
     logout(res: Response): {
         message: string;
     };
-    me(userId: string): Promise<{
-        email: string;
-        id: string;
-        name: string;
-        role: string;
-        phone: string | null;
-        avatar: string | null;
-        department: string | null;
-        createdAt: Date;
-    } | null>;
+    me(userId: string): Promise<import("../users/user.mapper.js").AuthUserDto>;
 }

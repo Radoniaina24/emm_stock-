@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
+const path_1 = require("path");
 const core_1 = require("@nestjs/core");
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
@@ -12,6 +13,7 @@ const app_module_js_1 = require("./app.module.js");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_js_1.AppModule);
     app.setGlobalPrefix("api");
+    app.useStaticAssets((0, path_1.join)(process.cwd(), "uploads"), { prefix: "/uploads" });
     app.use((0, cookie_parser_1.default)());
     app.enableCors({ origin: "http://localhost:5173", credentials: true });
     app.useGlobalPipes(new common_1.ValidationPipe({ whitelist: true, transform: true }));
@@ -26,6 +28,7 @@ async function bootstrap() {
         description: "JWT httpOnly défini par /auth/login ou /auth/register",
     })
         .addTag("auth", "Authentification (cookie JWT)")
+        .addTag("users", "Profil utilisateur et avatar")
         .addTag("app", "Endpoints généraux")
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, swaggerConfig);

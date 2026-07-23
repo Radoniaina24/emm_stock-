@@ -2,3 +2,8 @@ identifiants.txt
 backend/.env
 frontend/.env
 backend/node_modules
+backend/uploads/avatars/*
+!backend/uploads/avatars/.gitkeep
+backend/uploads/*
+!backend/uploads/.gitkeep
+!backend/uploads/avatars/

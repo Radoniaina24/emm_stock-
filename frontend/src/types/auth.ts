@@ -1,12 +1,34 @@
+export type UserProfile = {
+  firstName: string
+  lastName: string
+  displayName: string
+  profilePhoto?: string | null
+  phone?: string | null
+  secondaryPhone?: string | null
+  birthDate?: string | null
+  gender?: string | null
+  address?: string | null
+  city?: string | null
+  region?: string | null
+  country?: string | null
+  postalCode?: string | null
+  jobTitle?: string | null
+  department?: string | null
+  signature?: string | null
+}
+
 export type User = {
   id: string
-  name: string
   email: string
   role: string
+  /** Raccourci = profile.displayName */
+  name: string
+  /** Raccourci = profile.profilePhoto */
+  avatar?: string | null
   phone?: string | null
   department?: string | null
-  avatar?: string | null
   createdAt?: string
+  profile?: UserProfile | null
 }
 
 export type LoginPayload = {
@@ -22,8 +44,13 @@ export type RegisterPayload = {
   department?: string
 }
 
-export function getUserInitials(user: Pick<User, "name">): string {
-  return user.name
+export type UpdateProfilePayload = Partial<
+  Omit<UserProfile, "profilePhoto">
+>
+
+export function getUserInitials(user: Pick<User, "name"> & { profile?: UserProfile | null }): string {
+  const label = user.profile?.displayName || user.name
+  return label
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
