@@ -1,5 +1,5 @@
 import type * as runtime from "@prisma/client/runtime/client";
-import type * as Prisma from "../internal/prismaNamespace.js";
+import type * as Prisma from "../internal/prismaNamespace";
 export type MovementModel = runtime.Types.Result.DefaultSelection<Prisma.$MovementPayload>;
 export type AggregateMovement = {
     _count: MovementCountAggregateOutputType | null;

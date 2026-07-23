@@ -1,5 +1,5 @@
 import type * as runtime from "@prisma/client/runtime/client";
-import type * as Prisma from "../internal/prismaNamespace.js";
+import type * as Prisma from "../internal/prismaNamespace";
 export type ZoneModel = runtime.Types.Result.DefaultSelection<Prisma.$ZonePayload>;
 export type AggregateZone = {
     _count: ZoneCountAggregateOutputType | null;

@@ -1,4 +1,4 @@
-import type * as Prisma from "./internal/prismaNamespace.js";
+import type * as Prisma from "./internal/prismaNamespace";
 export type StringFilter<$PrismaModel = never> = {
     equals?: string | Prisma.StringFieldRefInput<$PrismaModel>;
     in?: string[];

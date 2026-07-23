@@ -1,5 +1,5 @@
 import type * as runtime from "@prisma/client/runtime/client";
-import type * as Prisma from "../internal/prismaNamespace.js";
+import type * as Prisma from "../internal/prismaNamespace";
 export type UnitModel = runtime.Types.Result.DefaultSelection<Prisma.$UnitPayload>;
 export type AggregateUnit = {
     _count: UnitCountAggregateOutputType | null;

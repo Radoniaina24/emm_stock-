@@ -1,5 +1,5 @@
 import type * as runtime from "@prisma/client/runtime/client";
-import type * as Prisma from "../internal/prismaNamespace.js";
+import type * as Prisma from "../internal/prismaNamespace";
 export type WarehouseModel = runtime.Types.Result.DefaultSelection<Prisma.$WarehousePayload>;
 export type AggregateWarehouse = {
     _count: WarehouseCountAggregateOutputType | null;

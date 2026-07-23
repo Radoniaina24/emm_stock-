@@ -1,5 +1,5 @@
 import type * as runtime from "@prisma/client/runtime/client";
-import type * as Prisma from "../internal/prismaNamespace.js";
+import type * as Prisma from "../internal/prismaNamespace";
 export type ExitLineModel = runtime.Types.Result.DefaultSelection<Prisma.$ExitLinePayload>;
 export type AggregateExitLine = {
     _count: ExitLineCountAggregateOutputType | null;

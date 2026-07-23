@@ -1,5 +1,5 @@
 import type * as runtime from "@prisma/client/runtime/client";
-import type * as Prisma from "../internal/prismaNamespace.js";
+import type * as Prisma from "../internal/prismaNamespace";
 export type StockModel = runtime.Types.Result.DefaultSelection<Prisma.$StockPayload>;
 export type AggregateStock = {
     _count: StockCountAggregateOutputType | null;
