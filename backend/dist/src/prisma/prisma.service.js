@@ -14,11 +14,23 @@ exports.PrismaService = void 0;
 const common_1 = require("@nestjs/common");
 const client_js_1 = require("../../generated/prisma/client.js");
 const adapter_mariadb_1 = require("@prisma/adapter-mariadb");
+function parseDatabaseUrl(url) {
+    const parsed = new URL(url);
+    return {
+        host: parsed.hostname,
+        port: parsed.port ? Number(parsed.port) : 3306,
+        user: decodeURIComponent(parsed.username),
+        password: decodeURIComponent(parsed.password),
+        database: parsed.pathname.replace(/^\//, "") || "gestion_stock",
+    };
+}
 let PrismaService = PrismaService_1 = class PrismaService extends client_js_1.PrismaClient {
     logger = new common_1.Logger(PrismaService_1.name);
     constructor() {
-        const adapter = new adapter_mariadb_1.PrismaMariaDb(process.env.DATABASE_URL ?? "mysql://root:root@localhost:3306/gestion_stock", {
-            database: "gestion_stock",
+        const connection = parseDatabaseUrl(process.env.DATABASE_URL ?? "mysql://root@localhost:3306/gestion_stock");
+        const adapter = new adapter_mariadb_1.PrismaMariaDb({
+            ...connection,
+            allowPublicKeyRetrieval: true,
         });
         super({ adapter });
     }

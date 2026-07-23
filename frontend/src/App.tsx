@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 
-import { AuthProvider } from "@/lib/auth"
+import { AuthBootstrap } from "@/components/AuthBootstrap"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { Toaster } from "@/components/ui/toast"
@@ -24,7 +24,7 @@ import { LoginPage } from "@/pages/LoginPage"
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
+      <AuthBootstrap>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -152,7 +152,7 @@ function App() {
           </Route>
         </Routes>
         <Toaster richColors closeButton />
-      </AuthProvider>
+      </AuthBootstrap>
     </BrowserRouter>
   )
 }

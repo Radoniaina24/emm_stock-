@@ -2,12 +2,12 @@ import { Link, useNavigate } from "react-router-dom"
 import { ChevronRight, LogOut, Moon, PanelLeftClose, PanelLeftOpen, Search, Sun, User } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { useAuth } from "@/lib/auth"
+import { useAuth } from "@/hooks/use-auth"
 import { useTheme } from "@/lib/theme"
 import { useSidebar } from "@/lib/sidebar"
 
 export function Topbar({ title }: { title: string }) {
-  const { logout } = useAuth()
+  const { logout, isLoggingOut } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const { collapsed, toggle: toggleSidebar } = useSidebar()
   const navigate = useNavigate()
@@ -69,12 +69,15 @@ export function Topbar({ title }: { title: string }) {
         <Button
           variant="outline"
           size="sm"
-          onClick={logout}
+          onClick={() => logout()}
+          disabled={isLoggingOut}
           aria-label="Se déconnecter"
           className="h-8 gap-1.5 border-border/60 px-2.5 text-xs font-medium text-muted-foreground/70 hover:text-destructive"
         >
           <LogOut className="size-3.5" />
-          <span className="hidden sm:inline">Déconnexion</span>
+          <span className="hidden sm:inline">
+            {isLoggingOut ? "…" : "Déconnexion"}
+          </span>
         </Button>
       </div>
     </header>

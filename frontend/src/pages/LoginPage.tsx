@@ -1,14 +1,15 @@
 import { useState, type FormEvent } from "react"
-import { Link, useLocation, useNavigate } from "react-router-dom"
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom"
 import { Boxes, Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { useAuth } from "@/lib/auth"
+import { useAuth } from "@/hooks/use-auth"
+import { ApiError } from "@/lib/api"
 
 type LocationState = { from?: { pathname: string } }
 
 export function LoginPage() {
-  const { login } = useAuth()
+  const { login, isAuthenticated, isLoggingIn } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -16,22 +17,30 @@ export function LoginPage() {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
 
   const from = (location.state as LocationState | null)?.from?.pathname ?? "/dashboard"
+
+  if (isAuthenticated) {
+    return <Navigate to={from} replace />
+  }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     setError(null)
-    setLoading(true)
 
     try {
       await login(email, password)
       navigate(from, { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue.")
-    } finally {
-      setLoading(false)
+      if (err instanceof ApiError) {
+        setError(
+          err.status === 401
+            ? "Identifiants incorrects."
+            : err.message,
+        )
+      } else {
+        setError(err instanceof Error ? err.message : "Une erreur est survenue.")
+      }
     }
   }
 
@@ -149,8 +158,8 @@ export function LoginPage() {
                 </p>
               ) : null}
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Connexion…" : "Se connecter"}
+              <Button type="submit" className="w-full" disabled={isLoggingIn}>
+                {isLoggingIn ? "Connexion…" : "Se connecter"}
               </Button>
             </div>
           </form>
