@@ -7,7 +7,7 @@ import {
   ChevronRight,
   Mail,
   MapPin,
-  Pencil,
+  PenLine,
   Phone,
   Shield,
   ShoppingCart,
@@ -19,6 +19,7 @@ import {
 
 import { AvatarEditorDialog } from "@/components/avatar/AvatarEditorDialog"
 import { UserAvatar } from "@/components/avatar/UserAvatar"
+import { EditableInfoRow } from "@/components/profile/EditableInfoRow"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -29,8 +30,9 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useAuth } from "@/hooks/use-auth"
+import { useUpdateProfileMutation } from "@/hooks/use-avatar"
 import { resolveUploadUrl } from "@/lib/api"
-import { getUserInitials } from "@/types/auth"
+import { getUserInitials, type UpdateProfilePayload } from "@/types/auth"
 
 function StatCard({
   icon: Icon,
@@ -67,28 +69,6 @@ function StatCard({
   )
 }
 
-function InfoRow({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof Mail
-  label: string
-  value: string
-}) {
-  return (
-    <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-muted/50">
-      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-        <Icon className="size-4" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-sm font-medium truncate">{value}</p>
-      </div>
-    </div>
-  )
-}
-
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("fr-FR", {
     year: "numeric",
@@ -97,9 +77,18 @@ function formatDate(dateStr: string) {
   })
 }
 
+const GENDER_OPTIONS = [
+  { value: "Homme", label: "Homme" },
+  { value: "Femme", label: "Femme" },
+  { value: "Autre", label: "Autre" },
+  { value: "Non précisé", label: "Non précisé" },
+]
+
 export function ProfilePage() {
   const { user } = useAuth()
   const [avatarOpen, setAvatarOpen] = useState(false)
+  const [activeField, setActiveField] = useState<string | null>(null)
+  const updateProfile = useUpdateProfileMutation()
 
   if (!user) return null
 
@@ -108,7 +97,20 @@ export function ProfilePage() {
   const profile = user.profile
   const joinedAt = user.createdAt ?? new Date().toISOString()
   const displayName = profile?.displayName || user.name
-  const orDash = (value?: string | null) => value?.trim() || "Non renseigné"
+
+  async function saveField(fieldKey: string, value: string) {
+    const payload = { [fieldKey]: value } as UpdateProfilePayload
+    await updateProfile.mutateAsync(payload)
+    setActiveField(null)
+  }
+
+  const fieldProps = {
+    activeField,
+    onStartEdit: setActiveField,
+    onCancel: () => setActiveField(null),
+    onSave: saveField,
+    isSaving: updateProfile.isPending,
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-8 pb-16">
@@ -123,25 +125,19 @@ export function ProfilePage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(139,92,246,0.2),transparent_50%)]" />
         <div className="relative px-6 pt-12 pb-24 sm:px-8 sm:pt-16 sm:pb-28">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-2 text-sm font-medium text-violet-200/80">
-                <Building2 className="size-4" />
-                <span>StockFlow</span>
-                <ChevronRight className="size-3" />
-                <span>Profil</span>
-              </div>
-              <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                Mon profil
-              </h1>
-              <p className="mt-1 text-sm text-violet-200/70">
-                Gérez vos informations personnelles et paramètres du compte.
-              </p>
+          <div>
+            <div className="flex items-center gap-2 text-sm font-medium text-violet-200/80">
+              <Building2 className="size-4" />
+              <span>StockFlow</span>
+              <ChevronRight className="size-3" />
+              <span>Profil</span>
             </div>
-            <Button className="hidden gap-2 bg-white/15 text-white backdrop-blur-sm hover:bg-white/25 sm:inline-flex">
-              <Pencil className="size-4" />
-              Modifier le profil
-            </Button>
+            <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+              Mon profil
+            </h1>
+            <p className="mt-1 text-sm text-violet-200/70">
+              Cliquez sur le crayon à côté d’un champ pour le modifier individuellement.
+            </p>
           </div>
         </div>
       </div>
@@ -162,7 +158,7 @@ export function ProfilePage() {
               <Camera className="size-3.5" />
             </Button>
           </div>
-          <div className="flex flex-1 flex-col items-center gap-3 text-center sm:flex-row sm:items-end sm:justify-between sm:pb-2 sm:text-left">
+          <div className="flex flex-1 flex-col items-center gap-3 text-center sm:items-start sm:pb-2 sm:text-left">
             <div>
               <h2 className="text-xl font-bold tracking-tight">{displayName}</h2>
               <div className="mt-1 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
@@ -186,10 +182,6 @@ export function ProfilePage() {
                 Changer la photo
               </Button>
             </div>
-            <Button className="gap-2 sm:hidden">
-              <Pencil className="size-4" />
-              Modifier le profil
-            </Button>
           </div>
         </div>
       </div>
@@ -206,30 +198,103 @@ export function ProfilePage() {
           <CardHeader>
             <CardTitle>Informations personnelles</CardTitle>
             <CardDescription>
-              Données issues de la table <code className="text-xs">user_profiles</code> (relation 1–1 avec{" "}
-              <code className="text-xs">users</code>).
+              Modifiez chaque champ via le crayon — enregistrement immédiat.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-1 sm:grid-cols-2">
-            <InfoRow icon={UserRound} label="Prénom" value={orDash(profile?.firstName)} />
-            <InfoRow icon={UserRound} label="Nom" value={orDash(profile?.lastName)} />
-            <InfoRow icon={UserRound} label="Nom d'affichage" value={orDash(profile?.displayName)} />
-            <InfoRow icon={Mail} label="Adresse e-mail" value={user.email} />
-            <InfoRow icon={Phone} label="Téléphone" value={orDash(profile?.phone ?? user.phone)} />
-            <InfoRow icon={Phone} label="Téléphone secondaire" value={orDash(profile?.secondaryPhone)} />
-            <InfoRow
+            <EditableInfoRow
+              icon={UserRound}
+              label="Prénom"
+              fieldKey="firstName"
+              value={profile?.firstName}
+              {...fieldProps}
+            />
+            <EditableInfoRow
+              icon={UserRound}
+              label="Nom"
+              fieldKey="lastName"
+              value={profile?.lastName}
+              {...fieldProps}
+            />
+            <EditableInfoRow
+              icon={UserRound}
+              label="Nom d'affichage"
+              fieldKey="displayName"
+              value={profile?.displayName}
+              {...fieldProps}
+            />
+            <EditableInfoRow
+              icon={Mail}
+              label="Adresse e-mail"
+              fieldKey="email"
+              value={user.email}
+              editable={false}
+              disabledReason="L'e-mail du compte n'est pas modifiable ici"
+              {...fieldProps}
+            />
+            <EditableInfoRow
+              icon={Phone}
+              label="Téléphone"
+              fieldKey="phone"
+              value={profile?.phone ?? user.phone}
+              type="tel"
+              placeholder="+261 …"
+              {...fieldProps}
+            />
+            <EditableInfoRow
+              icon={Phone}
+              label="Téléphone secondaire"
+              fieldKey="secondaryPhone"
+              value={profile?.secondaryPhone}
+              type="tel"
+              {...fieldProps}
+            />
+            <EditableInfoRow
               icon={Calendar}
               label="Date de naissance"
-              value={profile?.birthDate ? formatDate(profile.birthDate) : "Non renseigné"}
+              fieldKey="birthDate"
+              value={profile?.birthDate ?? ""}
+              displayValue={
+                profile?.birthDate ? formatDate(profile.birthDate) : "Non renseigné"
+              }
+              type="date"
+              placeholder="Choisir une date"
+              {...fieldProps}
             />
-            <InfoRow icon={UserRound} label="Sexe" value={orDash(profile?.gender)} />
-            <InfoRow icon={Briefcase} label="Poste / Fonction" value={orDash(profile?.jobTitle)} />
-            <InfoRow
+            <EditableInfoRow
+              icon={UserRound}
+              label="Sexe"
+              fieldKey="gender"
+              value={profile?.gender}
+              type="select"
+              options={GENDER_OPTIONS}
+              placeholder="Sélectionner le sexe"
+              {...fieldProps}
+            />
+            <EditableInfoRow
+              icon={Briefcase}
+              label="Poste / Fonction"
+              fieldKey="jobTitle"
+              value={profile?.jobTitle}
+              {...fieldProps}
+            />
+            <EditableInfoRow
               icon={Building2}
               label="Département"
-              value={orDash(profile?.department ?? user.department)}
+              fieldKey="department"
+              value={profile?.department ?? user.department}
+              {...fieldProps}
             />
-            <InfoRow icon={Calendar} label="Membre depuis" value={formatDate(joinedAt)} />
+            <EditableInfoRow
+              icon={Calendar}
+              label="Membre depuis"
+              fieldKey="createdAt"
+              value={joinedAt}
+              displayValue={formatDate(joinedAt)}
+              editable={false}
+              disabledReason="Date système non modifiable"
+              {...fieldProps}
+            />
           </CardContent>
         </Card>
 
@@ -240,11 +305,41 @@ export function ProfilePage() {
               <CardDescription>Localisation professionnelle / personnelle.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-1">
-              <InfoRow icon={MapPin} label="Adresse" value={orDash(profile?.address)} />
-              <InfoRow icon={MapPin} label="Ville" value={orDash(profile?.city)} />
-              <InfoRow icon={MapPin} label="Région" value={orDash(profile?.region)} />
-              <InfoRow icon={MapPin} label="Pays" value={orDash(profile?.country)} />
-              <InfoRow icon={MapPin} label="Code postal" value={orDash(profile?.postalCode)} />
+              <EditableInfoRow
+                icon={MapPin}
+                label="Adresse"
+                fieldKey="address"
+                value={profile?.address}
+                {...fieldProps}
+              />
+              <EditableInfoRow
+                icon={MapPin}
+                label="Ville"
+                fieldKey="city"
+                value={profile?.city}
+                {...fieldProps}
+              />
+              <EditableInfoRow
+                icon={MapPin}
+                label="Région"
+                fieldKey="region"
+                value={profile?.region}
+                {...fieldProps}
+              />
+              <EditableInfoRow
+                icon={MapPin}
+                label="Pays"
+                fieldKey="country"
+                value={profile?.country}
+                {...fieldProps}
+              />
+              <EditableInfoRow
+                icon={MapPin}
+                label="Code postal"
+                fieldKey="postalCode"
+                value={profile?.postalCode}
+                {...fieldProps}
+              />
             </CardContent>
           </Card>
 
@@ -253,23 +348,25 @@ export function ProfilePage() {
               <CardTitle>Rôle & signature</CardTitle>
               <CardDescription>Accès compte et signature électronique.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-2.5 rounded-lg bg-muted/50 px-3 py-2">
-                <div className="flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
-                  <Shield className="size-3" />
-                </div>
-                <span className="text-sm">{user.role}</span>
-              </div>
-              <div className="rounded-lg border border-dashed bg-muted/30 px-3 py-3">
-                <p className="text-xs text-muted-foreground">Signature électronique</p>
-                <p className="mt-1 text-sm font-medium">
-                  {profile?.signature?.trim()
-                    ? profile.signature.length > 80
-                      ? `${profile.signature.slice(0, 80)}…`
-                      : profile.signature
-                    : "Non renseignée"}
-                </p>
-              </div>
+            <CardContent className="space-y-1">
+              <EditableInfoRow
+                icon={Shield}
+                label="Rôle"
+                fieldKey="role"
+                value={user.role}
+                editable={false}
+                disabledReason="Le rôle est géré par l'administration"
+                {...fieldProps}
+              />
+              <EditableInfoRow
+                icon={PenLine}
+                label="Signature électronique"
+                fieldKey="signature"
+                value={profile?.signature}
+                type="textarea"
+                placeholder="Texte ou mention de signature…"
+                {...fieldProps}
+              />
             </CardContent>
           </Card>
         </div>

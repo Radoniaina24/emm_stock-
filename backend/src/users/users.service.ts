@@ -32,24 +32,41 @@ export class UsersService {
     })
     if (!existing) throw new NotFoundException("Profil introuvable")
 
+    const emptyToNull = (value: string | undefined) => {
+      if (value === undefined) return undefined
+      const trimmed = value.trim()
+      return trimmed.length ? trimmed : null
+    }
+
+    const required = (value: string | undefined, fallback: string) => {
+      if (value === undefined) return undefined
+      const trimmed = value.trim()
+      return trimmed.length ? trimmed : fallback
+    }
+
     await this.prisma.userProfile.update({
       where: { userId },
       data: {
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        displayName: dto.displayName,
-        phone: dto.phone,
-        secondaryPhone: dto.secondaryPhone,
-        birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
-        gender: dto.gender,
-        address: dto.address,
-        city: dto.city,
-        region: dto.region,
-        country: dto.country,
-        postalCode: dto.postalCode,
-        jobTitle: dto.jobTitle,
-        department: dto.department,
-        signature: dto.signature,
+        firstName: required(dto.firstName, existing.firstName),
+        lastName: required(dto.lastName, existing.lastName),
+        displayName: required(dto.displayName, existing.displayName),
+        phone: emptyToNull(dto.phone),
+        secondaryPhone: emptyToNull(dto.secondaryPhone),
+        birthDate:
+          dto.birthDate === undefined
+            ? undefined
+            : dto.birthDate.trim()
+              ? new Date(dto.birthDate)
+              : null,
+        gender: emptyToNull(dto.gender),
+        address: emptyToNull(dto.address),
+        city: emptyToNull(dto.city),
+        region: emptyToNull(dto.region),
+        country: emptyToNull(dto.country),
+        postalCode: emptyToNull(dto.postalCode),
+        jobTitle: emptyToNull(dto.jobTitle),
+        department: emptyToNull(dto.department),
+        signature: emptyToNull(dto.signature),
       },
     })
 

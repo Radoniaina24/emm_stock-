@@ -18,7 +18,7 @@ export function useUpdateProfileMutation() {
     onSuccess: (user) => {
       syncUser(user)
       queryClient.setQueryData(authKeys.me, user)
-      toast.success("Profil mis à jour")
+      toast.success("Champ enregistré")
     },
     onError: (error: Error) => {
       toast.error(error.message || "Échec de la mise à jour du profil")
