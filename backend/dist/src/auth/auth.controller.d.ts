@@ -6,9 +6,9 @@ export declare class AuthController {
     private readonly auth;
     constructor(auth: AuthService);
     register(dto: RegisterDto, res: Response): Promise<{
-        name: string;
         email: string;
         id: string;
+        name: string;
         role: string;
     }>;
     login(dto: LoginDto, res: Response): Promise<{
@@ -21,13 +21,13 @@ export declare class AuthController {
         message: string;
     };
     me(userId: string): Promise<{
-        name: string;
         email: string;
-        phone: string | null;
-        department: string | null;
         id: string;
+        name: string;
         role: string;
+        phone: string | null;
         avatar: string | null;
+        department: string | null;
         createdAt: Date;
     } | null>;
 }

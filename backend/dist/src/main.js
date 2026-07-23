@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const core_1 = require("@nestjs/core");
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const app_module_js_1 = require("./app.module.js");
 async function bootstrap() {
@@ -14,7 +15,30 @@ async function bootstrap() {
     app.use((0, cookie_parser_1.default)());
     app.enableCors({ origin: "http://localhost:5173", credentials: true });
     app.useGlobalPipes(new common_1.ValidationPipe({ whitelist: true, transform: true }));
-    await app.listen(process.env.PORT ?? 3000);
+    const swaggerConfig = new swagger_1.DocumentBuilder()
+        .setTitle("StockFlow API")
+        .setDescription("API de gestion de stock — documentation interactive")
+        .setVersion("1.0")
+        .addCookieAuth("token", {
+        type: "apiKey",
+        in: "cookie",
+        name: "token",
+        description: "JWT httpOnly défini par /auth/login ou /auth/register",
+    })
+        .addTag("auth", "Authentification (cookie JWT)")
+        .addTag("app", "Endpoints généraux")
+        .build();
+    const document = swagger_1.SwaggerModule.createDocument(app, swaggerConfig);
+    swagger_1.SwaggerModule.setup("api/docs", app, document, {
+        swaggerOptions: {
+            persistAuthorization: true,
+            withCredentials: true,
+        },
+        customSiteTitle: "StockFlow API Docs",
+    });
+    const port = process.env.PORT ?? 3000;
+    await app.listen(port);
+    console.log(`Swagger: http://localhost:${port}/api/docs`);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

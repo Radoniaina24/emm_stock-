@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const auth_service_js_1 = require("./auth.service.js");
 const register_dto_js_1 = require("./dto/register.dto.js");
 const login_dto_js_1 = require("./dto/login.dto.js");
@@ -45,6 +46,9 @@ let AuthController = class AuthController {
 exports.AuthController = AuthController;
 __decorate([
     (0, common_1.Post)("register"),
+    (0, swagger_1.ApiOperation)({ summary: "Créer un compte et définir le cookie JWT" }),
+    (0, swagger_1.ApiBody)({ type: register_dto_js_1.RegisterDto }),
+    (0, swagger_1.ApiOkResponse)({ description: "Utilisateur créé (cookie `token` défini)" }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
@@ -54,6 +58,10 @@ __decorate([
 __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, common_1.Post)("login"),
+    (0, swagger_1.ApiOperation)({ summary: "Connexion et définition du cookie JWT" }),
+    (0, swagger_1.ApiBody)({ type: login_dto_js_1.LoginDto }),
+    (0, swagger_1.ApiOkResponse)({ description: "Utilisateur connecté (cookie `token` défini)" }),
+    (0, swagger_1.ApiUnauthorizedResponse)({ description: "Identifiants invalides" }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
@@ -63,6 +71,8 @@ __decorate([
 __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, common_1.Post)("logout"),
+    (0, swagger_1.ApiOperation)({ summary: "Déconnexion — suppression du cookie JWT" }),
+    (0, swagger_1.ApiOkResponse)({ description: "Cookie `token` effacé" }),
     __param(0, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -71,12 +81,17 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_js_1.JwtAuthGuard),
     (0, common_1.Get)("me"),
+    (0, swagger_1.ApiCookieAuth)("token"),
+    (0, swagger_1.ApiOperation)({ summary: "Profil de l'utilisateur connecté" }),
+    (0, swagger_1.ApiOkResponse)({ description: "Profil utilisateur" }),
+    (0, swagger_1.ApiUnauthorizedResponse)({ description: "Cookie JWT manquant ou invalide" }),
     __param(0, (0, current_user_decorator_js_1.CurrentUser)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "me", null);
 exports.AuthController = AuthController = __decorate([
+    (0, swagger_1.ApiTags)("auth"),
     (0, common_1.Controller)("auth"),
     __metadata("design:paramtypes", [auth_service_js_1.AuthService])
 ], AuthController);
