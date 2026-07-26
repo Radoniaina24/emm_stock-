@@ -93,7 +93,6 @@ const tabs: Tab[] = [
   { id: "emails", label: "E-mails", icon: Mail },
   { id: "apps", label: "Applications connectées", icon: Link },
   { id: "assistance", label: "Assistance", icon: LifeBuoy },
-  { id: "deconnexion", label: "Déconnexion", icon: LogOut },
 ]
 
 function InfoRow({ label, value }: { label: string; value: string }) {
@@ -183,23 +182,23 @@ function CollapsibleSection({
   children: React.ReactNode
   divider?: boolean
 }) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   return (
     <div className={cn(divider && "border-t border-border/40")}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-muted/20"
+        className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/20"
       >
-        <div className="flex size-8 items-center justify-center rounded-lg bg-muted text-muted-foreground/60">
-          <Icon className="size-4" />
+        <div className="flex size-7 items-center justify-center rounded-lg bg-muted text-muted-foreground/60">
+          <Icon className="size-3.5" />
         </div>
         <span className="flex-1 text-sm font-medium text-foreground">{title}</span>
         <div className={cn(
-          "flex size-6 items-center justify-center rounded-md text-muted-foreground/30 transition-all duration-200",
+          "flex size-5 items-center justify-center rounded-md text-muted-foreground/30 transition-all duration-200",
           open && "text-muted-foreground/60"
         )}>
-          <ChevronRight className={cn("size-4 transition-transform duration-200", open && "rotate-90")} />
+          <ChevronRight className={cn("size-3.5 transition-transform duration-200", open && "rotate-90")} />
         </div>
       </button>
       <div
@@ -208,7 +207,7 @@ function CollapsibleSection({
           open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
         )}
       >
-        <div className="px-5 pb-5">
+        <div className="px-4 pb-4">
           {children}
         </div>
       </div>
@@ -255,7 +254,7 @@ export function ConfigurationPage() {
     switch (activeTab) {
       case "profil":
         return (
-          <div className="space-y-8">
+          <div className="space-y-5">
             <AvatarEditorDialog
               open={avatarOpen}
               onOpenChange={setAvatarOpen}
@@ -762,53 +761,40 @@ export function ConfigurationPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl pb-16">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">Paramètres du compte</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+    <div className="w-full px-2 pb-4">
+      <div className="mb-4">
+        <h1 className="text-xl font-bold tracking-tight text-foreground">Paramètres du compte</h1>
+        <p className="mt-0.5 text-sm text-muted-foreground">
           Gérez vos informations personnelles, votre mot de passe et vos préférences.
         </p>
       </div>
 
-      <div className="flex flex-col gap-8 lg:flex-row">
-        <nav className="shrink-0 lg:w-56">
-          <div className="-mx-3 flex flex-1 flex-col gap-0.5 lg:sticky lg:top-24">
-            {tabs.map((tab) => {
-              const isActive = activeTab === tab.id
-              const isDanger = tab.id === "deconnexion"
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => {
-                    if (tab.id === "deconnexion") {
-                      setActiveTab("deconnexion")
-                    } else {
-                      setActiveTab(tab.id)
-                    }
-                  }}
-                  className={cn(
-                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all duration-200",
-                    isDanger
-                      ? isActive
-                        ? "bg-destructive/10 text-destructive font-medium"
-                        : "text-muted-foreground/60 hover:text-destructive hover:bg-destructive/5"
-                      : isActive
-                        ? "bg-primary/10 text-primary font-medium shadow-sm"
-                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                  )}
-                >
-                  <tab.icon className="size-4 shrink-0" />
-                  <span className="truncate">{tab.label}</span>
-                </button>
-              )
-            })}
-          </div>
-        </nav>
-
-        <div className="min-w-0 flex-1">
-          {renderContent()}
+      <div className="overflow-x-auto scrollbar-hidden">
+        <div className="flex items-center gap-1 border-b border-border/50 pb-px">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "flex shrink-0 items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-all duration-200 border-b-2 -mb-px",
+                  isActive
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30"
+                )}
+              >
+                <tab.icon className="size-4" />
+                <span>{tab.label}</span>
+              </button>
+            )
+          })}
         </div>
+      </div>
+
+      <div className="mt-5">
+        {renderContent()}
       </div>
     </div>
   )

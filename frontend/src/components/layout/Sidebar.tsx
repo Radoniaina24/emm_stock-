@@ -473,7 +473,7 @@ export function Sidebar() {
     <aside
       className={cn(
         "hidden h-svh shrink-0 flex-col border-r bg-gradient-to-b from-sidebar to-sidebar/95 shadow-2xl transition-all duration-300 ease-in-out lg:flex",
-        collapsed ? "w-16" : "w-64"
+        collapsed ? "w-16" : "w-56"
       )}
     >
       <div className="flex h-16 items-center gap-3 border-b border-sidebar-border/50 px-3">
