@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Activity,
   Bell,
@@ -70,12 +70,16 @@ type TabId =
   | "emails"
   | "apps"
   | "assistance"
-  | "deconnexion"
 
 interface Tab {
   id: TabId
   label: string
   icon: typeof User
+}
+
+interface TabGroup {
+  group: string
+  items: Tab[]
 }
 
 const tabs: Tab[] = [
@@ -84,7 +88,7 @@ const tabs: Tab[] = [
   { id: "sessions", label: "Sessions & Appareils", icon: Laptop },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "preferences", label: "Préférences", icon: SlidersHorizontal },
-  { id: "professionnel", label: "Informations professionnelles", icon: Building2 },
+  { id: "professionnel", label: "Infos professionnelles", icon: Building2 },
   { id: "api", label: "API & Intégrations", icon: Code },
   { id: "journal", label: "Journal d'activité", icon: Activity },
   { id: "confidentialite", label: "Confidentialité", icon: ShieldCheck },
@@ -94,6 +98,58 @@ const tabs: Tab[] = [
   { id: "apps", label: "Applications connectées", icon: Link },
   { id: "assistance", label: "Assistance", icon: LifeBuoy },
 ]
+
+const primarySm = new Set<TabId>(["profil", "securite", "sessions"])
+const primaryMd = new Set<TabId>(["profil", "securite", "sessions", "preferences", "notifications", "assistance"])
+
+const tabGroups: TabGroup[] = [
+  {
+    group: "Compte",
+    items: [
+      { id: "profil", label: "Profil", icon: User },
+      { id: "securite", label: "Sécurité", icon: Shield },
+      { id: "sessions", label: "Sessions & Appareils", icon: Laptop },
+    ],
+  },
+  {
+    group: "Personnalisation",
+    items: [
+      { id: "preferences", label: "Préférences", icon: SlidersHorizontal },
+      { id: "langue", label: "Langue & Région", icon: Languages },
+      { id: "notifications", label: "Notifications", icon: Bell },
+      { id: "emails", label: "E-mails", icon: Mail },
+    ],
+  },
+  {
+    group: "Professionnel",
+    items: [
+      { id: "professionnel", label: "Infos professionnelles", icon: Building2 },
+      { id: "documents", label: "Documents personnels", icon: FolderOpen },
+    ],
+  },
+  {
+    group: "Intégrations",
+    items: [
+      { id: "api", label: "API & Intégrations", icon: Code },
+      { id: "apps", label: "Applications connectées", icon: Link },
+    ],
+  },
+  {
+    group: "Activité",
+    items: [
+      { id: "journal", label: "Journal d'activité", icon: Activity },
+      { id: "confidentialite", label: "Confidentialité", icon: ShieldCheck },
+    ],
+  },
+  {
+    group: "Support",
+    items: [
+      { id: "assistance", label: "Assistance", icon: LifeBuoy },
+    ],
+  },
+]
+
+
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
@@ -219,6 +275,14 @@ export function ConfigurationPage() {
   const { user, logout, isLoggingOut } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const [activeTab, setActiveTab] = useState<TabId>("profil")
+  const [moreOpen, setMoreOpen] = useState(false)
+  const [isMd, setIsMd] = useState(window.innerWidth >= 768)
+
+  useEffect(() => {
+    const onResize = () => setIsMd(window.innerWidth >= 768)
+    window.addEventListener("resize", onResize)
+    return () => window.removeEventListener("resize", onResize)
+  }, [])
 
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
@@ -734,62 +798,100 @@ export function ConfigurationPage() {
           </Section>
         )
 
-      case "deconnexion":
-        return (
-          <Section title="Déconnexion" description="Êtes-vous sûr de vouloir vous déconnecter ?">
-            <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-border/50 py-12">
-              <div className="flex size-16 items-center justify-center rounded-full bg-destructive/10">
-                <LogOut className="size-8 text-destructive" />
-              </div>
-              <p className="mt-4 text-sm text-muted-foreground/70">
-                Vous allez être déconnecté de votre session actuelle.
-              </p>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => logout()}
-                disabled={isLoggingOut}
-                className="mt-6 gap-2"
-              >
-                <LogOut className="size-4" />
-                {isLoggingOut ? "Déconnexion…" : "Se déconnecter"}
-              </Button>
-            </div>
-          </Section>
-        )
+
     }
   }
 
   return (
     <div className="w-full px-2 pb-4">
-      <div className="mb-4">
+      <div className="mb-6">
         <h1 className="text-xl font-bold tracking-tight text-foreground">Paramètres du compte</h1>
         <p className="mt-0.5 text-sm text-muted-foreground">
           Gérez vos informations personnelles, votre mot de passe et vos préférences.
         </p>
       </div>
 
-      <div className="overflow-x-auto scrollbar-hidden">
-        <div className="flex items-center gap-1 border-b border-border/50 pb-px">
+      <div className="relative flex items-stretch border-b border-border/40">
+        <div className="flex items-center gap-0.5 overflow-x-auto pb-px scrollbar-hidden">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id
+            const inPrimarySm = primarySm.has(tab.id)
+            const inPrimaryMd = primaryMd.has(tab.id)
             return (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "flex shrink-0 items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-all duration-200 border-b-2 -mb-px",
+                  "relative shrink-0 items-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-all duration-200 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:scale-x-0 after:transition-transform after:duration-200 sm:gap-2 sm:px-4 sm:py-3",
+                  inPrimarySm
+                    ? "flex"
+                    : inPrimaryMd
+                      ? "hidden md:flex"
+                      : "hidden",
                   isActive
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30"
+                    ? "text-primary after:bg-primary after:scale-x-100"
+                    : "text-muted-foreground hover:text-foreground after:bg-muted-foreground/30 hover:after:scale-x-60"
                 )}
               >
-                <tab.icon className="size-4" />
-                <span>{tab.label}</span>
+                <tab.icon className="size-3.5 sm:size-4" />
+                <span className="whitespace-nowrap">{tab.label}</span>
               </button>
             )
           })}
+        </div>
+
+        <div className="relative shrink-0 border-l border-border/40">
+          <button
+            type="button"
+            onClick={() => setMoreOpen(!moreOpen)}
+            className={cn(
+              "flex items-center gap-1 px-3 py-2.5 text-sm font-medium transition-all duration-200 sm:gap-1.5 sm:px-3 sm:py-3",
+              moreOpen ? "text-primary" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <ChevronDown className="size-3.5" />
+            <span className="whitespace-nowrap">Plus</span>
+          </button>
+
+          {moreOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
+              <div className="absolute right-0 top-full z-50 mt-1.5 w-56 rounded-xl border border-border/50 bg-popover p-1.5 shadow-xl">
+                {tabGroups.map((group) => {
+                  const exclude = isMd ? primaryMd : primarySm
+                  const secondary = group.items.filter(tab => !exclude.has(tab.id))
+                  if (secondary.length === 0) return null
+                  return (
+                    <div key={group.group}>
+                      <p className="px-2 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/50">
+                        {group.group}
+                      </p>
+                      {secondary.map((tab) => {
+                        const isActive = activeTab === tab.id
+                        return (
+                          <button
+                            key={tab.id}
+                            type="button"
+                            onClick={() => { setActiveTab(tab.id); setMoreOpen(false) }}
+                            className={cn(
+                              "flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-sm font-medium transition-all duration-150",
+                              isActive
+                                ? "bg-primary/10 text-primary"
+                                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                            )}
+                          >
+                            <tab.icon className="size-4" />
+                            <span>{tab.label}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
