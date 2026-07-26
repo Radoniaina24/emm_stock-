@@ -20,6 +20,7 @@ import { HomePage } from "@/pages/HomePage"
 import { LandingPage } from "@/pages/LandingPage"
 import { ProfilePage } from "@/pages/ProfilePage"
 import { LoginPage } from "@/pages/LoginPage"
+import { ConfigurationPage } from "@/pages/parametres/ConfigurationPage"
 
 function App() {
   return (
@@ -132,7 +133,7 @@ function App() {
             <Route path="parametres/numerotation" element={<div className="text-muted-foreground">Numérotation documents</div>} />
             <Route path="parametres/notifications" element={<div className="text-muted-foreground">Notifications</div>} />
             <Route path="parametres/sauvegarde" element={<div className="text-muted-foreground">Sauvegarde</div>} />
-            <Route path="parametres/configuration" element={<div className="text-muted-foreground">Configuration générale</div>} />
+            <Route path="parametres/configuration" element={<ConfigurationPage />} />
             <Route path="composants" element={<ComponentShowcase />} />
             <Route path="composants/boutons" element={<BoutonsPage />} />
             <Route path="composants/formulaires" element={<FormulairesPage />} />
