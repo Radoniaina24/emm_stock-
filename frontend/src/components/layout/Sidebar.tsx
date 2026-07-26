@@ -375,7 +375,7 @@ function MenuSection({
 }
 
 export function Sidebar() {
-  const { collapsed } = useSidebar()
+  const { collapsed, mobileOpen, toggleMobile, closeMobile } = useSidebar()
   const location = useLocation()
   const [produitsOpen, setProduitsOpen] = useState(
     location.pathname.startsWith("/dashboard/produits")
@@ -469,29 +469,9 @@ export function Sidebar() {
     location.pathname === "/dashboard/composants" ||
     location.pathname.startsWith("/dashboard/composants/")
 
-  return (
-    <aside
-      className={cn(
-        "hidden h-svh shrink-0 flex-col border-r bg-gradient-to-b from-sidebar to-sidebar/95 shadow-2xl transition-all duration-300 ease-in-out lg:flex",
-        collapsed ? "w-16" : "w-56"
-      )}
-    >
-      <div className="flex h-16 items-center gap-3 border-b border-sidebar-border/50 px-3">
-        <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 text-sidebar-primary-foreground shadow-md ring-1 ring-white/10">
-          <Boxes className="size-5" />
-        </div>
-        {!collapsed ? (
-          <div className="flex flex-col">
-            <span className="truncate text-base font-bold tracking-tight text-sidebar-foreground">
-              StockFlow
-            </span>
-            <span className="truncate text-[10px] font-medium text-muted-foreground/50">
-              Gestion de stock
-            </span>
-          </div>
-        ) : null}
-      </div>
-
+  function NavContent({ isMobile }: { isMobile?: boolean }) {
+    const c = isMobile ? false : collapsed
+    return (
       <nav className="flex-1 space-y-1 overflow-y-auto scrollbar-hidden p-4 [scrollbar-gutter:stable]">
         {mainNav.map((item) => (
           <NavItem
@@ -499,12 +479,12 @@ export function Sidebar() {
             to={item.to}
             icon={item.icon}
             label={item.label}
-            collapsed={collapsed}
+            collapsed={c}
             end={item.to === "/dashboard"}
           />
         ))}
 
-        <SidebarGroupLabel label="Gestion" collapsed={collapsed} />
+        <SidebarGroupLabel label="Gestion" collapsed={c} />
 
         <MenuSection
           label="Produits"
@@ -512,15 +492,10 @@ export function Sidebar() {
           open={produitsOpen}
           onToggle={() => setProduitsOpen(!produitsOpen)}
           isActive={isProduitsActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {produitsSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
@@ -530,15 +505,10 @@ export function Sidebar() {
           open={stockOpen}
           onToggle={() => setStockOpen(!stockOpen)}
           isActive={isStockActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {stockSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
@@ -548,15 +518,10 @@ export function Sidebar() {
           open={entrepotsOpen}
           onToggle={() => setEntrepotsOpen(!entrepotsOpen)}
           isActive={isEntrepotsActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {entrepotsSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
@@ -566,15 +531,10 @@ export function Sidebar() {
           open={entreesOpen}
           onToggle={() => setEntreesOpen(!entreesOpen)}
           isActive={isEntreesActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {entreesSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
@@ -584,15 +544,10 @@ export function Sidebar() {
           open={sortiesOpen}
           onToggle={() => setSortiesOpen(!sortiesOpen)}
           isActive={isSortiesActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {sortiesSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
@@ -602,15 +557,10 @@ export function Sidebar() {
           open={mouvementsOpen}
           onToggle={() => setMouvementsOpen(!mouvementsOpen)}
           isActive={isMouvementsActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {mouvementsSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
@@ -620,19 +570,14 @@ export function Sidebar() {
           open={inventaireOpen}
           onToggle={() => setInventaireOpen(!inventaireOpen)}
           isActive={isInventaireActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {inventaireSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
-        <SidebarGroupLabel label="Achats & Approvisionnement" collapsed={collapsed} />
+        <SidebarGroupLabel label="Achats & Approvisionnement" collapsed={c} />
 
         <MenuSection
           label="Achats"
@@ -640,15 +585,10 @@ export function Sidebar() {
           open={achatsOpen}
           onToggle={() => setAchatsOpen(!achatsOpen)}
           isActive={isAchatsActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {achatsSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
@@ -658,19 +598,14 @@ export function Sidebar() {
           open={fournisseursOpen}
           onToggle={() => setFournisseursOpen(!fournisseursOpen)}
           isActive={isFournisseursActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {fournisseursSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
-        <SidebarGroupLabel label="Ventes & Clients" collapsed={collapsed} />
+        <SidebarGroupLabel label="Ventes & Clients" collapsed={c} />
 
         <MenuSection
           label="Clients"
@@ -678,15 +613,10 @@ export function Sidebar() {
           open={clientsOpen}
           onToggle={() => setClientsOpen(!clientsOpen)}
           isActive={isClientsActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {clientsSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
@@ -696,19 +626,14 @@ export function Sidebar() {
           open={ventesOpen}
           onToggle={() => setVentesOpen(!ventesOpen)}
           isActive={isVentesActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {ventesSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
-        <SidebarGroupLabel label="Analyse & Rapports" collapsed={collapsed} />
+        <SidebarGroupLabel label="Analyse & Rapports" collapsed={c} />
 
         <MenuSection
           label="Rapports"
@@ -716,19 +641,14 @@ export function Sidebar() {
           open={rapportsOpen}
           onToggle={() => setRapportsOpen(!rapportsOpen)}
           isActive={isRapportsActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {rapportsSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
-        <SidebarGroupLabel label="Système" collapsed={collapsed} />
+        <SidebarGroupLabel label="Système" collapsed={c} />
 
         <MenuSection
           label="Administration"
@@ -736,15 +656,10 @@ export function Sidebar() {
           open={administrationOpen}
           onToggle={() => setAdministrationOpen(!administrationOpen)}
           isActive={isAdministrationActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {administrationSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
@@ -754,15 +669,10 @@ export function Sidebar() {
           open={parametresOpen}
           onToggle={() => setParametresOpen(!parametresOpen)}
           isActive={isParametresActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {parametresSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
@@ -772,15 +682,10 @@ export function Sidebar() {
           open={composantsOpen}
           onToggle={() => setComposantsOpen(!composantsOpen)}
           isActive={isComposantsActive}
-          collapsed={collapsed}
+          collapsed={c}
         >
           {composantsSubNav.map((item) => (
-            <SubNavItem
-              key={item.to}
-              to={item.to}
-              icon={item.icon}
-              label={item.label}
-            />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </MenuSection>
 
@@ -790,10 +695,61 @@ export function Sidebar() {
             to={item.to}
             icon={item.icon}
             label={item.label}
-            collapsed={collapsed}
+            collapsed={c}
           />
         ))}
       </nav>
-    </aside>
+    )
+  }
+
+  return (
+    <>
+      <aside
+        className={cn(
+          "hidden h-svh shrink-0 flex-col border-r bg-gradient-to-b from-sidebar to-sidebar/95 shadow-2xl transition-all duration-300 ease-in-out lg:flex",
+          collapsed ? "w-16" : "w-56"
+        )}
+      >
+        <div className="flex h-16 items-center gap-3 border-b border-sidebar-border/50 px-3">
+          <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 text-sidebar-primary-foreground shadow-md ring-1 ring-white/10">
+            <Boxes className="size-5" />
+          </div>
+          {!collapsed ? (
+            <div className="flex flex-col">
+              <span className="truncate text-base font-bold tracking-tight text-sidebar-foreground">
+                StockFlow
+              </span>
+              <span className="truncate text-[10px] font-medium text-muted-foreground/50">
+                Gestion de stock
+              </span>
+            </div>
+          ) : null}
+        </div>
+
+        <NavContent />
+      </aside>
+
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={closeMobile} />
+          <aside className="absolute left-0 top-0 flex h-full w-72 flex-col border-r bg-sidebar shadow-2xl">
+            <div className="flex h-16 items-center gap-3 border-b border-sidebar-border/50 px-4">
+              <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 text-sidebar-primary-foreground shadow-md ring-1 ring-white/10">
+                <Boxes className="size-5" />
+              </div>
+              <div className="flex flex-col">
+                <span className="truncate text-base font-bold tracking-tight text-sidebar-foreground">
+                  StockFlow
+                </span>
+                <span className="truncate text-[10px] font-medium text-muted-foreground/50">
+                  Gestion de stock
+                </span>
+              </div>
+            </div>
+            <NavContent isMobile />
+          </aside>
+        </div>
+      )}
+    </>
   )
 }

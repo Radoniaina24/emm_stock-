@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { ChevronRight, LifeBuoy, LogOut, Moon, PanelLeftClose, PanelLeftOpen, Search, Settings, Shield, Sun, User } from "lucide-react"
+import { ChevronRight, LifeBuoy, LogOut, Menu, Moon, PanelLeftClose, PanelLeftOpen, Search, Settings, Shield, Sun, User } from "lucide-react"
 
 import { UserAvatar } from "@/components/avatar/UserAvatar"
 import { Button } from "@/components/ui/button"
@@ -11,7 +11,7 @@ import { useSidebar } from "@/lib/sidebar"
 export function Topbar({ title }: { title: string }) {
   const { logout, isLoggingOut, user } = useAuth()
   const { theme, toggleTheme } = useTheme()
-  const { collapsed, toggle: toggleSidebar } = useSidebar()
+  const { collapsed, toggle: toggleSidebar, toggleMobile } = useSidebar()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -33,9 +33,19 @@ export function Topbar({ title }: { title: string }) {
       <Button
         variant="ghost"
         size="icon"
+        onClick={toggleMobile}
+        aria-label="Ouvrir le menu"
+        className="size-8 shrink-0 text-muted-foreground/60 hover:text-foreground lg:hidden"
+      >
+        <Menu className="size-4" />
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={toggleSidebar}
         aria-label="Replier/Déplier la sidebar"
-        className="size-8 shrink-0 text-muted-foreground/60 hover:text-foreground"
+        className="hidden size-8 shrink-0 text-muted-foreground/60 hover:text-foreground lg:flex"
       >
         {collapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
       </Button>

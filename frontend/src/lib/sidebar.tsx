@@ -5,6 +5,9 @@ const STORAGE_KEY = "stockflow_sidebar_collapsed"
 type SidebarContextValue = {
   collapsed: boolean
   toggle: () => void
+  mobileOpen: boolean
+  toggleMobile: () => void
+  closeMobile: () => void
 }
 
 const SidebarContext = createContext<SidebarContextValue | null>(null)
@@ -13,6 +16,7 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState<boolean>(() => {
     return localStorage.getItem(STORAGE_KEY) === "true"
   })
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, String(collapsed))
@@ -21,6 +25,9 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   const value: SidebarContextValue = {
     collapsed,
     toggle: () => setCollapsed((c) => !c),
+    mobileOpen,
+    toggleMobile: () => setMobileOpen((o) => !o),
+    closeMobile: () => setMobileOpen(false),
   }
 
   return <SidebarContext.Provider value={value}>{children}</SidebarContext.Provider>
