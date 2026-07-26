@@ -100,7 +100,7 @@ const tabs: Tab[] = [
 ]
 
 const primarySm = new Set<TabId>(["profil", "securite", "sessions"])
-const primaryMd = new Set<TabId>(["profil", "securite", "sessions", "preferences", "notifications", "assistance"])
+const primaryMd = new Set<TabId>(["profil", "securite", "sessions", "preferences"])
 
 const tabGroups: TabGroup[] = [
   {
