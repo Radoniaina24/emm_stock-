@@ -210,6 +210,7 @@ function DataTablePagination<TData>({
   pageSizes,
 }: DataTablePaginationProps<TData>) {
   const sizes = pageSizes ?? [10, 20, 30, 50, 100]
+  const [pageSizeOpen, setPageSizeOpen] = React.useState(false)
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 py-3">
@@ -231,7 +232,7 @@ function DataTablePagination<TData>({
       </div>
 
       <div className="flex items-center gap-3">
-        <BasePopover.Root>
+        <BasePopover.Root open={pageSizeOpen} onOpenChange={setPageSizeOpen}>
           <BasePopover.Trigger
             render={
               <button
@@ -250,7 +251,7 @@ function DataTablePagination<TData>({
                   <button
                     key={size}
                     type="button"
-                    onClick={() => table.setPageSize(size)}
+                    onClick={() => { table.setPageSize(size); setPageSizeOpen(false) }}
                     className={cn(
                       "flex w-full items-center rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors",
                       table.getState().pagination.pageSize === size
