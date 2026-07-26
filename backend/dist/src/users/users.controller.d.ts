@@ -1,8 +1,10 @@
-import { UpdateProfileDto } from "./dto/update-profile.dto.js";
-import { UsersService } from "./users.service.js";
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { UpdateProfileDto } from './dto/update-profile.dto.js';
+import { UsersService } from './users.service.js';
 export declare class UsersController {
     private readonly users;
     constructor(users: UsersService);
+    create(dto: CreateUserDto): Promise<import("./user.mapper.js").AuthUserDto>;
     findAll(): Promise<any>;
     getMe(userId: string): Promise<import("./user.mapper.js").AuthUserDto>;
     updateProfile(userId: string, dto: UpdateProfileDto): Promise<import("./user.mapper.js").AuthUserDto>;

@@ -56,9 +56,11 @@ let AuthService = class AuthService {
         this.jwt = jwt;
     }
     async register(dto) {
-        const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
+        const existing = await this.prisma.user.findUnique({
+            where: { email: dto.email },
+        });
         if (existing)
-            throw new common_1.ConflictException("Email already in use");
+            throw new common_1.ConflictException('Email already in use');
         const hashed = await bcrypt.hash(dto.password, 10);
         const names = (0, user_mapper_js_1.splitDisplayName)(dto.name);
         const user = await this.prisma.user.create({
@@ -77,7 +79,10 @@ let AuthService = class AuthService {
             },
             select: user_mapper_js_1.userWithProfileSelect,
         });
-        return { user: (0, user_mapper_js_1.toAuthUserDto)(user), token: this.signToken(user.id, user.email) };
+        return {
+            user: (0, user_mapper_js_1.toAuthUserDto)(user),
+            token: this.signToken(user.id, user.email),
+        };
     }
     async login(dto) {
         const user = await this.prisma.user.findUnique({
@@ -93,10 +98,10 @@ let AuthService = class AuthService {
             },
         });
         if (!user || !user.isActive)
-            throw new common_1.UnauthorizedException("Invalid credentials");
+            throw new common_1.UnauthorizedException('Invalid credentials');
         const valid = await bcrypt.compare(dto.password, user.password);
         if (!valid)
-            throw new common_1.UnauthorizedException("Invalid credentials");
+            throw new common_1.UnauthorizedException('Invalid credentials');
         const { password: _, ...safe } = user;
         return {
             user: (0, user_mapper_js_1.toAuthUserDto)(safe),
@@ -113,7 +118,7 @@ let AuthService = class AuthService {
         return (0, user_mapper_js_1.toAuthUserDto)(user);
     }
     signToken(userId, email) {
-        return this.jwt.sign({ sub: userId, email }, { expiresIn: "7d" });
+        return this.jwt.sign({ sub: userId, email }, { expiresIn: '7d' });
     }
 };
 exports.AuthService = AuthService;

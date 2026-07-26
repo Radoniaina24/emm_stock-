@@ -41,8 +41,8 @@ function toAuthUserDto(user) {
 }
 function splitDisplayName(fullName) {
     const parts = fullName.trim().split(/\s+/).filter(Boolean);
-    const firstName = parts[0] ?? "User";
-    const lastName = parts.length > 1 ? parts.slice(1).join(" ") : firstName;
+    const firstName = parts[0] ?? 'User';
+    const lastName = parts.length > 1 ? parts.slice(1).join(' ') : firstName;
     return { firstName, lastName, displayName: fullName.trim() || firstName };
 }
 exports.userWithProfileSelect = {

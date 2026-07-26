@@ -25,14 +25,14 @@ let AppController = class AppController {
 exports.AppController = AppController;
 __decorate([
     (0, common_1.Get)(),
-    (0, swagger_1.ApiOperation)({ summary: "Health check" }),
-    (0, swagger_1.ApiOkResponse)({ description: "Message de bienvenue" }),
+    (0, swagger_1.ApiOperation)({ summary: 'Health check' }),
+    (0, swagger_1.ApiOkResponse)({ description: 'Message de bienvenue' }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", String)
 ], AppController.prototype, "getHello", null);
 exports.AppController = AppController = __decorate([
-    (0, swagger_1.ApiTags)("app"),
+    (0, swagger_1.ApiTags)('app'),
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [app_service_1.AppService])
 ], AppController);

@@ -1,10 +1,18 @@
-import { ConflictException, Injectable, UnauthorizedException } from "@nestjs/common"
-import { JwtService } from "@nestjs/jwt"
-import * as bcrypt from "bcrypt"
-import { PrismaService } from "../prisma/prisma.service.js"
-import { RegisterDto } from "./dto/register.dto.js"
-import { LoginDto } from "./dto/login.dto.js"
-import { splitDisplayName, toAuthUserDto, userWithProfileSelect } from "../users/user.mapper.js"
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { RegisterDto } from './dto/register.dto.js';
+import { LoginDto } from './dto/login.dto.js';
+import {
+  splitDisplayName,
+  toAuthUserDto,
+  userWithProfileSelect,
+} from '../users/user.mapper.js';
 
 @Injectable()
 export class AuthService {
@@ -14,11 +22,13 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const existing = await this.prisma.user.findUnique({ where: { email: dto.email } })
-    if (existing) throw new ConflictException("Email already in use")
+    const existing = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+    if (existing) throw new ConflictException('Email already in use');
 
-    const hashed = await bcrypt.hash(dto.password, 10)
-    const names = splitDisplayName(dto.name)
+    const hashed = await bcrypt.hash(dto.password, 10);
+    const names = splitDisplayName(dto.name);
 
     const user = await this.prisma.user.create({
       data: {
@@ -35,9 +45,12 @@ export class AuthService {
         },
       },
       select: userWithProfileSelect,
-    })
+    });
 
-    return { user: toAuthUserDto(user), token: this.signToken(user.id, user.email) }
+    return {
+      user: toAuthUserDto(user),
+      token: this.signToken(user.id, user.email),
+    };
   }
 
   async login(dto: LoginDto) {
@@ -52,29 +65,30 @@ export class AuthService {
         createdAt: true,
         profile: true,
       },
-    })
-    if (!user || !user.isActive) throw new UnauthorizedException("Invalid credentials")
+    });
+    if (!user || !user.isActive)
+      throw new UnauthorizedException('Invalid credentials');
 
-    const valid = await bcrypt.compare(dto.password, user.password)
-    if (!valid) throw new UnauthorizedException("Invalid credentials")
+    const valid = await bcrypt.compare(dto.password, user.password);
+    if (!valid) throw new UnauthorizedException('Invalid credentials');
 
-    const { password: _, ...safe } = user
+    const { password: _, ...safe } = user;
     return {
       user: toAuthUserDto(safe),
       token: this.signToken(user.id, user.email),
-    }
+    };
   }
 
   async me(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: userWithProfileSelect,
-    })
-    if (!user) throw new UnauthorizedException()
-    return toAuthUserDto(user)
+    });
+    if (!user) throw new UnauthorizedException();
+    return toAuthUserDto(user);
   }
 
   private signToken(userId: string, email: string): string {
-    return this.jwt.sign({ sub: userId, email }, { expiresIn: "7d" })
+    return this.jwt.sign({ sub: userId, email }, { expiresIn: '7d' });
   }
 }

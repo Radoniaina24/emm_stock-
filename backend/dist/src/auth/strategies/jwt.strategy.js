@@ -18,9 +18,11 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
     prisma;
     constructor(prisma) {
         super({
-            jwtFromRequest: passport_jwt_1.ExtractJwt.fromExtractors([(req) => req?.cookies?.token]),
+            jwtFromRequest: passport_jwt_1.ExtractJwt.fromExtractors([
+                (req) => req?.cookies?.token,
+            ]),
             ignoreExpiration: false,
-            secretOrKey: process.env.JWT_SECRET ?? "default-secret",
+            secretOrKey: process.env.JWT_SECRET ?? 'default-secret',
         });
         this.prisma = prisma;
     }

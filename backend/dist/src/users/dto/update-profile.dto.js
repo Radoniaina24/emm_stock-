@@ -31,28 +31,28 @@ class UpdateProfileDto {
 }
 exports.UpdateProfileDto = UpdateProfileDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: "Admin" }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Admin' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
 ], UpdateProfileDto.prototype, "firstName", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: "StockFlow" }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 'StockFlow' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
 ], UpdateProfileDto.prototype, "lastName", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: "Admin StockFlow" }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Admin StockFlow' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(150),
     __metadata("design:type", String)
 ], UpdateProfileDto.prototype, "displayName", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: "+261 34 00 000 00" }),
+    (0, swagger_1.ApiPropertyOptional)({ example: '+261 34 00 000 00' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(30),
@@ -66,13 +66,13 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateProfileDto.prototype, "secondaryPhone", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: "1990-01-15" }),
+    (0, swagger_1.ApiPropertyOptional)({ example: '1990-01-15' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsDateString)(),
     __metadata("design:type", String)
 ], UpdateProfileDto.prototype, "birthDate", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: "Homme" }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Homme' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(20),
@@ -114,21 +114,23 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateProfileDto.prototype, "postalCode", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: "Gestionnaire de stock" }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Gestionnaire de stock' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
 ], UpdateProfileDto.prototype, "jobTitle", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: "Opérations" }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Opérations' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
 ], UpdateProfileDto.prototype, "department", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: "Signature électronique (texte ou data URL)" }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Signature électronique (texte ou data URL)',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)

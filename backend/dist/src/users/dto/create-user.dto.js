@@ -9,43 +9,51 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RegisterDto = void 0;
+exports.CreateUserDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
-class RegisterDto {
+class CreateUserDto {
     name;
     email;
     password;
+    role;
     phone;
     department;
 }
-exports.RegisterDto = RegisterDto;
+exports.CreateUserDto = CreateUserDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Admin StockFlow' }),
+    (0, swagger_1.ApiProperty)({ example: 'Jean Dupont' }),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(2),
     __metadata("design:type", String)
-], RegisterDto.prototype, "name", void 0);
+], CreateUserDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'admin@stockflow.app' }),
+    (0, swagger_1.ApiProperty)({ example: 'jean.dupont@email.com' }),
     (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
-], RegisterDto.prototype, "email", void 0);
+], CreateUserDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'admin123', minLength: 6 }),
+    (0, swagger_1.ApiProperty)({ example: 'password123', minLength: 6 }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(6),
     __metadata("design:type", String)
-], RegisterDto.prototype, "password", void 0);
+], CreateUserDto.prototype, "password", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Gestionnaire' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "role", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: '+261 34 00 000 00' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], RegisterDto.prototype, "phone", void 0);
+], CreateUserDto.prototype, "phone", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: 'Direction des opérations' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], RegisterDto.prototype, "department", void 0);
-//# sourceMappingURL=register.dto.js.map
+], CreateUserDto.prototype, "department", void 0);
+//# sourceMappingURL=create-user.dto.js.map

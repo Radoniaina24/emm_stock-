@@ -1,5 +1,12 @@
 import { api } from "@/lib/api"
-import type { UpdateProfilePayload, User } from "@/types/auth"
+import type { CreateUserPayload, UpdateProfilePayload, User } from "@/types/auth"
+
+export function createUser(payload: CreateUserPayload) {
+  return api<User>("/users", {
+    method: "POST",
+    body: payload,
+  })
+}
 
 export function getUsers() {
   return api<User[]>("/users")

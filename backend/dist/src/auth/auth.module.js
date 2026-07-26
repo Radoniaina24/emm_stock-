@@ -19,10 +19,10 @@ exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            passport_1.PassportModule.register({ defaultStrategy: "jwt" }),
+            passport_1.PassportModule.register({ defaultStrategy: 'jwt' }),
             jwt_1.JwtModule.register({
-                secret: process.env.JWT_SECRET ?? "default-secret",
-                signOptions: { expiresIn: "7d" },
+                secret: process.env.JWT_SECRET ?? 'default-secret',
+                signOptions: { expiresIn: '7d' },
             }),
         ],
         controllers: [auth_controller_js_1.AuthController],

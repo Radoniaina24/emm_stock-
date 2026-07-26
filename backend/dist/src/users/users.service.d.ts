@@ -1,8 +1,10 @@
-import { PrismaService } from "../prisma/prisma.service.js";
-import { UpdateProfileDto } from "./dto/update-profile.dto.js";
+import { PrismaService } from '../prisma/prisma.service.js';
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { UpdateProfileDto } from './dto/update-profile.dto.js';
 export declare class UsersService {
     private readonly prisma;
     constructor(prisma: PrismaService);
+    create(dto: CreateUserDto): Promise<import("./user.mapper.js").AuthUserDto>;
     findAll(): Promise<any>;
     getMe(userId: string): Promise<import("./user.mapper.js").AuthUserDto>;
     updateProfile(userId: string, dto: UpdateProfileDto): Promise<import("./user.mapper.js").AuthUserDto>;

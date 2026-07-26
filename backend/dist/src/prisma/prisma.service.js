@@ -21,13 +21,13 @@ function parseDatabaseUrl(url) {
         port: parsed.port ? Number(parsed.port) : 3306,
         user: decodeURIComponent(parsed.username),
         password: decodeURIComponent(parsed.password),
-        database: parsed.pathname.replace(/^\//, "") || "gestion_stock",
+        database: parsed.pathname.replace(/^\//, '') || 'gestion_stock',
     };
 }
 let PrismaService = PrismaService_1 = class PrismaService extends client_js_1.PrismaClient {
     logger = new common_1.Logger(PrismaService_1.name);
     constructor() {
-        const connection = parseDatabaseUrl(process.env.DATABASE_URL ?? "mysql://root@localhost:3306/gestion_stock");
+        const connection = parseDatabaseUrl(process.env.DATABASE_URL ?? 'mysql://root@localhost:3306/gestion_stock');
         const adapter = new adapter_mariadb_1.PrismaMariaDb({
             ...connection,
             allowPublicKeyRetrieval: true,
@@ -36,11 +36,11 @@ let PrismaService = PrismaService_1 = class PrismaService extends client_js_1.Pr
     }
     async onModuleInit() {
         await this.$connect();
-        this.logger.log("Connected to database");
+        this.logger.log('Connected to database');
     }
     async onModuleDestroy() {
         await this.$disconnect();
-        this.logger.log("Disconnected from database");
+        this.logger.log('Disconnected from database');
     }
 };
 exports.PrismaService = PrismaService;

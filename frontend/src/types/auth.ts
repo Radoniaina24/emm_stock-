@@ -44,6 +44,15 @@ export type RegisterPayload = {
   department?: string
 }
 
+export type CreateUserPayload = {
+  name: string
+  email: string
+  password: string
+  role?: string
+  phone?: string
+  department?: string
+}
+
 export type UpdateProfilePayload = Partial<
   Omit<UserProfile, "profilePhoto">
 >

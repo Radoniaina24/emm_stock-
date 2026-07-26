@@ -1,60 +1,60 @@
 type ProfileRecord = {
-  firstName: string
-  lastName: string
-  displayName: string
-  profilePhoto: string | null
-  phone: string | null
-  secondaryPhone: string | null
-  birthDate: Date | null
-  gender: string | null
-  address: string | null
-  city: string | null
-  region: string | null
-  country: string | null
-  postalCode: string | null
-  jobTitle: string | null
-  department: string | null
-  signature: string | null
-}
+  firstName: string;
+  lastName: string;
+  displayName: string;
+  profilePhoto: string | null;
+  phone: string | null;
+  secondaryPhone: string | null;
+  birthDate: Date | null;
+  gender: string | null;
+  address: string | null;
+  city: string | null;
+  region: string | null;
+  country: string | null;
+  postalCode: string | null;
+  jobTitle: string | null;
+  department: string | null;
+  signature: string | null;
+};
 
 export type UserProfileDto = {
-  firstName: string
-  lastName: string
-  displayName: string
-  profilePhoto: string | null
-  phone: string | null
-  secondaryPhone: string | null
-  birthDate: string | null
-  gender: string | null
-  address: string | null
-  city: string | null
-  region: string | null
-  country: string | null
-  postalCode: string | null
-  jobTitle: string | null
-  department: string | null
-  signature: string | null
-}
+  firstName: string;
+  lastName: string;
+  displayName: string;
+  profilePhoto: string | null;
+  phone: string | null;
+  secondaryPhone: string | null;
+  birthDate: string | null;
+  gender: string | null;
+  address: string | null;
+  city: string | null;
+  region: string | null;
+  country: string | null;
+  postalCode: string | null;
+  jobTitle: string | null;
+  department: string | null;
+  signature: string | null;
+};
 
 export type AuthUserDto = {
-  id: string
-  email: string
-  role: string
-  createdAt?: Date
-  name: string
-  avatar: string | null
-  phone: string | null
-  department: string | null
-  profile: UserProfileDto | null
-}
+  id: string;
+  email: string;
+  role: string;
+  createdAt?: Date;
+  name: string;
+  avatar: string | null;
+  phone: string | null;
+  department: string | null;
+  profile: UserProfileDto | null;
+};
 
 type UserWithProfile = {
-  id: string
-  email: string
-  role: string
-  createdAt?: Date
-  profile?: ProfileRecord | null
-}
+  id: string;
+  email: string;
+  role: string;
+  createdAt?: Date;
+  profile?: ProfileRecord | null;
+};
 
 function mapProfile(profile: ProfileRecord): UserProfileDto {
   return {
@@ -76,11 +76,11 @@ function mapProfile(profile: ProfileRecord): UserProfileDto {
     jobTitle: profile.jobTitle,
     department: profile.department,
     signature: profile.signature,
-  }
+  };
 }
 
 export function toAuthUserDto(user: UserWithProfile): AuthUserDto {
-  const profile = user.profile ? mapProfile(user.profile) : null
+  const profile = user.profile ? mapProfile(user.profile) : null;
   return {
     id: user.id,
     email: user.email,
@@ -91,14 +91,14 @@ export function toAuthUserDto(user: UserWithProfile): AuthUserDto {
     phone: profile?.phone ?? null,
     department: profile?.department ?? null,
     profile,
-  }
+  };
 }
 
 export function splitDisplayName(fullName: string) {
-  const parts = fullName.trim().split(/\s+/).filter(Boolean)
-  const firstName = parts[0] ?? "User"
-  const lastName = parts.length > 1 ? parts.slice(1).join(" ") : firstName
-  return { firstName, lastName, displayName: fullName.trim() || firstName }
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  const firstName = parts[0] ?? 'User';
+  const lastName = parts.length > 1 ? parts.slice(1).join(' ') : firstName;
+  return { firstName, lastName, displayName: fullName.trim() || firstName };
 }
 
 export const userWithProfileSelect = {
@@ -107,4 +107,4 @@ export const userWithProfileSelect = {
   role: true,
   createdAt: true,
   profile: true,
-} as const
+} as const;
