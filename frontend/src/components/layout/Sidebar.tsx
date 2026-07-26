@@ -223,18 +223,21 @@ function NavItem({
   label,
   collapsed,
   end,
+  onClick,
 }: {
   to: string
   icon: typeof LayoutDashboard
   label: string
   collapsed: boolean
   end?: boolean
+  onClick?: () => void
 }) {
   return (
     <NavLink
       to={to}
       end={end}
       title={collapsed ? label : undefined}
+      onClick={onClick}
       className={({ isActive }) =>
         cn(
           "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
@@ -262,15 +265,18 @@ function SubNavItem({
   to,
   icon: Icon,
   label,
+  onClick,
 }: {
   to: string
   icon: typeof LayoutDashboard
   label: string
+  onClick?: () => void
 }) {
   return (
     <NavLink
       to={to}
       end
+      onClick={onClick}
       className={({ isActive }) =>
         cn(
           "group flex items-center gap-3 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200",
@@ -471,6 +477,7 @@ export function Sidebar() {
 
   function NavContent({ isMobile }: { isMobile?: boolean }) {
     const c = isMobile ? false : collapsed
+    const navOnClick = isMobile ? closeMobile : undefined
     return (
       <nav className="flex-1 space-y-1 overflow-y-auto scrollbar-hidden p-4 [scrollbar-gutter:stable]">
         {mainNav.map((item) => (
@@ -481,6 +488,7 @@ export function Sidebar() {
             label={item.label}
             collapsed={c}
             end={item.to === "/dashboard"}
+            onClick={navOnClick}
           />
         ))}
 
@@ -495,7 +503,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {produitsSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -508,7 +516,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {stockSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -521,7 +529,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {entrepotsSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -534,7 +542,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {entreesSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -547,7 +555,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {sortiesSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -560,7 +568,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {mouvementsSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -573,7 +581,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {inventaireSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -588,7 +596,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {achatsSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -601,7 +609,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {fournisseursSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -616,7 +624,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {clientsSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -629,7 +637,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {ventesSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -644,7 +652,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {rapportsSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -659,7 +667,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {administrationSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -672,7 +680,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {parametresSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -685,7 +693,7 @@ export function Sidebar() {
           collapsed={c}
         >
           {composantsSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} />
+            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>
 
@@ -696,6 +704,7 @@ export function Sidebar() {
             icon={item.icon}
             label={item.label}
             collapsed={c}
+            onClick={navOnClick}
           />
         ))}
       </nav>
