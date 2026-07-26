@@ -102,7 +102,7 @@ export function Topbar({ title }: { title: string }) {
               <div className="p-1">
                 <button
                   type="button"
-                  onClick={() => { navigate("/dashboard/profil"); closeMenu() }}
+                  onClick={() => { navigate("/dashboard/parametres/configuration"); closeMenu() }}
                   className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                 >
                   <User className="size-4" />

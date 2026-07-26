@@ -6,6 +6,7 @@ import {
   Building2,
   Calendar,
   Camera,
+  ChevronDown,
   ChevronRight,
   Code,
   FileText,
@@ -171,6 +172,50 @@ const GENDER_OPTIONS = [
   { value: "Non précisé", label: "Non précisé" },
 ]
 
+function CollapsibleSection({
+  title,
+  description,
+  icon: Icon,
+  children,
+}: {
+  title: string
+  description: string
+  icon: typeof Briefcase
+  children: React.ReactNode
+}) {
+  const [open, setOpen] = useState(false)
+  return (
+    <Card>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center gap-3 px-6 pt-5 pb-4 text-left transition-colors hover:bg-muted/30"
+      >
+        <div className="flex size-9 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+          <Icon className="size-4" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <CardTitle className="text-base">{title}</CardTitle>
+          <CardDescription className="mt-0.5">{description}</CardDescription>
+        </div>
+        <div className="flex size-6 items-center justify-center rounded-md text-muted-foreground/50 transition-transform duration-200">
+          {open ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
+        </div>
+      </button>
+      <div
+        className={cn(
+          "overflow-hidden transition-all duration-300",
+          open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        )}
+      >
+        <div className="border-t border-border/50 px-6 py-4">
+          {children}
+        </div>
+      </div>
+    </Card>
+  )
+}
+
 export function ConfigurationPage() {
   const { user, logout, isLoggingOut } = useAuth()
   const { theme, toggleTheme } = useTheme()
@@ -218,66 +263,46 @@ export function ConfigurationPage() {
               initials={initials}
             />
 
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600 via-violet-700 to-indigo-800 shadow-xl">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(139,92,246,0.2),transparent_50%)]" />
-              <div className="relative px-6 pt-12 pb-24 sm:px-8 sm:pt-16 sm:pb-28">
-                <div>
-                  <div className="flex items-center gap-2 text-sm font-medium text-violet-200/80">
-                    <Building2 className="size-4" />
-                    <span>StockFlow</span>
-                    <ChevronRight className="size-3" />
-                    <span>Profil</span>
-                  </div>
-                  <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                    Mon profil
-                  </h1>
-                  <p className="mt-1 text-sm text-violet-200/70">
-                    Cliquez sur le crayon à côté d&apos;un champ pour le modifier individuellement.
-                  </p>
+            <div className="flex items-start gap-6 rounded-xl border border-border/50 bg-card p-6 shadow-sm">
+              <div className="relative shrink-0">
+                <div className="flex size-20 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-xl font-bold text-white ring-2 ring-border/60">
+                  <UserAvatar user={user} />
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setAvatarOpen(true)}
+                  className="absolute -bottom-0.5 -right-0.5 flex size-7 items-center justify-center rounded-full border border-border bg-background text-muted-foreground shadow-sm transition-colors hover:text-foreground"
+                >
+                  <Camera className="size-3.5" />
+                </button>
               </div>
-            </div>
-
-            <div className="relative -mt-20 px-4 sm:-mt-24 sm:px-6">
-              <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-end">
-                <div className="relative">
-                  <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 text-2xl font-bold text-white shadow-xl ring-4 ring-white dark:ring-gray-900 sm:size-28 sm:text-3xl">
-                    <UserAvatar user={user} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <h2 className="text-lg font-bold text-foreground truncate">{displayName}</h2>
+                    <p className="text-sm text-muted-foreground/70 truncate">{user.email}</p>
                   </div>
-                  <Button
-                    type="button"
-                    size="icon-sm"
-                    onClick={() => setAvatarOpen(true)}
-                    aria-label="Modifier la photo de profil"
-                    className="absolute -bottom-1 -right-1 size-8 rounded-full bg-background text-foreground shadow-md ring-2 ring-background hover:bg-muted"
-                  >
-                    <Camera className="size-3.5" />
-                  </Button>
+                  <Badge variant="secondary" className="shrink-0 gap-1.5 text-xs font-medium">
+                    <Shield className="size-3" />
+                    {user.role}
+                  </Badge>
                 </div>
-                <div className="flex flex-1 flex-col items-center gap-3 text-center sm:items-start sm:pb-2 sm:text-left">
-                  <div>
-                    <h2 className="text-xl font-bold tracking-tight">{displayName}</h2>
-                    <div className="mt-1 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-                      <Badge className="gap-1.5 bg-violet-100 text-violet-700 hover:bg-violet-200 dark:bg-violet-900/30 dark:text-violet-300">
-                        <Shield className="size-3" />
-                        {user.role}
-                      </Badge>
-                      {profile?.jobTitle ? (
-                        <span className="text-sm text-muted-foreground">{profile.jobTitle}</span>
-                      ) : null}
-                      <span className="text-sm text-muted-foreground">{user.email}</span>
+                <div className="mt-4 flex flex-wrap gap-4">
+                  {profile?.jobTitle && (
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground/60">
+                      <Briefcase className="size-3.5" />
+                      <span>{profile.jobTitle}</span>
                     </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="mt-3"
-                      onClick={() => setAvatarOpen(true)}
-                    >
-                      <Camera data-icon="inline-start" />
-                      Changer la photo
-                    </Button>
+                  )}
+                  {profile?.department && (
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground/60">
+                      <Building2 className="size-3.5" />
+                      <span>{profile.department}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground/60">
+                    <Calendar className="size-3.5" />
+                    <span>Membre depuis {formatDate(joinedAt)}</span>
                   </div>
                 </div>
               </div>
@@ -290,184 +315,187 @@ export function ConfigurationPage() {
               <StatCard icon={Store} label="Fournisseurs" value="—" color="bg-rose-500" />
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-3">
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle>Informations personnelles</CardTitle>
-                  <CardDescription>
-                    Modifiez chaque champ via le crayon — enregistrement immédiat.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="grid gap-1 sm:grid-cols-2">
-                  <EditableInfoRow
-                    icon={UserRound}
-                    label="Prénom"
-                    fieldKey="firstName"
-                    value={profile?.firstName}
-                    {...fieldProps}
-                  />
-                  <EditableInfoRow
-                    icon={UserRound}
-                    label="Nom"
-                    fieldKey="lastName"
-                    value={profile?.lastName}
-                    {...fieldProps}
-                  />
-                  <EditableInfoRow
-                    icon={UserRound}
-                    label="Nom d'affichage"
-                    fieldKey="displayName"
-                    value={profile?.displayName}
-                    {...fieldProps}
-                  />
-                  <EditableInfoRow
-                    icon={Mail}
-                    label="Adresse e-mail"
-                    fieldKey="email"
-                    value={user.email}
-                    editable={false}
-                    disabledReason="L'e-mail du compte n'est pas modifiable ici"
-                    {...fieldProps}
-                  />
-                  <EditableInfoRow
-                    icon={Phone}
-                    label="Téléphone"
-                    fieldKey="phone"
-                    value={profile?.phone ?? user.phone}
-                    type="tel"
-                    placeholder="+261 …"
-                    {...fieldProps}
-                  />
-                  <EditableInfoRow
-                    icon={Phone}
-                    label="Téléphone secondaire"
-                    fieldKey="secondaryPhone"
-                    value={profile?.secondaryPhone}
-                    type="tel"
-                    {...fieldProps}
-                  />
-                  <EditableInfoRow
-                    icon={Calendar}
-                    label="Date de naissance"
-                    fieldKey="birthDate"
-                    value={profile?.birthDate ?? ""}
-                    displayValue={
-                      profile?.birthDate ? formatDate(profile.birthDate) : "Non renseigné"
-                    }
-                    type="date"
-                    placeholder="Choisir une date"
-                    {...fieldProps}
-                  />
-                  <EditableInfoRow
-                    icon={UserRound}
-                    label="Sexe"
-                    fieldKey="gender"
-                    value={profile?.gender}
-                    type="select"
-                    options={GENDER_OPTIONS}
-                    placeholder="Sélectionner le sexe"
-                    {...fieldProps}
-                  />
-                  <EditableInfoRow
-                    icon={Briefcase}
-                    label="Poste / Fonction"
-                    fieldKey="jobTitle"
-                    value={profile?.jobTitle}
-                    {...fieldProps}
-                  />
-                  <EditableInfoRow
-                    icon={Building2}
-                    label="Département"
-                    fieldKey="department"
-                    value={profile?.department ?? user.department}
-                    {...fieldProps}
-                  />
-                  <EditableInfoRow
-                    icon={Calendar}
-                    label="Membre depuis"
-                    fieldKey="createdAt"
-                    value={joinedAt}
-                    displayValue={formatDate(joinedAt)}
-                    editable={false}
-                    disabledReason="Date système non modifiable"
-                    {...fieldProps}
-                  />
-                </CardContent>
-              </Card>
-
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Adresse</CardTitle>
-                    <CardDescription>Localisation professionnelle / personnelle.</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-1">
-                    <EditableInfoRow
-                      icon={MapPin}
-                      label="Adresse"
-                      fieldKey="address"
-                      value={profile?.address}
-                      {...fieldProps}
-                    />
-                    <EditableInfoRow
-                      icon={MapPin}
-                      label="Ville"
-                      fieldKey="city"
-                      value={profile?.city}
-                      {...fieldProps}
-                    />
-                    <EditableInfoRow
-                      icon={MapPin}
-                      label="Région"
-                      fieldKey="region"
-                      value={profile?.region}
-                      {...fieldProps}
-                    />
-                    <EditableInfoRow
-                      icon={MapPin}
-                      label="Pays"
-                      fieldKey="country"
-                      value={profile?.country}
-                      {...fieldProps}
-                    />
-                    <EditableInfoRow
-                      icon={MapPin}
-                      label="Code postal"
-                      fieldKey="postalCode"
-                      value={profile?.postalCode}
-                      {...fieldProps}
-                    />
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Rôle & signature</CardTitle>
-                    <CardDescription>Accès compte et signature électronique.</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-1">
-                    <EditableInfoRow
-                      icon={Shield}
-                      label="Rôle"
-                      fieldKey="role"
-                      value={user.role}
-                      editable={false}
-                      disabledReason="Le rôle est géré par l'administration"
-                      {...fieldProps}
-                    />
-                    <EditableInfoRow
-                      icon={PenLine}
-                      label="Signature électronique"
-                      fieldKey="signature"
-                      value={profile?.signature}
-                      type="textarea"
-                      placeholder="Texte ou mention de signature…"
-                      {...fieldProps}
-                    />
-                  </CardContent>
-                </Card>
+            <CollapsibleSection
+              title="Informations personnelles"
+              description="Cliquez sur le crayon pour modifier un champ — enregistrement immédiat."
+              icon={UserRound}
+            >
+              <div className="grid gap-x-6 gap-y-0 sm:grid-cols-2">
+                <EditableInfoRow
+                  icon={UserRound}
+                  label="Prénom"
+                  fieldKey="firstName"
+                  value={profile?.firstName}
+                  {...fieldProps}
+                />
+                <EditableInfoRow
+                  icon={UserRound}
+                  label="Nom"
+                  fieldKey="lastName"
+                  value={profile?.lastName}
+                  {...fieldProps}
+                />
+                <EditableInfoRow
+                  icon={UserRound}
+                  label="Nom d'affichage"
+                  fieldKey="displayName"
+                  value={profile?.displayName}
+                  {...fieldProps}
+                />
+                <EditableInfoRow
+                  icon={Mail}
+                  label="Adresse e-mail"
+                  fieldKey="email"
+                  value={user.email}
+                  editable={false}
+                  disabledReason="L'e-mail du compte n'est pas modifiable ici"
+                  {...fieldProps}
+                />
+                <EditableInfoRow
+                  icon={Phone}
+                  label="Téléphone"
+                  fieldKey="phone"
+                  value={profile?.phone ?? user.phone}
+                  type="tel"
+                  placeholder="+261 …"
+                  {...fieldProps}
+                />
+                <EditableInfoRow
+                  icon={Phone}
+                  label="Téléphone secondaire"
+                  fieldKey="secondaryPhone"
+                  value={profile?.secondaryPhone}
+                  type="tel"
+                  {...fieldProps}
+                />
+                <EditableInfoRow
+                  icon={Calendar}
+                  label="Date de naissance"
+                  fieldKey="birthDate"
+                  value={profile?.birthDate ?? ""}
+                  displayValue={
+                    profile?.birthDate ? formatDate(profile.birthDate) : "Non renseigné"
+                  }
+                  type="date"
+                  placeholder="Choisir une date"
+                  {...fieldProps}
+                />
+                <EditableInfoRow
+                  icon={UserRound}
+                  label="Sexe"
+                  fieldKey="gender"
+                  value={profile?.gender}
+                  type="select"
+                  options={GENDER_OPTIONS}
+                  placeholder="Sélectionner le sexe"
+                  {...fieldProps}
+                />
+                <EditableInfoRow
+                  icon={Calendar}
+                  label="Membre depuis"
+                  fieldKey="createdAt"
+                  value={joinedAt}
+                  displayValue={formatDate(joinedAt)}
+                  editable={false}
+                  disabledReason="Date système non modifiable"
+                  {...fieldProps}
+                />
               </div>
-            </div>
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title="Informations professionnelles"
+              description="Poste, département et informations liées à votre fonction."
+              icon={Briefcase}
+            >
+              <div className="grid gap-x-6 gap-y-0 sm:grid-cols-2">
+                <EditableInfoRow
+                  icon={Briefcase}
+                  label="Poste / Fonction"
+                  fieldKey="jobTitle"
+                  value={profile?.jobTitle}
+                  {...fieldProps}
+                />
+                <EditableInfoRow
+                  icon={Building2}
+                  label="Département"
+                  fieldKey="department"
+                  value={profile?.department ?? user.department}
+                  {...fieldProps}
+                />
+              </div>
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title="Adresse"
+              description="Localisation professionnelle / personnelle."
+              icon={MapPin}
+            >
+              <div className="grid gap-x-6 gap-y-0 sm:grid-cols-2">
+                <EditableInfoRow
+                  icon={MapPin}
+                  label="Adresse"
+                  fieldKey="address"
+                  value={profile?.address}
+                  {...fieldProps}
+                />
+                <EditableInfoRow
+                  icon={MapPin}
+                  label="Ville"
+                  fieldKey="city"
+                  value={profile?.city}
+                  {...fieldProps}
+                />
+                <EditableInfoRow
+                  icon={MapPin}
+                  label="Région"
+                  fieldKey="region"
+                  value={profile?.region}
+                  {...fieldProps}
+                />
+                <EditableInfoRow
+                  icon={MapPin}
+                  label="Pays"
+                  fieldKey="country"
+                  value={profile?.country}
+                  {...fieldProps}
+                />
+                <EditableInfoRow
+                  icon={MapPin}
+                  label="Code postal"
+                  fieldKey="postalCode"
+                  value={profile?.postalCode}
+                  {...fieldProps}
+                />
+              </div>
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title="Rôle & signature"
+              description="Accès compte et signature électronique."
+              icon={Shield}
+            >
+              <div className="grid gap-x-6 gap-y-0 sm:grid-cols-2">
+                <EditableInfoRow
+                  icon={Shield}
+                  label="Rôle"
+                  fieldKey="role"
+                  value={user.role}
+                  editable={false}
+                  disabledReason="Le rôle est géré par l'administration"
+                  {...fieldProps}
+                />
+                <EditableInfoRow
+                  icon={PenLine}
+                  label="Signature électronique"
+                  fieldKey="signature"
+                  value={profile?.signature}
+                  type="textarea"
+                  placeholder="Texte ou mention de signature…"
+                  {...fieldProps}
+                />
+              </div>
+            </CollapsibleSection>
           </div>
         )
 
