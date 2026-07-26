@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { ChevronRight, LogOut, Moon, PanelLeftClose, PanelLeftOpen, Search, Sun, User } from "lucide-react"
+import { ChevronRight, LifeBuoy, LogOut, Moon, PanelLeftClose, PanelLeftOpen, Search, Settings, Shield, Sun, User } from "lucide-react"
 
 import { UserAvatar } from "@/components/avatar/UserAvatar"
 import { Button } from "@/components/ui/button"
@@ -94,7 +94,11 @@ export function Topbar({ title }: { title: string }) {
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-48 overflow-hidden rounded-xl border border-border/50 bg-popover shadow-xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-1 duration-200">
+            <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-border/50 bg-popover shadow-xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-1 duration-200">
+              <div className="border-b border-border/50 px-4 py-3">
+                <p className="truncate text-sm font-semibold text-foreground">{user?.name ?? "Utilisateur"}</p>
+                <p className="truncate text-xs text-muted-foreground/70">{user?.email ?? ""}</p>
+              </div>
               <div className="p-1">
                 <button
                   type="button"
@@ -102,13 +106,41 @@ export function Topbar({ title }: { title: string }) {
                   className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                 >
                   <User className="size-4" />
-                  Profil
+                  Mon profil
                 </button>
+                <button
+                  type="button"
+                  onClick={() => { navigate("/dashboard/parametres/configuration"); closeMenu() }}
+                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                  <Settings className="size-4" />
+                  Paramètres du compte
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { navigate("/dashboard/administration/securite"); closeMenu() }}
+                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                  <Shield className="size-4" />
+                  Sécurité & confidentialité
+                </button>
+              </div>
+              <div className="border-t border-border/50 p-1">
+                <button
+                  type="button"
+                  onClick={() => { navigate("/dashboard/aide"); closeMenu() }}
+                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                  <LifeBuoy className="size-4" />
+                  Aide & support
+                </button>
+              </div>
+              <div className="border-t border-border/50 p-1">
                 <button
                   type="button"
                   onClick={() => { logout(); closeMenu() }}
                   disabled={isLoggingOut}
-                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
+                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10"
                 >
                   <LogOut className="size-4" />
                   {isLoggingOut ? "Déconnexion…" : "Déconnexion"}
