@@ -21,13 +21,13 @@ const roleColors: Record<string, string> = {
 
 function InfoRow({ label, value, icon: Icon }: { label: string; value: string | null | undefined; icon: typeof Shield }) {
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-border/30 bg-card px-3.5 py-3 shadow-sm transition-all hover:border-border/60 hover:shadow-md">
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 text-primary shadow-sm ring-1 ring-primary/10">
-        <Icon className="size-4" />
+    <div className="flex items-center gap-2.5 rounded-lg border border-border/20 bg-muted/10 px-3 py-2.5 transition-all hover:border-border/40 hover:bg-muted/20">
+      <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-background text-muted-foreground/50 shadow-sm ring-1 ring-border/20">
+        <Icon className="size-3.5" />
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">{label}</p>
-        <p className="mt-0.5 text-sm font-medium text-foreground truncate">{value ?? "—"}</p>
+        <p className="text-[10px] font-medium text-muted-foreground/50">{label}</p>
+        <p className="mt-px text-sm font-medium text-foreground truncate">{value ?? "—"}</p>
       </div>
     </div>
   )
@@ -146,7 +146,7 @@ export function UtilisateursPage() {
 
       <ModalRoot open={!!selectedUser} onOpenChange={(open) => { if (!open) setSelectedUser(null) }}>
         <ModalPopup size="full" className="overflow-hidden p-0 sm:mx-4 sm:max-w-3xl lg:max-w-4xl">
-          <ModalClose />
+          <ModalClose className="rounded-full bg-red-500/15 text-red-500 hover:bg-red-500/25 hover:text-red-600" />
           <div className="flex max-h-[70vh] flex-col sm:max-h-[75vh] md:flex-row">
             <div className="relative flex flex-col items-center gap-3 overflow-hidden bg-gradient-to-b from-violet-600 via-violet-600 to-indigo-700 px-4 py-5 text-white sm:px-6 sm:py-6 md:w-52 md:shrink-0 md:justify-between md:gap-4 lg:w-56">
               <div className="absolute -right-8 -top-8 size-32 rounded-full bg-white/5" />
@@ -174,96 +174,78 @@ export function UtilisateursPage() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto divide-y divide-border/30">
-              <div className="px-4 py-2.5 sm:px-6 sm:py-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary sm:size-8">
-                    <Shield className="size-3.5 sm:size-4" />
+            <div className="flex-1 overflow-y-auto">
+              <div className="space-y-0.5 p-4 sm:p-5">
+                <div className="rounded-lg bg-muted/20 px-3.5 py-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary">
+                      <Shield className="size-3.5" />
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">Général</p>
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">Informations générales</p>
-                    <p className="text-[11px] text-muted-foreground/60 sm:text-xs">Détails du compte utilisateur</p>
+                  <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
+                    <InfoRow label="Rôle" value={selectedUser?.role} icon={Shield} />
+                    <InfoRow label="Département" value={selectedUser?.department} icon={Shield} />
+                    <InfoRow label="Téléphone" value={selectedUser?.phone} icon={Phone} />
+                    <InfoRow label="Membre depuis" value={formatDate(selectedUser?.createdAt)} icon={Shield} />
                   </div>
                 </div>
-              </div>
-              <div className="px-4 py-3 sm:px-6 sm:py-4">
-                <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
-                  <InfoRow label="Rôle" value={selectedUser?.role} icon={Shield} />
-                  <InfoRow label="Département" value={selectedUser?.department} icon={Shield} />
-                  <InfoRow label="Téléphone" value={selectedUser?.phone} icon={Phone} />
-                  <InfoRow label="Membre depuis" value={formatDate(selectedUser?.createdAt)} icon={Shield} />
-                </div>
-              </div>
 
-              {selectedUser?.profile && (
-                <>
-                  <div className="px-4 py-2.5 sm:px-6 sm:py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary sm:size-8">
-                        <Shield className="size-3.5 sm:size-4" />
-                      </div>
-                      <div>
+                {selectedUser?.profile && (
+                  <>
+                    <div className="rounded-lg bg-muted/20 px-3.5 py-2.5">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary">
+                          <Shield className="size-3.5" />
+                        </div>
                         <p className="text-sm font-semibold text-foreground">Identité & Contact</p>
-                        <p className="text-[11px] text-muted-foreground/60 sm:text-xs">Informations personnelles</p>
+                      </div>
+                      <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
+                        <InfoRow label="Prénom" value={selectedUser.profile.firstName} icon={Shield} />
+                        <InfoRow label="Nom" value={selectedUser.profile.lastName} icon={Shield} />
+                        <InfoRow label="Nom d'affichage" value={selectedUser.profile.displayName} icon={Shield} />
+                        <InfoRow label="Date de naissance" value={formatDate(selectedUser.profile.birthDate ?? undefined)} icon={Shield} />
+                        <InfoRow label="Sexe" value={selectedUser.profile.gender} icon={Shield} />
+                        <InfoRow label="Email" value={selectedUser.email} icon={Mail} />
+                        <InfoRow label="Téléphone" value={selectedUser.profile.phone} icon={Phone} />
+                        <InfoRow label="Téléphone secondaire" value={selectedUser.profile.secondaryPhone} icon={Phone} />
                       </div>
                     </div>
-                  </div>
-                  <div className="px-4 py-3 sm:px-6 sm:py-4">
-                    <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
-                      <InfoRow label="Prénom" value={selectedUser.profile.firstName} icon={Shield} />
-                      <InfoRow label="Nom" value={selectedUser.profile.lastName} icon={Shield} />
-                      <InfoRow label="Nom d'affichage" value={selectedUser.profile.displayName} icon={Shield} />
-                      <InfoRow label="Date de naissance" value={formatDate(selectedUser.profile.birthDate ?? undefined)} icon={Shield} />
-                      <InfoRow label="Sexe" value={selectedUser.profile.gender} icon={Shield} />
-                      <InfoRow label="Email" value={selectedUser.email} icon={Mail} />
-                      <InfoRow label="Téléphone" value={selectedUser.profile.phone} icon={Phone} />
-                      <InfoRow label="Téléphone secondaire" value={selectedUser.profile.secondaryPhone} icon={Phone} />
-                    </div>
-                  </div>
 
-                  <div className="px-4 py-2.5 sm:px-6 sm:py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary sm:size-8">
-                        <MapPin className="size-3.5 sm:size-4" />
-                      </div>
-                      <div>
+                    <div className="rounded-lg bg-muted/20 px-3.5 py-2.5">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary">
+                          <MapPin className="size-3.5" />
+                        </div>
                         <p className="text-sm font-semibold text-foreground">Adresse</p>
-                        <p className="text-[11px] text-muted-foreground/60 sm:text-xs">Localisation</p>
+                      </div>
+                      <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
+                        <InfoRow label="Adresse" value={selectedUser.profile.address} icon={MapPin} />
+                        <InfoRow label="Ville" value={selectedUser.profile.city} icon={MapPin} />
+                        <InfoRow label="Région" value={selectedUser.profile.region} icon={MapPin} />
+                        <InfoRow label="Pays" value={selectedUser.profile.country} icon={MapPin} />
+                        <InfoRow label="Code postal" value={selectedUser.profile.postalCode} icon={MapPin} />
                       </div>
                     </div>
-                  </div>
-                  <div className="px-4 py-3 sm:px-6 sm:py-4">
-                    <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
-                      <InfoRow label="Adresse" value={selectedUser.profile.address} icon={MapPin} />
-                      <InfoRow label="Ville" value={selectedUser.profile.city} icon={MapPin} />
-                      <InfoRow label="Région" value={selectedUser.profile.region} icon={MapPin} />
-                      <InfoRow label="Pays" value={selectedUser.profile.country} icon={MapPin} />
-                      <InfoRow label="Code postal" value={selectedUser.profile.postalCode} icon={MapPin} />
-                    </div>
-                  </div>
 
-                  <div className="px-4 py-2.5 sm:px-6 sm:py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary sm:size-8">
-                        <Shield className="size-3.5 sm:size-4" />
-                      </div>
-                      <div>
+                    <div className="rounded-lg bg-muted/20 px-3.5 py-2.5">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary">
+                          <Shield className="size-3.5" />
+                        </div>
                         <p className="text-sm font-semibold text-foreground">Professionnel</p>
-                        <p className="text-[11px] text-muted-foreground/60 sm:text-xs">Poste et signature</p>
+                      </div>
+                      <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
+                        <InfoRow label="Poste" value={selectedUser.profile.jobTitle} icon={Shield} />
+                        <InfoRow label="Département" value={selectedUser.profile.department} icon={Shield} />
+                        <InfoRow label="Signature" value={selectedUser.profile.signature} icon={Shield} />
                       </div>
                     </div>
-                  </div>
-                  <div className="px-4 py-3 sm:px-6 sm:py-4">
-                    <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
-                      <InfoRow label="Poste" value={selectedUser.profile.jobTitle} icon={Shield} />
-                      <InfoRow label="Département" value={selectedUser.profile.department} icon={Shield} />
-                      <InfoRow label="Signature" value={selectedUser.profile.signature} icon={Shield} />
-                    </div>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
+              </div>
 
-              <div className="flex items-center justify-end gap-3 px-4 py-2.5 sm:px-6 sm:py-3">
+              <div className="flex items-center justify-end border-t border-border/20 px-4 py-2.5 sm:px-6 sm:py-3">
                 <Button variant="outline" size="sm" onClick={() => setSelectedUser(null)}>
                   Fermer
                 </Button>
