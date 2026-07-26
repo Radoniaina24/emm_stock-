@@ -308,12 +308,12 @@ export function ConfigurationPage() {
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <StatCard icon={Package} label="Produits gérés" value="—" color="bg-blue-500" />
               <StatCard icon={TrendingUp} label="Valeur du stock" value="—" color="bg-emerald-500" />
               <StatCard icon={ShoppingCart} label="Commandes / mois" value="—" color="bg-amber-500" />
               <StatCard icon={Store} label="Fournisseurs" value="—" color="bg-rose-500" />
-            </div>
+            </div> */}
 
             <CollapsibleSection
               title="Informations personnelles"
