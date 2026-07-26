@@ -174,45 +174,45 @@ const GENDER_OPTIONS = [
 
 function CollapsibleSection({
   title,
-  description,
   icon: Icon,
   children,
+  divider,
 }: {
   title: string
-  description: string
   icon: typeof Briefcase
   children: React.ReactNode
+  divider?: boolean
 }) {
   const [open, setOpen] = useState(false)
   return (
-    <Card>
+    <div className={cn(divider && "border-t border-border/40")}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center gap-3 px-6 pt-5 pb-4 text-left transition-colors hover:bg-muted/30"
+        className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-muted/20"
       >
-        <div className="flex size-9 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+        <div className="flex size-8 items-center justify-center rounded-lg bg-muted text-muted-foreground/60">
           <Icon className="size-4" />
         </div>
-        <div className="flex-1 min-w-0">
-          <CardTitle className="text-base">{title}</CardTitle>
-          <CardDescription className="mt-0.5">{description}</CardDescription>
-        </div>
-        <div className="flex size-6 items-center justify-center rounded-md text-muted-foreground/50 transition-transform duration-200">
-          {open ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
+        <span className="flex-1 text-sm font-medium text-foreground">{title}</span>
+        <div className={cn(
+          "flex size-6 items-center justify-center rounded-md text-muted-foreground/30 transition-all duration-200",
+          open && "text-muted-foreground/60"
+        )}>
+          <ChevronRight className={cn("size-4 transition-transform duration-200", open && "rotate-90")} />
         </div>
       </button>
       <div
         className={cn(
-          "overflow-hidden transition-all duration-300",
+          "overflow-hidden transition-all duration-300 ease-in-out",
           open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
         )}
       >
-        <div className="border-t border-border/50 px-6 py-4">
+        <div className="px-5 pb-5">
           {children}
         </div>
       </div>
-    </Card>
+    </div>
   )
 }
 
@@ -315,187 +315,173 @@ export function ConfigurationPage() {
               <StatCard icon={Store} label="Fournisseurs" value="—" color="bg-rose-500" />
             </div> */}
 
-            <CollapsibleSection
-              title="Informations personnelles"
-              description="Cliquez sur le crayon pour modifier un champ — enregistrement immédiat."
-              icon={UserRound}
-            >
-              <div className="grid gap-x-6 gap-y-0 sm:grid-cols-2">
-                <EditableInfoRow
-                  icon={UserRound}
-                  label="Prénom"
-                  fieldKey="firstName"
-                  value={profile?.firstName}
-                  {...fieldProps}
-                />
-                <EditableInfoRow
-                  icon={UserRound}
-                  label="Nom"
-                  fieldKey="lastName"
-                  value={profile?.lastName}
-                  {...fieldProps}
-                />
-                <EditableInfoRow
-                  icon={UserRound}
-                  label="Nom d'affichage"
-                  fieldKey="displayName"
-                  value={profile?.displayName}
-                  {...fieldProps}
-                />
-                <EditableInfoRow
-                  icon={Mail}
-                  label="Adresse e-mail"
-                  fieldKey="email"
-                  value={user.email}
-                  editable={false}
-                  disabledReason="L'e-mail du compte n'est pas modifiable ici"
-                  {...fieldProps}
-                />
-                <EditableInfoRow
-                  icon={Phone}
-                  label="Téléphone"
-                  fieldKey="phone"
-                  value={profile?.phone ?? user.phone}
-                  type="tel"
-                  placeholder="+261 …"
-                  {...fieldProps}
-                />
-                <EditableInfoRow
-                  icon={Phone}
-                  label="Téléphone secondaire"
-                  fieldKey="secondaryPhone"
-                  value={profile?.secondaryPhone}
-                  type="tel"
-                  {...fieldProps}
-                />
-                <EditableInfoRow
-                  icon={Calendar}
-                  label="Date de naissance"
-                  fieldKey="birthDate"
-                  value={profile?.birthDate ?? ""}
-                  displayValue={
-                    profile?.birthDate ? formatDate(profile.birthDate) : "Non renseigné"
-                  }
-                  type="date"
-                  placeholder="Choisir une date"
-                  {...fieldProps}
-                />
-                <EditableInfoRow
-                  icon={UserRound}
-                  label="Sexe"
-                  fieldKey="gender"
-                  value={profile?.gender}
-                  type="select"
-                  options={GENDER_OPTIONS}
-                  placeholder="Sélectionner le sexe"
-                  {...fieldProps}
-                />
-                <EditableInfoRow
-                  icon={Calendar}
-                  label="Membre depuis"
-                  fieldKey="createdAt"
-                  value={joinedAt}
-                  displayValue={formatDate(joinedAt)}
-                  editable={false}
-                  disabledReason="Date système non modifiable"
-                  {...fieldProps}
-                />
-              </div>
-            </CollapsibleSection>
+            <div className="overflow-hidden rounded-xl border border-border/50 bg-card shadow-sm">
+              <CollapsibleSection title="Informations personnelles" icon={UserRound}>
+                <div className="grid gap-x-6 gap-y-0 sm:grid-cols-2">
+                  <EditableInfoRow
+                    icon={UserRound}
+                    label="Prénom"
+                    fieldKey="firstName"
+                    value={profile?.firstName}
+                    {...fieldProps}
+                  />
+                  <EditableInfoRow
+                    icon={UserRound}
+                    label="Nom"
+                    fieldKey="lastName"
+                    value={profile?.lastName}
+                    {...fieldProps}
+                  />
+                  <EditableInfoRow
+                    icon={UserRound}
+                    label="Nom d'affichage"
+                    fieldKey="displayName"
+                    value={profile?.displayName}
+                    {...fieldProps}
+                  />
+                  <EditableInfoRow
+                    icon={Mail}
+                    label="Adresse e-mail"
+                    fieldKey="email"
+                    value={user.email}
+                    editable={false}
+                    disabledReason="L'e-mail du compte n'est pas modifiable ici"
+                    {...fieldProps}
+                  />
+                  <EditableInfoRow
+                    icon={Phone}
+                    label="Téléphone"
+                    fieldKey="phone"
+                    value={profile?.phone ?? user.phone}
+                    type="tel"
+                    placeholder="+261 …"
+                    {...fieldProps}
+                  />
+                  <EditableInfoRow
+                    icon={Phone}
+                    label="Téléphone secondaire"
+                    fieldKey="secondaryPhone"
+                    value={profile?.secondaryPhone}
+                    type="tel"
+                    {...fieldProps}
+                  />
+                  <EditableInfoRow
+                    icon={Calendar}
+                    label="Date de naissance"
+                    fieldKey="birthDate"
+                    value={profile?.birthDate ?? ""}
+                    displayValue={
+                      profile?.birthDate ? formatDate(profile.birthDate) : "Non renseigné"
+                    }
+                    type="date"
+                    placeholder="Choisir une date"
+                    {...fieldProps}
+                  />
+                  <EditableInfoRow
+                    icon={UserRound}
+                    label="Sexe"
+                    fieldKey="gender"
+                    value={profile?.gender}
+                    type="select"
+                    options={GENDER_OPTIONS}
+                    placeholder="Sélectionner le sexe"
+                    {...fieldProps}
+                  />
+                  <EditableInfoRow
+                    icon={Calendar}
+                    label="Membre depuis"
+                    fieldKey="createdAt"
+                    value={joinedAt}
+                    displayValue={formatDate(joinedAt)}
+                    editable={false}
+                    disabledReason="Date système non modifiable"
+                    {...fieldProps}
+                  />
+                </div>
+              </CollapsibleSection>
 
-            <CollapsibleSection
-              title="Informations professionnelles"
-              description="Poste, département et informations liées à votre fonction."
-              icon={Briefcase}
-            >
-              <div className="grid gap-x-6 gap-y-0 sm:grid-cols-2">
-                <EditableInfoRow
-                  icon={Briefcase}
-                  label="Poste / Fonction"
-                  fieldKey="jobTitle"
-                  value={profile?.jobTitle}
-                  {...fieldProps}
-                />
-                <EditableInfoRow
-                  icon={Building2}
-                  label="Département"
-                  fieldKey="department"
-                  value={profile?.department ?? user.department}
-                  {...fieldProps}
-                />
-              </div>
-            </CollapsibleSection>
+              <CollapsibleSection title="Informations professionnelles" icon={Briefcase} divider>
+                <div className="grid gap-x-6 gap-y-0 sm:grid-cols-2">
+                  <EditableInfoRow
+                    icon={Briefcase}
+                    label="Poste / Fonction"
+                    fieldKey="jobTitle"
+                    value={profile?.jobTitle}
+                    {...fieldProps}
+                  />
+                  <EditableInfoRow
+                    icon={Building2}
+                    label="Département"
+                    fieldKey="department"
+                    value={profile?.department ?? user.department}
+                    {...fieldProps}
+                  />
+                </div>
+              </CollapsibleSection>
 
-            <CollapsibleSection
-              title="Adresse"
-              description="Localisation professionnelle / personnelle."
-              icon={MapPin}
-            >
-              <div className="grid gap-x-6 gap-y-0 sm:grid-cols-2">
-                <EditableInfoRow
-                  icon={MapPin}
-                  label="Adresse"
-                  fieldKey="address"
-                  value={profile?.address}
-                  {...fieldProps}
-                />
-                <EditableInfoRow
-                  icon={MapPin}
-                  label="Ville"
-                  fieldKey="city"
-                  value={profile?.city}
-                  {...fieldProps}
-                />
-                <EditableInfoRow
-                  icon={MapPin}
-                  label="Région"
-                  fieldKey="region"
-                  value={profile?.region}
-                  {...fieldProps}
-                />
-                <EditableInfoRow
-                  icon={MapPin}
-                  label="Pays"
-                  fieldKey="country"
-                  value={profile?.country}
-                  {...fieldProps}
-                />
-                <EditableInfoRow
-                  icon={MapPin}
-                  label="Code postal"
-                  fieldKey="postalCode"
-                  value={profile?.postalCode}
-                  {...fieldProps}
-                />
-              </div>
-            </CollapsibleSection>
+              <CollapsibleSection title="Adresse" icon={MapPin} divider>
+                <div className="grid gap-x-6 gap-y-0 sm:grid-cols-2">
+                  <EditableInfoRow
+                    icon={MapPin}
+                    label="Adresse"
+                    fieldKey="address"
+                    value={profile?.address}
+                    {...fieldProps}
+                  />
+                  <EditableInfoRow
+                    icon={MapPin}
+                    label="Ville"
+                    fieldKey="city"
+                    value={profile?.city}
+                    {...fieldProps}
+                  />
+                  <EditableInfoRow
+                    icon={MapPin}
+                    label="Région"
+                    fieldKey="region"
+                    value={profile?.region}
+                    {...fieldProps}
+                  />
+                  <EditableInfoRow
+                    icon={MapPin}
+                    label="Pays"
+                    fieldKey="country"
+                    value={profile?.country}
+                    {...fieldProps}
+                  />
+                  <EditableInfoRow
+                    icon={MapPin}
+                    label="Code postal"
+                    fieldKey="postalCode"
+                    value={profile?.postalCode}
+                    {...fieldProps}
+                  />
+                </div>
+              </CollapsibleSection>
 
-            <CollapsibleSection
-              title="Rôle & signature"
-              description="Accès compte et signature électronique."
-              icon={Shield}
-            >
-              <div className="grid gap-x-6 gap-y-0 sm:grid-cols-2">
-                <EditableInfoRow
-                  icon={Shield}
-                  label="Rôle"
-                  fieldKey="role"
-                  value={user.role}
-                  editable={false}
-                  disabledReason="Le rôle est géré par l'administration"
-                  {...fieldProps}
-                />
-                <EditableInfoRow
-                  icon={PenLine}
-                  label="Signature électronique"
-                  fieldKey="signature"
-                  value={profile?.signature}
-                  type="textarea"
-                  placeholder="Texte ou mention de signature…"
-                  {...fieldProps}
-                />
-              </div>
-            </CollapsibleSection>
+              <CollapsibleSection title="Rôle & signature" icon={Shield} divider>
+                <div className="grid gap-x-6 gap-y-0 sm:grid-cols-2">
+                  <EditableInfoRow
+                    icon={Shield}
+                    label="Rôle"
+                    fieldKey="role"
+                    value={user.role}
+                    editable={false}
+                    disabledReason="Le rôle est géré par l'administration"
+                    {...fieldProps}
+                  />
+                  <EditableInfoRow
+                    icon={PenLine}
+                    label="Signature électronique"
+                    fieldKey="signature"
+                    value={profile?.signature}
+                    type="textarea"
+                    placeholder="Texte ou mention de signature…"
+                    {...fieldProps}
+                  />
+                </div>
+              </CollapsibleSection>
+            </div>
           </div>
         )
 
