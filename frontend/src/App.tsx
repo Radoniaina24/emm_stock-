@@ -21,6 +21,7 @@ import { LandingPage } from "@/pages/LandingPage"
 import { ProfilePage } from "@/pages/ProfilePage"
 import { LoginPage } from "@/pages/LoginPage"
 import { ConfigurationPage } from "@/pages/parametres/ConfigurationPage"
+import { UtilisateursPage } from "@/pages/administration/UtilisateursPage"
 
 function App() {
   return (
@@ -119,7 +120,7 @@ function App() {
             <Route path="rapports/marge" element={<div className="text-muted-foreground">Marge</div>} />
             <Route path="rapports/export" element={<div className="text-muted-foreground">Export Excel/PDF</div>} />
             <Route path="administration" element={<div className="text-muted-foreground">Administration</div>} />
-            <Route path="administration/utilisateurs" element={<div className="text-muted-foreground">Utilisateurs</div>} />
+            <Route path="administration/utilisateurs" element={<UtilisateursPage />} />
             <Route path="administration/roles" element={<div className="text-muted-foreground">Rôles</div>} />
             <Route path="administration/permissions" element={<div className="text-muted-foreground">Permissions</div>} />
             <Route path="administration/journal" element={<div className="text-muted-foreground">Journal d'activité</div>} />

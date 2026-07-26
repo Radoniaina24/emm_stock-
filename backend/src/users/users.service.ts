@@ -17,6 +17,14 @@ const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"])
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findAll() {
+    const users = await this.prisma.user.findMany({
+      select: userWithProfileSelect,
+      orderBy: { createdAt: "desc" },
+    })
+    return users.map((u) => toAuthUserDto(u))
+  }
+
   async getMe(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },

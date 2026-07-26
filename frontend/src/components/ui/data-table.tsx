@@ -231,17 +231,40 @@ function DataTablePagination<TData>({
       </div>
 
       <div className="flex items-center gap-3">
-        <select
-          value={table.getState().pagination.pageSize}
-          onChange={(e) => table.setPageSize(Number(e.target.value))}
-          className="h-8 rounded-lg border border-border/60 bg-muted/30 px-2 text-xs font-medium text-muted-foreground outline-none transition-all hover:border-border focus:border-ring/80 focus:bg-background focus:shadow-[0_0_0_3px_rgba(59,130,246,0.08)]"
-        >
-          {sizes.map((size) => (
-            <option key={size} value={size}>
-              {size} / page
-            </option>
-          ))}
-        </select>
+        <BasePopover.Root>
+          <BasePopover.Trigger
+            render={
+              <button
+                type="button"
+                className="flex h-8 items-center gap-1.5 rounded-lg border border-border/60 bg-muted/30 px-2.5 text-xs font-medium text-muted-foreground outline-none transition-all hover:border-border focus:border-ring/80 focus:bg-background focus:shadow-[0_0_0_3px_rgba(59,130,246,0.08)]"
+              >
+                {table.getState().pagination.pageSize} / page
+                <ChevronsLeft className="size-3 rotate-90" />
+              </button>
+            }
+          />
+          <BasePopover.Portal>
+            <BasePopover.Positioner sideOffset={4} align="start">
+              <BasePopover.Popup className="z-50 min-w-32 origin-top-right rounded-xl border border-border/60 bg-popover p-1 text-sm shadow-lg shadow-black/5 outline-none transition-[transform,opacity] data-[open]:animate-in data-[closed]:animate-out data-[closed]:fade-out-0 data-[open]:fade-in-0 data-[closed]:zoom-out-95 data-[open]:zoom-in-95">
+                {sizes.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => table.setPageSize(size)}
+                    className={cn(
+                      "flex w-full items-center rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors",
+                      table.getState().pagination.pageSize === size
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
+                    )}
+                  >
+                    {size} / page
+                  </button>
+                ))}
+              </BasePopover.Popup>
+            </BasePopover.Positioner>
+          </BasePopover.Portal>
+        </BasePopover.Root>
 
         <div className="flex items-center gap-1">
           <Button
@@ -390,7 +413,7 @@ function DataTable<TData>({
     if (renderActions) {
       cols.push({
         id: "actions",
-        header: "",
+        header: "Action",
         cell: ({ row }) => renderActions(row.original),
         enableSorting: false,
         enableHiding: false,
@@ -511,7 +534,7 @@ function DataTable<TData>({
                           "group/head h-11 px-3 text-left align-middle text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 transition-colors",
                           canSort && "cursor-pointer select-none hover:text-foreground",
                           header.id === "select" && "w-12 px-2",
-                          header.id === "actions" && "w-14 px-1 text-right",
+                          header.id === "actions" && "w-24 px-1 text-right",
                         )}
                         onClick={
                           canSort

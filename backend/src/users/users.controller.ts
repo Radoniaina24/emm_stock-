@@ -34,6 +34,13 @@ import { UsersService } from "./users.service.js"
 export class UsersController {
   constructor(private readonly users: UsersService) {}
 
+  @Get()
+  @ApiOperation({ summary: "Liste de tous les utilisateurs" })
+  @ApiOkResponse({ description: "Liste des utilisateurs" })
+  findAll() {
+    return this.users.findAll()
+  }
+
   @Get("me")
   @ApiOperation({ summary: "Profil complet (user + user_profiles)" })
   @ApiOkResponse({ description: "Utilisateur authentifié avec profil" })

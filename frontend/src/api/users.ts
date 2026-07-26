@@ -1,6 +1,10 @@
 import { api } from "@/lib/api"
 import type { UpdateProfilePayload, User } from "@/types/auth"
 
+export function getUsers() {
+  return api<User[]>("/users")
+}
+
 export function getMe() {
   return api<User>("/users/me")
 }

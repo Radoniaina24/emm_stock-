@@ -26,6 +26,9 @@ let UsersController = class UsersController {
     constructor(users) {
         this.users = users;
     }
+    findAll() {
+        return this.users.findAll();
+    }
     getMe(userId) {
         return this.users.getMe(userId);
     }
@@ -40,6 +43,14 @@ let UsersController = class UsersController {
     }
 };
 exports.UsersController = UsersController;
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: "Liste de tous les utilisateurs" }),
+    (0, swagger_1.ApiOkResponse)({ description: "Liste des utilisateurs" }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)("me"),
     (0, swagger_1.ApiOperation)({ summary: "Profil complet (user + user_profiles)" }),

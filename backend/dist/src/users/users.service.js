@@ -23,6 +23,13 @@ let UsersService = class UsersService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async findAll() {
+        const users = await this.prisma.user.findMany({
+            select: user_mapper_js_1.userWithProfileSelect,
+            orderBy: { createdAt: "desc" },
+        });
+        return users.map((u) => (0, user_mapper_js_1.toAuthUserDto)(u));
+    }
     async getMe(userId) {
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
