@@ -1,5 +1,6 @@
+import { useCallback, useEffect, useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { ChevronRight, LogOut, Moon, PanelLeftClose, PanelLeftOpen, Search, Sun } from "lucide-react"
+import { ChevronRight, LogOut, Moon, PanelLeftClose, PanelLeftOpen, Search, Sun, User } from "lucide-react"
 
 import { UserAvatar } from "@/components/avatar/UserAvatar"
 import { Button } from "@/components/ui/button"
@@ -12,6 +13,20 @@ export function Topbar({ title }: { title: string }) {
   const { theme, toggleTheme } = useTheme()
   const { collapsed, toggle: toggleSidebar } = useSidebar()
   const navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  const closeMenu = useCallback(() => setMenuOpen(false), [])
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        closeMenu()
+      }
+    }
+    if (menuOpen) document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [menuOpen, closeMenu])
 
   return (
     <header className="sticky top-0 z-40 flex h-16 min-h-16 shrink-0 items-center gap-4 border-b border-border/50 bg-background/80 px-4 shadow-sm backdrop-blur-xl lg:px-6">
@@ -58,28 +73,50 @@ export function Topbar({ title }: { title: string }) {
 
         <div className="mx-1.5 h-5 w-px bg-border/50" />
 
-        <button
-          type="button"
-          onClick={() => navigate("/dashboard/profil")}
-          aria-label="Mon profil"
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-[10px] font-semibold text-white ring-1 ring-border/60 transition-opacity hover:opacity-90"
-        >
-          {user ? <UserAvatar user={user} /> : null}
-        </button>
+        <div ref={menuRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Mon profil"
+            className="flex items-center gap-2.5 rounded-xl px-3 py-1.5 text-left transition-all duration-200 hover:bg-sidebar-accent/40"
+          >
+            <div className="flex size-9 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-[10px] font-semibold text-white ring-1 ring-border/60">
+              {user ? <UserAvatar user={user} /> : null}
+            </div>
+            <div className="hidden sm:block">
+              <p className="truncate text-sm font-semibold text-foreground">
+                {user?.name ?? "Utilisateur"}
+              </p>
+              <p className="truncate text-xs text-muted-foreground/70">
+                {user?.email ?? ""}
+              </p>
+            </div>
+          </button>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => logout()}
-          disabled={isLoggingOut}
-          aria-label="Se déconnecter"
-          className="h-8 gap-1.5 border-border/60 px-2.5 text-xs font-medium text-muted-foreground/70 hover:text-destructive"
-        >
-          <LogOut className="size-3.5" />
-          <span className="hidden sm:inline">
-            {isLoggingOut ? "…" : "Déconnexion"}
-          </span>
-        </Button>
+          {menuOpen && (
+            <div className="absolute right-0 top-full mt-2 w-48 overflow-hidden rounded-xl border border-border/50 bg-popover shadow-xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-1 duration-200">
+              <div className="p-1">
+                <button
+                  type="button"
+                  onClick={() => { navigate("/dashboard/profil"); closeMenu() }}
+                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                  <User className="size-4" />
+                  Profil
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { logout(); closeMenu() }}
+                  disabled={isLoggingOut}
+                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
+                >
+                  <LogOut className="size-4" />
+                  {isLoggingOut ? "Déconnexion…" : "Déconnexion"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   )

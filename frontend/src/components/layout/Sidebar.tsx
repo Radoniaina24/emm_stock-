@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { NavLink, useLocation, useNavigate } from "react-router-dom"
+import { NavLink, useLocation } from "react-router-dom"
 import {
   AlertTriangle,
   ArrowDownToLine,
@@ -377,7 +377,6 @@ function MenuSection({
 export function Sidebar() {
   const { collapsed } = useSidebar()
   const location = useLocation()
-  const navigate = useNavigate()
   const [produitsOpen, setProduitsOpen] = useState(
     location.pathname.startsWith("/dashboard/produits")
   )
@@ -795,40 +794,6 @@ export function Sidebar() {
           />
         ))}
       </nav>
-
-      <div className="border-t border-sidebar-border/50 p-3">
-        {collapsed ? (
-          <div className="flex justify-center">
-            <button
-              onClick={() => navigate("/dashboard/profil")}
-              title="Profil"
-              className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 text-sm font-bold text-sidebar-primary-foreground shadow-sm ring-1 ring-white/10 transition-all duration-200 hover:from-sidebar-primary/90 hover:to-sidebar-primary/70"
-            >
-              TM
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => navigate("/dashboard/profil")}
-            className="group flex w-full items-center gap-3 rounded-xl bg-sidebar-accent/40 p-3 text-left transition-all duration-200 hover:bg-sidebar-accent/60"
-          >
-            <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 text-sm font-bold text-sidebar-primary-foreground shadow-sm ring-1 ring-white/10">
-              TM
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-sidebar-foreground">
-                Thomas Martin
-              </p>
-              <p className="truncate text-xs text-muted-foreground/70">
-                admin@stockflow.app
-              </p>
-            </div>
-            <div className="flex size-6 items-center justify-center rounded-md opacity-0 transition-opacity group-hover:opacity-100">
-              <Settings className="size-3.5 text-muted-foreground/50" />
-            </div>
-          </button>
-        )}
-      </div>
     </aside>
   )
 }
