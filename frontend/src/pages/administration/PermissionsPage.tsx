@@ -184,6 +184,7 @@ export function PermissionsPage() {
   const deletePermission = useDeletePermissionMutation()
 
   const [moduleFilter, setModuleFilter] = useState<string | null>(null)
+  const [actionFilter, setActionFilter] = useState<string | null>(null)
   const [selectedPermission, setSelectedPermission] = useState<Permission | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [editingPermission, setEditingPermission] = useState<Permission | null>(null)
@@ -322,11 +323,18 @@ export function PermissionsPage() {
     return [...new Set(permissions.map((p) => p.module))].sort()
   }, [permissions])
 
+  const actions = useMemo(() => {
+    if (!permissions) return []
+    return [...new Set(permissions.map((p) => p.action))].sort()
+  }, [permissions])
+
   const filteredPermissions = useMemo(() => {
     if (!permissions) return []
-    if (!moduleFilter) return permissions
-    return permissions.filter((p) => p.module === moduleFilter)
-  }, [permissions, moduleFilter])
+    let result = permissions
+    if (moduleFilter) result = result.filter((p) => p.module === moduleFilter)
+    if (actionFilter) result = result.filter((p) => p.action === actionFilter)
+    return result
+  }, [permissions, moduleFilter, actionFilter])
 
   return (
     <div className="w-full space-y-6">
@@ -348,26 +356,48 @@ export function PermissionsPage() {
         columns={columns}
         data={filteredPermissions}
         filters={
-          <SelectRoot value={moduleFilter ?? ""} onValueChange={(value) => setModuleFilter(value || null)}>
-            <SelectTrigger className="w-48 bg-background h-9">
-              <SelectValue placeholder="Filtrer par module…" />
-            </SelectTrigger>
-            <SelectPopup>
-              <SelectList>
-                <SelectItem value="" className="py-1">
-                  <span className="flex items-center gap-2 text-muted-foreground">
-                    <FilterX className="size-3.5" />
-                    Tous les modules
-                  </span>
-                </SelectItem>
-                {modules.map((module) => (
-                  <SelectItem key={module} value={module} className="py-1">
-                    {module}
+          <div className="flex items-center gap-2">
+            <SelectRoot value={moduleFilter ?? ""} onValueChange={(value) => setModuleFilter(value || null)}>
+              <SelectTrigger className="w-48 bg-background h-9">
+                <SelectValue placeholder="Filtrer par module…" />
+              </SelectTrigger>
+              <SelectPopup searchable searchPlaceholder="Rechercher un module…">
+                <SelectList>
+                  <SelectItem value="">
+                    <span className="flex items-center gap-2 text-muted-foreground">
+                      <FilterX className="size-3.5" />
+                      Tous les modules
+                    </span>
                   </SelectItem>
-                ))}
-              </SelectList>
-            </SelectPopup>
-          </SelectRoot>
+                  {modules.map((module) => (
+                    <SelectItem key={module} value={module}>
+                      {module}
+                    </SelectItem>
+                  ))}
+                </SelectList>
+              </SelectPopup>
+            </SelectRoot>
+            <SelectRoot value={actionFilter ?? ""} onValueChange={(value) => setActionFilter(value || null)}>
+              <SelectTrigger className="w-48 bg-background h-9">
+                <SelectValue placeholder="Filtrer par action…" />
+              </SelectTrigger>
+              <SelectPopup searchable searchPlaceholder="Rechercher une action…">
+                <SelectList>
+                  <SelectItem value="">
+                    <span className="flex items-center gap-2 text-muted-foreground">
+                      <FilterX className="size-3.5" />
+                      Toutes les actions
+                    </span>
+                  </SelectItem>
+                  {actions.map((action) => (
+                    <SelectItem key={action} value={action}>
+                      {action}
+                    </SelectItem>
+                  ))}
+                </SelectList>
+              </SelectPopup>
+            </SelectRoot>
+          </div>
         }
         searchKey="code"
         searchPlaceholder="Rechercher une permission..."

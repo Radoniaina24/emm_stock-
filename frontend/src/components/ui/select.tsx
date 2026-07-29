@@ -58,8 +58,10 @@ function SelectValue({
 
 function SelectPopup({
   className,
+  searchable,
+  searchPlaceholder,
   ...props
-}: SelectPrimitive.Popup.Props & { className?: string }) {
+}: SelectPrimitive.Popup.Props & { className?: string; searchable?: boolean; searchPlaceholder?: string }) {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner side="bottom" align="start" sideOffset={4}>
