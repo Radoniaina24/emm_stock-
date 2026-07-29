@@ -158,10 +158,214 @@ const permissions: PermissionSeed[] = [
   { module: "Rôles", action: "Modifier", code: "roles.update", description: "Modifier un rôle." },
   { module: "Rôles", action: "Supprimer", code: "roles.delete", description: "Supprimer un rôle." },
   { module: "Rôles", action: "Attribuer", code: "roles.assign_permissions", description: "Attribuer ou retirer des permissions à un rôle." },
+  { module: "Permissions", action: "Voir", code: "permissions.view", description: "Consulter la liste des permissions." },
+  { module: "Permissions", action: "Créer", code: "permissions.create", description: "Créer une nouvelle permission." },
+  { module: "Permissions", action: "Modifier", code: "permissions.update", description: "Modifier une permission." },
+  { module: "Permissions", action: "Supprimer", code: "permissions.delete", description: "Supprimer une permission." },
+  { module: "Entrées", action: "Voir", code: "entries.view", description: "Consulter les entrées de stock." },
+  { module: "Entrées", action: "Créer", code: "entries.create", description: "Créer une nouvelle entrée de stock." },
+  { module: "Entrées", action: "Modifier", code: "entries.update", description: "Modifier une entrée de stock." },
+  { module: "Entrées", action: "Annuler", code: "entries.cancel", description: "Annuler une entrée de stock." },
+  { module: "Entrées", action: "Valider", code: "entries.approve", description: "Valider une entrée de stock." },
+  { module: "Sorties", action: "Voir", code: "exits.view", description: "Consulter les sorties de stock." },
+  { module: "Sorties", action: "Créer", code: "exits.create", description: "Créer une nouvelle sortie de stock." },
+  { module: "Sorties", action: "Modifier", code: "exits.update", description: "Modifier une sortie de stock." },
+  { module: "Sorties", action: "Annuler", code: "exits.cancel", description: "Annuler une sortie de stock." },
+  { module: "Sorties", action: "Valider", code: "exits.approve", description: "Valider une sortie de stock." },
+  { module: "Mouvements", action: "Voir", code: "movements.view", description: "Consulter l'historique des mouvements." },
+  { module: "Mouvements", action: "Exporter", code: "movements.export", description: "Exporter les mouvements de stock." },
+  { module: "Rapports", action: "Voir", code: "reports.view", description: "Consulter les rapports." },
+  { module: "Rapports", action: "Exporter", code: "reports.export", description: "Exporter les rapports en PDF/Excel." },
+  { module: "Tableau de bord", action: "Voir", code: "dashboard.view", description: "Accéder au tableau de bord." },
+  { module: "Paramètres", action: "Voir", code: "settings.view", description: "Consulter les paramètres." },
+  { module: "Paramètres", action: "Modifier", code: "settings.update", description: "Modifier les paramètres de l'application." },
 ]
 
 const roleCodeToId: Record<string, string> = {}
 const permissionCodeToId: Record<string, string> = {}
+
+type RolePermissionAssignment = {
+  roleCode: string
+  permissionCodes: string[]
+}
+
+const rolePermissionsMap: RolePermissionAssignment[] = [
+  {
+    roleCode: "SUPER_ADMIN",
+    permissionCodes: [
+      "dashboard.view",
+      "products.view", "products.create", "products.update", "products.delete", "products.import", "products.export", "products.print",
+      "categories.view", "categories.create", "categories.update", "categories.delete",
+      "warehouses.view", "warehouses.create", "warehouses.update", "warehouses.delete", "warehouses.transfer",
+      "stocks.view", "stocks.adjust", "stocks.transfer", "stocks.reserve", "stocks.release", "stocks.export",
+      "inventories.view", "inventories.create", "inventories.update", "inventories.validate", "inventories.cancel",
+      "suppliers.view", "suppliers.create", "suppliers.update", "suppliers.delete",
+      "purchases.view", "purchases.create", "purchases.update", "purchases.approve", "purchases.cancel", "purchases.receive",
+      "customers.view", "customers.create", "customers.update", "customers.delete",
+      "sales.view", "sales.create", "sales.update", "sales.approve", "sales.cancel",
+      "entries.view", "entries.create", "entries.update", "entries.cancel", "entries.approve",
+      "exits.view", "exits.create", "exits.update", "exits.cancel", "exits.approve",
+      "movements.view", "movements.export",
+      "reports.view", "reports.export",
+      "users.view", "users.create", "users.update", "users.delete", "users.reset_password",
+      "roles.view", "roles.create", "roles.update", "roles.delete", "roles.assign_permissions",
+      "permissions.view", "permissions.create", "permissions.update", "permissions.delete",
+      "settings.view", "settings.update",
+    ],
+  },
+  {
+    roleCode: "ADMIN",
+    permissionCodes: [
+      "dashboard.view",
+      "products.view", "products.create", "products.update", "products.import", "products.export", "products.print",
+      "categories.view", "categories.create", "categories.update", "categories.delete",
+      "warehouses.view", "warehouses.create", "warehouses.update", "warehouses.transfer",
+      "stocks.view", "stocks.adjust", "stocks.transfer", "stocks.reserve", "stocks.release", "stocks.export",
+      "inventories.view", "inventories.create", "inventories.update", "inventories.validate", "inventories.cancel",
+      "suppliers.view", "suppliers.create", "suppliers.update", "suppliers.delete",
+      "purchases.view", "purchases.create", "purchases.update", "purchases.approve", "purchases.cancel", "purchases.receive",
+      "customers.view", "customers.create", "customers.update", "customers.delete",
+      "sales.view", "sales.create", "sales.update", "sales.approve", "sales.cancel",
+      "entries.view", "entries.create", "entries.update", "entries.approve",
+      "exits.view", "exits.create", "exits.update", "exits.approve",
+      "movements.view", "movements.export",
+      "reports.view", "reports.export",
+      "users.view", "users.create", "users.update", "users.reset_password",
+      "roles.view", "roles.update",
+      "permissions.view",
+      "settings.view", "settings.update",
+    ],
+  },
+  {
+    roleCode: "STOCK_MANAGER",
+    permissionCodes: [
+      "dashboard.view",
+      "products.view", "products.create", "products.update", "products.import", "products.export", "products.print",
+      "categories.view", "categories.create", "categories.update",
+      "warehouses.view", "warehouses.create", "warehouses.update", "warehouses.transfer",
+      "stocks.view", "stocks.adjust", "stocks.transfer", "stocks.reserve", "stocks.release", "stocks.export",
+      "inventories.view", "inventories.create", "inventories.update", "inventories.validate",
+      "entries.view", "entries.create", "entries.update", "entries.approve",
+      "exits.view", "exits.create", "exits.update", "exits.approve",
+      "movements.view", "movements.export",
+      "reports.view", "reports.export",
+      "suppliers.view",
+      "purchases.view",
+    ],
+  },
+  {
+    roleCode: "STOREKEEPER",
+    permissionCodes: [
+      "dashboard.view",
+      "products.view", "products.export", "products.print",
+      "categories.view",
+      "warehouses.view",
+      "stocks.view", "stocks.adjust", "stocks.export",
+      "inventories.view", "inventories.create", "inventories.update",
+      "entries.view", "entries.create",
+      "exits.view", "exits.create",
+      "movements.view",
+      "suppliers.view",
+      "purchases.view", "purchases.receive",
+    ],
+  },
+  {
+    roleCode: "PURCHASE_MANAGER",
+    permissionCodes: [
+      "dashboard.view",
+      "products.view", "products.create", "products.update", "products.import", "products.export",
+      "categories.view", "categories.create", "categories.update",
+      "suppliers.view", "suppliers.create", "suppliers.update", "suppliers.delete",
+      "purchases.view", "purchases.create", "purchases.update", "purchases.approve", "purchases.cancel", "purchases.receive",
+      "entries.view", "entries.create", "entries.approve",
+      "stocks.view",
+      "movements.view",
+      "reports.view", "reports.export",
+      "warehouses.view",
+    ],
+  },
+  {
+    roleCode: "SALES_MANAGER",
+    permissionCodes: [
+      "dashboard.view",
+      "products.view", "products.export",
+      "customers.view", "customers.create", "customers.update", "customers.delete",
+      "sales.view", "sales.create", "sales.update", "sales.approve", "sales.cancel",
+      "exits.view", "exits.create", "exits.approve",
+      "stocks.view", "stocks.reserve", "stocks.release",
+      "reports.view", "reports.export",
+      "movements.view",
+    ],
+  },
+  {
+    roleCode: "SALES_AGENT",
+    permissionCodes: [
+      "dashboard.view",
+      "products.view",
+      "customers.view", "customers.create", "customers.update",
+      "sales.view", "sales.create",
+      "exits.view", "exits.create",
+      "stocks.view",
+      "movements.view",
+    ],
+  },
+  {
+    roleCode: "ACCOUNTANT",
+    permissionCodes: [
+      "dashboard.view",
+      "products.view",
+      "suppliers.view",
+      "purchases.view",
+      "customers.view",
+      "sales.view",
+      "entries.view",
+      "exits.view",
+      "stocks.view",
+      "movements.view",
+      "reports.view", "reports.export",
+    ],
+  },
+  {
+    roleCode: "AUDITOR",
+    permissionCodes: [
+      "dashboard.view",
+      "products.view",
+      "categories.view",
+      "warehouses.view",
+      "stocks.view",
+      "inventories.view",
+      "suppliers.view",
+      "purchases.view",
+      "customers.view",
+      "sales.view",
+      "entries.view",
+      "exits.view",
+      "movements.view",
+      "reports.view", "reports.export",
+      "users.view",
+      "roles.view",
+      "permissions.view",
+      "settings.view",
+    ],
+  },
+  {
+    roleCode: "VIEWER",
+    permissionCodes: [
+      "dashboard.view",
+      "products.view",
+      "categories.view",
+      "warehouses.view",
+      "stocks.view",
+      "suppliers.view",
+      "purchases.view",
+      "customers.view",
+      "sales.view",
+      "entries.view",
+      "exits.view",
+      "movements.view",
+    ],
+  },
+]
 
 async function main() {
   const conn = await mysql.createConnection({
@@ -250,6 +454,32 @@ async function main() {
 
     console.log(`ℹ️  ${Object.keys(permissionCodeToId).length} permissions disponibles`)
   }
+
+  const [rpRows] = await conn.execute("SELECT COUNT(*) as cnt FROM role_permissions")
+  const rpCount = (rpRows as any)[0].cnt
+  if (rpCount > 0) {
+    await conn.execute("DELETE FROM role_permissions")
+    console.log(`🗑️  ${rpCount} anciennes associations supprimées`)
+  }
+
+  let insertedCount = 0
+  for (const assignment of rolePermissionsMap) {
+    const roleId = roleCodeToId[assignment.roleCode]
+    if (!roleId) continue
+    for (const code of assignment.permissionCodes) {
+      const permId = permissionCodeToId[code]
+      if (!permId) {
+        console.warn(`⚠️  Permission "${code}" introuvable pour le rôle ${assignment.roleCode}`)
+        continue
+      }
+      await conn.execute(
+        "INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
+        [roleId, permId],
+      )
+      insertedCount++
+    }
+  }
+  console.log(`✅ ${insertedCount} permissions attribuées aux rôles avec succès`)
 
   const [userRows] = await conn.execute("SELECT COUNT(*) as cnt FROM users")
   const userCount = (userRows as any)[0].cnt
