@@ -1,0 +1,1 @@
+{"version":3,"file":"permissions.module.js","sourceRoot":"","sources":["../../../src/permissions/permissions.module.ts"],"names":[],"mappings":";;;;;;;;;AAAA,2CAAwC;AACxC,2EAAoE;AACpE,qEAA8D;AAMvD,IAAM,iBAAiB,GAAvB,MAAM,iBAAiB;CAAG,CAAA;AAApB,8CAAiB;4BAAjB,iBAAiB;IAJ7B,IAAA,eAAM,EAAC;QACN,WAAW,EAAE,CAAC,iDAAqB,CAAC;QACpC,SAAS,EAAE,CAAC,2CAAkB,CAAC;KAChC,CAAC;GACW,iBAAiB,CAAG"}
