@@ -117,6 +117,7 @@ interface DataTableToolbarProps<TData> {
   searchPlaceholder?: string
   enableColumnVisibility?: boolean
   enableFiltering?: boolean
+  filters?: React.ReactNode
 }
 
 function DataTableToolbar<TData>({
@@ -124,6 +125,7 @@ function DataTableToolbar<TData>({
   searchKey,
   searchPlaceholder,
   enableColumnVisibility,
+  filters,
 }: DataTableToolbarProps<TData>) {
   const [open, setOpen] = React.useState(false)
 
@@ -150,6 +152,8 @@ function DataTableToolbar<TData>({
           )}
         </div>
       )}
+
+      {filters}
 
       <div className="flex items-center gap-2 ml-auto">
         {enableColumnVisibility && (
@@ -383,6 +387,7 @@ interface DataTableProps<TData> {
   exportFilename?: string
   emptyMessage?: string
   renderActions?: (row: TData) => React.ReactNode
+  filters?: React.ReactNode
   className?: string
 }
 
@@ -401,6 +406,7 @@ function DataTable<TData>({
   exportFilename,
   emptyMessage = "Aucune donnée disponible",
   renderActions,
+  filters,
   className,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -504,6 +510,7 @@ function DataTable<TData>({
           searchKey={searchKey}
           searchPlaceholder={searchPlaceholder}
           enableColumnVisibility={enableColumnVisibility}
+          filters={filters}
         />
         {exportFilename && (
           <Button

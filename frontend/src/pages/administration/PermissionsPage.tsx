@@ -271,26 +271,6 @@ export function PermissionsPage() {
   const columns: ColumnDef<Permission>[] = useMemo(
     () => [
       {
-        accessorKey: "code",
-        header: "Code",
-        cell: ({ row }) => {
-          const perm = row.original
-          return (
-            <div className="flex items-center gap-3">
-              <div className={`flex size-9 items-center justify-center rounded-lg ring-1 ${getModuleColor(perm.module)}`}>
-                <Shield className="size-4" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-foreground">{perm.code}</p>
-                <Badge variant="secondary" className={`mt-0.5 text-[10px] ${getModuleColor(perm.module)}`}>
-                  {perm.module}
-                </Badge>
-              </div>
-            </div>
-          )
-        },
-      },
-      {
         accessorKey: "module",
         header: "Module",
         cell: ({ row }) => {
@@ -299,6 +279,16 @@ export function PermissionsPage() {
             <Badge variant="secondary" className={`text-xs font-medium ${getModuleColor(module)}`}>
               {module}
             </Badge>
+          )
+        },
+      },
+      {
+        accessorKey: "code",
+        header: "Code",
+        cell: ({ row }) => {
+          const perm = row.original
+          return (
+            <p className="text-sm font-medium text-foreground">{perm.code}</p>
           )
         },
       },
@@ -347,29 +337,7 @@ export function PermissionsPage() {
         </p>
       </div>
 
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <SelectRoot value={moduleFilter ?? ""} onValueChange={(value) => setModuleFilter(value || null)}>
-            <SelectTrigger className="w-48 bg-background">
-              <SelectValue placeholder="Filtrer par module…" />
-            </SelectTrigger>
-            <SelectPopup>
-              <SelectList>
-                <SelectItem value="">
-                  <span className="flex items-center gap-2 text-muted-foreground">
-                    <FilterX className="size-3.5" />
-                    Tous les modules
-                  </span>
-                </SelectItem>
-                {modules.map((module) => (
-                  <SelectItem key={module} value={module}>
-                    {module}
-                  </SelectItem>
-                ))}
-              </SelectList>
-            </SelectPopup>
-          </SelectRoot>
-        </div>
+      <div className="flex items-center justify-end gap-4">
         <Button onClick={() => { resetForm(); setShowCreate(true) }}>
           <Plus className="size-4" />
           Ajouter une permission
@@ -379,6 +347,28 @@ export function PermissionsPage() {
       <DataTable
         columns={columns}
         data={filteredPermissions}
+        filters={
+          <SelectRoot value={moduleFilter ?? ""} onValueChange={(value) => setModuleFilter(value || null)}>
+            <SelectTrigger className="w-48 bg-background h-9">
+              <SelectValue placeholder="Filtrer par module…" />
+            </SelectTrigger>
+            <SelectPopup>
+              <SelectList>
+                <SelectItem value="" className="py-1">
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <FilterX className="size-3.5" />
+                    Tous les modules
+                  </span>
+                </SelectItem>
+                {modules.map((module) => (
+                  <SelectItem key={module} value={module} className="py-1">
+                    {module}
+                  </SelectItem>
+                ))}
+              </SelectList>
+            </SelectPopup>
+          </SelectRoot>
+        }
         searchKey="code"
         searchPlaceholder="Rechercher une permission..."
         loading={isLoading}

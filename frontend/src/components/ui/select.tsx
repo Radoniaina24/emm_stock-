@@ -62,7 +62,7 @@ function SelectPopup({
 }: SelectPrimitive.Popup.Props & { className?: string }) {
   return (
     <SelectPrimitive.Portal>
-      <SelectPrimitive.Positioner sideOffset={4}>
+      <SelectPrimitive.Positioner side="bottom" align="start" sideOffset={4}>
         <SelectPrimitive.Popup
           className={cn(
             "z-50 min-w-[var(--anchor-width)] origin-[var(--transform-origin)] overflow-hidden rounded-lg border border-border/60 bg-popover p-1 text-sm text-popover-foreground shadow-lg transition-[transform,opacity] duration-150 ease-in data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
