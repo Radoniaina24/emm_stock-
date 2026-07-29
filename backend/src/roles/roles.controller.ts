@@ -37,7 +37,7 @@ export class RolesController {
   @ApiOperation({ summary: 'Liste des rôles' })
   @ApiOkResponse({ description: 'Liste des rôles' })
   findAll() {
-    return this.roles.findAll();
+    return this.roles.findAllWithUserCount();
   }
 
   @Get(':id')

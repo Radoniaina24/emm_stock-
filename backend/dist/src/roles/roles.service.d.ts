@@ -6,6 +6,7 @@ export declare class RolesService {
     constructor(prisma: PrismaService);
     create(dto: CreateRoleDto): Promise<runtime.Types.Result.GetResult<import("../../generated/prisma/models.js").$RolePayload<ExtArgs>, T, "create", GlobalOmitOptions>>;
     findAll(): Promise<runtime.Types.Public.PrismaPromise<T>>;
+    findAllWithUserCount(): Promise<any>;
     findOne(id: string): Promise<any>;
     update(id: string, dto: UpdateRoleDto): Promise<runtime.Types.Result.GetResult<import("../../generated/prisma/models.js").$RolePayload<ExtArgs>, T, "update", GlobalOmitOptions>>;
     remove(id: string): Promise<void>;

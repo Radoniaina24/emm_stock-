@@ -22,6 +22,7 @@ import { ProfilePage } from "@/pages/ProfilePage"
 import { LoginPage } from "@/pages/LoginPage"
 import { ConfigurationPage } from "@/pages/parametres/ConfigurationPage"
 import { UtilisateursPage } from "@/pages/administration/UtilisateursPage"
+import { RolesPage } from "@/pages/administration/RolesPage"
 
 function App() {
   return (
@@ -121,7 +122,7 @@ function App() {
             <Route path="rapports/export" element={<div className="text-muted-foreground">Export Excel/PDF</div>} />
             <Route path="administration" element={<div className="text-muted-foreground">Administration</div>} />
             <Route path="administration/utilisateurs" element={<UtilisateursPage />} />
-            <Route path="administration/roles" element={<div className="text-muted-foreground">Rôles</div>} />
+            <Route path="administration/roles" element={<RolesPage />} />
             <Route path="administration/permissions" element={<div className="text-muted-foreground">Permissions</div>} />
             <Route path="administration/journal" element={<div className="text-muted-foreground">Journal d'activité</div>} />
             <Route path="administration/securite" element={<div className="text-muted-foreground">Paramètres sécurité</div>} />

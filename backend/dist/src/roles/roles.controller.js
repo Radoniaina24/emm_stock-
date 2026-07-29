@@ -28,7 +28,7 @@ let RolesController = class RolesController {
         return this.roles.create(dto);
     }
     findAll() {
-        return this.roles.findAll();
+        return this.roles.findAllWithUserCount();
     }
     findOne(id) {
         return this.roles.findOne(id);

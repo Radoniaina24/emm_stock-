@@ -31,6 +31,16 @@ let RolesService = class RolesService {
             orderBy: { createdAt: 'desc' },
         });
     }
+    async findAllWithUserCount() {
+        const roles = await this.prisma.role.findMany({
+            include: {
+                rolePermissions: { include: { permission: true } },
+                _count: { select: { users: true } },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+        return roles.map(({ _count, ...role }) => ({ ...role, userCount: _count.users }));
+    }
     async findOne(id) {
         const role = await this.prisma.role.findUnique({
             where: { id },
