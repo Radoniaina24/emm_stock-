@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react"
+import { useNavigate } from "react-router-dom"
 import { Edit, Eye, Plus, Shield, ShieldCheck, ShieldOff, Trash2 } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { z } from "zod"
@@ -126,6 +127,7 @@ function FormFields({
 }
 
 export function RolesPage() {
+  const navigate = useNavigate()
   const { data: roles, isLoading } = useRolesQuery()
   const createRole = useCreateRoleMutation()
   const updateRole = useUpdateRoleMutation()
@@ -340,6 +342,15 @@ export function RolesPage() {
         enableSelection
         renderActions={(row) => (
           <div className="flex items-center justify-end gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(`/dashboard/administration/roles/${row.id}/permissions`)}
+              className="size-8 text-muted-foreground/60 hover:text-indigo-500"
+              title="Gérer les permissions"
+            >
+              <ShieldCheck className="size-4" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"

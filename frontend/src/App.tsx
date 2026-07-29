@@ -24,6 +24,7 @@ import { ConfigurationPage } from "@/pages/parametres/ConfigurationPage"
 import { UtilisateursPage } from "@/pages/administration/UtilisateursPage"
 import { RolesPage } from "@/pages/administration/RolesPage"
 import { PermissionsPage } from "@/pages/administration/PermissionsPage"
+import { RolePermissionPage } from "@/pages/administration/RolePermissionPage"
 
 function App() {
   return (
@@ -124,6 +125,7 @@ function App() {
             <Route path="administration" element={<div className="text-muted-foreground">Administration</div>} />
             <Route path="administration/utilisateurs" element={<UtilisateursPage />} />
             <Route path="administration/roles" element={<RolesPage />} />
+            <Route path="administration/roles/:roleId/permissions" element={<RolePermissionPage />} />
             <Route path="administration/permissions" element={<PermissionsPage />} />
             <Route path="administration/journal" element={<div className="text-muted-foreground">Journal d'activité</div>} />
             <Route path="administration/securite" element={<div className="text-muted-foreground">Paramètres sécurité</div>} />
