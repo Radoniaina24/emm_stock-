@@ -476,7 +476,7 @@ export function RolesPage() {
       </ModalRoot>
 
       <ModalRoot open={!!selectedRole} onOpenChange={(open) => { if (!open) setSelectedRole(null) }}>
-        <ModalPopup size="full" className="overflow-hidden p-0 sm:mx-4 sm:max-w-xl">
+        <ModalPopup size="full" className="overflow-hidden p-0 sm:mx-4 sm:max-w-3xl lg:max-w-4xl">
           <ModalClose />
           <div className="flex max-h-[85vh] flex-col">
             <div className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 px-6 py-6 text-white">
