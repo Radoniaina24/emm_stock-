@@ -30,6 +30,15 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
     $extends: runtime.Types.Extensions.ExtendsHook<"extends", Prisma.TypeMapCb<OmitOpts>, ExtArgs, runtime.Types.Utils.Call<Prisma.TypeMapCb<OmitOpts>, {
         extArgs: ExtArgs;
     }>>;
+    get permission(): Prisma.PermissionDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get rolePermission(): Prisma.RolePermissionDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get role(): Prisma.RoleDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
     get user(): Prisma.UserDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;

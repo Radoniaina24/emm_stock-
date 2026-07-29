@@ -30,7 +30,7 @@ function toAuthUserDto(user) {
     return {
         id: user.id,
         email: user.email,
-        role: user.role,
+        role: user.role?.name ?? '',
         createdAt: user.createdAt,
         name: profile?.displayName ?? user.email,
         avatar: profile?.profilePhoto ?? null,
@@ -48,7 +48,7 @@ function splitDisplayName(fullName) {
 exports.userWithProfileSelect = {
     id: true,
     email: true,
-    role: true,
+    role: { select: { name: true, code: true } },
     createdAt: true,
     profile: true,
 };

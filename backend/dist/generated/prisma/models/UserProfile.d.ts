@@ -574,9 +574,6 @@ export type UserProfileUncheckedUpdateOneWithoutUserNestedInput = {
     connect?: Prisma.UserProfileWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutUserInput, Prisma.UserProfileUpdateWithoutUserInput>, Prisma.UserProfileUncheckedUpdateWithoutUserInput>;
 };
-export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null;
-};
 export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null;
 };

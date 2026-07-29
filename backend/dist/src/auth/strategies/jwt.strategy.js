@@ -32,7 +32,7 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
             select: {
                 id: true,
                 email: true,
-                role: true,
+                role: { select: { name: true, code: true } },
                 isActive: true,
                 profile: { select: { displayName: true } },
             },
@@ -42,7 +42,7 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         return {
             id: user.id,
             email: user.email,
-            role: user.role,
+            role: user.role?.code ?? '',
             isActive: user.isActive,
             name: user.profile?.displayName ?? user.email,
         };

@@ -24,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       select: {
         id: true,
         email: true,
-        role: true,
+        role: { select: { name: true, code: true } },
         isActive: true,
         profile: { select: { displayName: true } },
       },
@@ -33,7 +33,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return {
       id: user.id,
       email: user.email,
-      role: user.role,
+      role: user.role?.code ?? '',
       isActive: user.isActive,
       name: user.profile?.displayName ?? user.email,
     };

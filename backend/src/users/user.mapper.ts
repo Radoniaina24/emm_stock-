@@ -51,7 +51,7 @@ export type AuthUserDto = {
 type UserWithProfile = {
   id: string;
   email: string;
-  role: string;
+  role: { name: string; code: string } | null;
   createdAt?: Date;
   profile?: ProfileRecord | null;
 };
@@ -84,7 +84,7 @@ export function toAuthUserDto(user: UserWithProfile): AuthUserDto {
   return {
     id: user.id,
     email: user.email,
-    role: user.role,
+    role: user.role?.name ?? '',
     createdAt: user.createdAt,
     name: profile?.displayName ?? user.email,
     avatar: profile?.profilePhoto ?? null,
@@ -104,7 +104,7 @@ export function splitDisplayName(fullName: string) {
 export const userWithProfileSelect = {
   id: true,
   email: true,
-  role: true,
+  role: { select: { name: true, code: true } },
   createdAt: true,
   profile: true,
 } as const;

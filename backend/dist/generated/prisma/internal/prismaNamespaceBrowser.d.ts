@@ -11,6 +11,9 @@ export declare const DbNull: any;
 export declare const JsonNull: any;
 export declare const AnyNull: any;
 export declare const ModelName: {
+    readonly Permission: "Permission";
+    readonly RolePermission: "RolePermission";
+    readonly Role: "Role";
     readonly User: "User";
     readonly UserProfile: "UserProfile";
     readonly Category: "Category";
@@ -32,11 +35,36 @@ export declare const ModelName: {
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export declare const TransactionIsolationLevel: any;
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel];
+export declare const PermissionScalarFieldEnum: {
+    readonly id: "id";
+    readonly module: "module";
+    readonly action: "action";
+    readonly code: "code";
+    readonly description: "description";
+    readonly createdAt: "createdAt";
+};
+export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof typeof PermissionScalarFieldEnum];
+export declare const RolePermissionScalarFieldEnum: {
+    readonly roleId: "roleId";
+    readonly permissionId: "permissionId";
+};
+export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum];
+export declare const RoleScalarFieldEnum: {
+    readonly id: "id";
+    readonly name: "name";
+    readonly code: "code";
+    readonly description: "description";
+    readonly isSystem: "isSystem";
+    readonly isActive: "isActive";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum];
 export declare const UserScalarFieldEnum: {
     readonly id: "id";
     readonly email: "email";
     readonly password: "password";
-    readonly role: "role";
+    readonly roleId: "roleId";
     readonly isActive: "isActive";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
@@ -225,18 +253,38 @@ export declare const SortOrder: {
     readonly desc: "desc";
 };
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder];
-export declare const UserOrderByRelevanceFieldEnum: {
-    readonly id: "id";
-    readonly email: "email";
-    readonly password: "password";
-    readonly role: "role";
-};
-export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum];
 export declare const NullsOrder: {
     readonly first: "first";
     readonly last: "last";
 };
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder];
+export declare const PermissionOrderByRelevanceFieldEnum: {
+    readonly id: "id";
+    readonly module: "module";
+    readonly action: "action";
+    readonly code: "code";
+    readonly description: "description";
+};
+export type PermissionOrderByRelevanceFieldEnum = (typeof PermissionOrderByRelevanceFieldEnum)[keyof typeof PermissionOrderByRelevanceFieldEnum];
+export declare const RolePermissionOrderByRelevanceFieldEnum: {
+    readonly roleId: "roleId";
+    readonly permissionId: "permissionId";
+};
+export type RolePermissionOrderByRelevanceFieldEnum = (typeof RolePermissionOrderByRelevanceFieldEnum)[keyof typeof RolePermissionOrderByRelevanceFieldEnum];
+export declare const RoleOrderByRelevanceFieldEnum: {
+    readonly id: "id";
+    readonly name: "name";
+    readonly code: "code";
+    readonly description: "description";
+};
+export type RoleOrderByRelevanceFieldEnum = (typeof RoleOrderByRelevanceFieldEnum)[keyof typeof RoleOrderByRelevanceFieldEnum];
+export declare const UserOrderByRelevanceFieldEnum: {
+    readonly id: "id";
+    readonly email: "email";
+    readonly password: "password";
+    readonly roleId: "roleId";
+};
+export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum];
 export declare const UserProfileOrderByRelevanceFieldEnum: {
     readonly id: "id";
     readonly userId: "userId";

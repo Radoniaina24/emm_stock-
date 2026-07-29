@@ -48,7 +48,10 @@ export type AuthUserDto = {
 type UserWithProfile = {
     id: string;
     email: string;
-    role: string;
+    role: {
+        name: string;
+        code: string;
+    } | null;
     createdAt?: Date;
     profile?: ProfileRecord | null;
 };
@@ -61,7 +64,12 @@ export declare function splitDisplayName(fullName: string): {
 export declare const userWithProfileSelect: {
     readonly id: true;
     readonly email: true;
-    readonly role: true;
+    readonly role: {
+        readonly select: {
+            readonly name: true;
+            readonly code: true;
+        };
+    };
     readonly createdAt: true;
     readonly profile: true;
 };

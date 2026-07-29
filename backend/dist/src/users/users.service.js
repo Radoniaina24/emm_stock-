@@ -65,11 +65,15 @@ let UsersService = class UsersService {
             throw new common_1.ConflictException('Cet email est déjà utilisé');
         const hashed = await bcrypt.hash(dto.password, 10);
         const names = (0, user_mapper_js_1.splitDisplayName)(dto.name);
+        const roleName = dto.role ?? 'Gestionnaire';
+        const role = await this.prisma.role.findFirst({
+            where: { OR: [{ code: roleName }, { name: roleName }] },
+        });
         const user = await this.prisma.user.create({
             data: {
                 email: dto.email,
                 password: hashed,
-                role: dto.role ?? 'Employé',
+                roleId: role?.id ?? null,
                 profile: {
                     create: {
                         firstName: names.firstName,

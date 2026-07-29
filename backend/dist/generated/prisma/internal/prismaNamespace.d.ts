@@ -157,6 +157,9 @@ export type ExcludeUnderscoreKeys<T extends string> = T extends `_${string}` ? n
 export type FieldRef<Model, FieldType> = runtime.FieldRef<Model, FieldType>;
 type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRef<Model, FieldType>;
 export declare const ModelName: {
+    readonly Permission: "Permission";
+    readonly RolePermission: "RolePermission";
+    readonly Role: "Role";
     readonly User: "User";
     readonly UserProfile: "UserProfile";
     readonly Category: "Category";
@@ -186,10 +189,208 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "user" | "userProfile" | "category" | "brand" | "unit" | "product" | "warehouse" | "zone" | "stock" | "supplier" | "entry" | "entryLine" | "exit" | "exitLine" | "movement" | "inventory" | "inventoryLine";
+        modelProps: "permission" | "rolePermission" | "role" | "user" | "userProfile" | "category" | "brand" | "unit" | "product" | "warehouse" | "zone" | "stock" | "supplier" | "entry" | "entryLine" | "exit" | "exitLine" | "movement" | "inventory" | "inventoryLine";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
+        Permission: {
+            payload: Prisma.$PermissionPayload<ExtArgs>;
+            fields: Prisma.PermissionFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.PermissionFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.PermissionFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>;
+                };
+                findFirst: {
+                    args: Prisma.PermissionFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.PermissionFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>;
+                };
+                findMany: {
+                    args: Prisma.PermissionFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>[];
+                };
+                create: {
+                    args: Prisma.PermissionCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>;
+                };
+                createMany: {
+                    args: Prisma.PermissionCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                delete: {
+                    args: Prisma.PermissionDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>;
+                };
+                update: {
+                    args: Prisma.PermissionUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.PermissionDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.PermissionUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                upsert: {
+                    args: Prisma.PermissionUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>;
+                };
+                aggregate: {
+                    args: Prisma.PermissionAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregatePermission>;
+                };
+                groupBy: {
+                    args: Prisma.PermissionGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.PermissionGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.PermissionCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.PermissionCountAggregateOutputType> | number;
+                };
+            };
+        };
+        RolePermission: {
+            payload: Prisma.$RolePermissionPayload<ExtArgs>;
+            fields: Prisma.RolePermissionFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.RolePermissionFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.RolePermissionFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>;
+                };
+                findFirst: {
+                    args: Prisma.RolePermissionFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.RolePermissionFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>;
+                };
+                findMany: {
+                    args: Prisma.RolePermissionFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>[];
+                };
+                create: {
+                    args: Prisma.RolePermissionCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>;
+                };
+                createMany: {
+                    args: Prisma.RolePermissionCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                delete: {
+                    args: Prisma.RolePermissionDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>;
+                };
+                update: {
+                    args: Prisma.RolePermissionUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.RolePermissionDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.RolePermissionUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                upsert: {
+                    args: Prisma.RolePermissionUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>;
+                };
+                aggregate: {
+                    args: Prisma.RolePermissionAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateRolePermission>;
+                };
+                groupBy: {
+                    args: Prisma.RolePermissionGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.RolePermissionGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.RolePermissionCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.RolePermissionCountAggregateOutputType> | number;
+                };
+            };
+        };
+        Role: {
+            payload: Prisma.$RolePayload<ExtArgs>;
+            fields: Prisma.RoleFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.RoleFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.RoleFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>;
+                };
+                findFirst: {
+                    args: Prisma.RoleFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.RoleFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>;
+                };
+                findMany: {
+                    args: Prisma.RoleFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>[];
+                };
+                create: {
+                    args: Prisma.RoleCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>;
+                };
+                createMany: {
+                    args: Prisma.RoleCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                delete: {
+                    args: Prisma.RoleDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>;
+                };
+                update: {
+                    args: Prisma.RoleUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>;
+                };
+                deleteMany: {
+                    args: Prisma.RoleDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.RoleUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                upsert: {
+                    args: Prisma.RoleUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>;
+                };
+                aggregate: {
+                    args: Prisma.RoleAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateRole>;
+                };
+                groupBy: {
+                    args: Prisma.RoleGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.RoleGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.RoleCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.RoleCountAggregateOutputType> | number;
+                };
+            };
+        };
         User: {
             payload: Prisma.$UserPayload<ExtArgs>;
             fields: Prisma.UserFieldRefs;
@@ -1338,11 +1539,36 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
 };
 export declare const TransactionIsolationLevel: any;
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel];
+export declare const PermissionScalarFieldEnum: {
+    readonly id: "id";
+    readonly module: "module";
+    readonly action: "action";
+    readonly code: "code";
+    readonly description: "description";
+    readonly createdAt: "createdAt";
+};
+export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof typeof PermissionScalarFieldEnum];
+export declare const RolePermissionScalarFieldEnum: {
+    readonly roleId: "roleId";
+    readonly permissionId: "permissionId";
+};
+export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum];
+export declare const RoleScalarFieldEnum: {
+    readonly id: "id";
+    readonly name: "name";
+    readonly code: "code";
+    readonly description: "description";
+    readonly isSystem: "isSystem";
+    readonly isActive: "isActive";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum];
 export declare const UserScalarFieldEnum: {
     readonly id: "id";
     readonly email: "email";
     readonly password: "password";
-    readonly role: "role";
+    readonly roleId: "roleId";
     readonly isActive: "isActive";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
@@ -1531,18 +1757,38 @@ export declare const SortOrder: {
     readonly desc: "desc";
 };
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder];
-export declare const UserOrderByRelevanceFieldEnum: {
-    readonly id: "id";
-    readonly email: "email";
-    readonly password: "password";
-    readonly role: "role";
-};
-export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum];
 export declare const NullsOrder: {
     readonly first: "first";
     readonly last: "last";
 };
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder];
+export declare const PermissionOrderByRelevanceFieldEnum: {
+    readonly id: "id";
+    readonly module: "module";
+    readonly action: "action";
+    readonly code: "code";
+    readonly description: "description";
+};
+export type PermissionOrderByRelevanceFieldEnum = (typeof PermissionOrderByRelevanceFieldEnum)[keyof typeof PermissionOrderByRelevanceFieldEnum];
+export declare const RolePermissionOrderByRelevanceFieldEnum: {
+    readonly roleId: "roleId";
+    readonly permissionId: "permissionId";
+};
+export type RolePermissionOrderByRelevanceFieldEnum = (typeof RolePermissionOrderByRelevanceFieldEnum)[keyof typeof RolePermissionOrderByRelevanceFieldEnum];
+export declare const RoleOrderByRelevanceFieldEnum: {
+    readonly id: "id";
+    readonly name: "name";
+    readonly code: "code";
+    readonly description: "description";
+};
+export type RoleOrderByRelevanceFieldEnum = (typeof RoleOrderByRelevanceFieldEnum)[keyof typeof RoleOrderByRelevanceFieldEnum];
+export declare const UserOrderByRelevanceFieldEnum: {
+    readonly id: "id";
+    readonly email: "email";
+    readonly password: "password";
+    readonly roleId: "roleId";
+};
+export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum];
 export declare const UserProfileOrderByRelevanceFieldEnum: {
     readonly id: "id";
     readonly userId: "userId";
@@ -1674,8 +1920,8 @@ export declare const InventoryLineOrderByRelevanceFieldEnum: {
 };
 export type InventoryLineOrderByRelevanceFieldEnum = (typeof InventoryLineOrderByRelevanceFieldEnum)[keyof typeof InventoryLineOrderByRelevanceFieldEnum];
 export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>;
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>;
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>;
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>;
 export type BatchPayload = {
@@ -1703,6 +1949,9 @@ export type PrismaClientOptions = ({
     queryPlanCacheMaxSize?: number;
 };
 export type GlobalOmitConfig = {
+    permission?: Prisma.PermissionOmit;
+    rolePermission?: Prisma.RolePermissionOmit;
+    role?: Prisma.RoleOmit;
     user?: Prisma.UserOmit;
     userProfile?: Prisma.UserProfileOmit;
     category?: Prisma.CategoryOmit;

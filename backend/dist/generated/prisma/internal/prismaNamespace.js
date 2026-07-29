@@ -33,8 +33,8 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EntryLineOrderByRelevanceFieldEnum = exports.EntryOrderByRelevanceFieldEnum = exports.SupplierOrderByRelevanceFieldEnum = exports.StockOrderByRelevanceFieldEnum = exports.ZoneOrderByRelevanceFieldEnum = exports.WarehouseOrderByRelevanceFieldEnum = exports.ProductOrderByRelevanceFieldEnum = exports.UnitOrderByRelevanceFieldEnum = exports.BrandOrderByRelevanceFieldEnum = exports.CategoryOrderByRelevanceFieldEnum = exports.UserProfileOrderByRelevanceFieldEnum = exports.NullsOrder = exports.UserOrderByRelevanceFieldEnum = exports.SortOrder = exports.InventoryLineScalarFieldEnum = exports.InventoryScalarFieldEnum = exports.MovementScalarFieldEnum = exports.ExitLineScalarFieldEnum = exports.ExitScalarFieldEnum = exports.EntryLineScalarFieldEnum = exports.EntryScalarFieldEnum = exports.SupplierScalarFieldEnum = exports.StockScalarFieldEnum = exports.ZoneScalarFieldEnum = exports.WarehouseScalarFieldEnum = exports.ProductScalarFieldEnum = exports.UnitScalarFieldEnum = exports.BrandScalarFieldEnum = exports.CategoryScalarFieldEnum = exports.UserProfileScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
-exports.defineExtension = exports.InventoryLineOrderByRelevanceFieldEnum = exports.InventoryOrderByRelevanceFieldEnum = exports.MovementOrderByRelevanceFieldEnum = exports.ExitLineOrderByRelevanceFieldEnum = exports.ExitOrderByRelevanceFieldEnum = void 0;
+exports.ProductOrderByRelevanceFieldEnum = exports.UnitOrderByRelevanceFieldEnum = exports.BrandOrderByRelevanceFieldEnum = exports.CategoryOrderByRelevanceFieldEnum = exports.UserProfileOrderByRelevanceFieldEnum = exports.UserOrderByRelevanceFieldEnum = exports.RoleOrderByRelevanceFieldEnum = exports.RolePermissionOrderByRelevanceFieldEnum = exports.PermissionOrderByRelevanceFieldEnum = exports.NullsOrder = exports.SortOrder = exports.InventoryLineScalarFieldEnum = exports.InventoryScalarFieldEnum = exports.MovementScalarFieldEnum = exports.ExitLineScalarFieldEnum = exports.ExitScalarFieldEnum = exports.EntryLineScalarFieldEnum = exports.EntryScalarFieldEnum = exports.SupplierScalarFieldEnum = exports.StockScalarFieldEnum = exports.ZoneScalarFieldEnum = exports.WarehouseScalarFieldEnum = exports.ProductScalarFieldEnum = exports.UnitScalarFieldEnum = exports.BrandScalarFieldEnum = exports.CategoryScalarFieldEnum = exports.UserProfileScalarFieldEnum = exports.UserScalarFieldEnum = exports.RoleScalarFieldEnum = exports.RolePermissionScalarFieldEnum = exports.PermissionScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
+exports.defineExtension = exports.InventoryLineOrderByRelevanceFieldEnum = exports.InventoryOrderByRelevanceFieldEnum = exports.MovementOrderByRelevanceFieldEnum = exports.ExitLineOrderByRelevanceFieldEnum = exports.ExitOrderByRelevanceFieldEnum = exports.EntryLineOrderByRelevanceFieldEnum = exports.EntryOrderByRelevanceFieldEnum = exports.SupplierOrderByRelevanceFieldEnum = exports.StockOrderByRelevanceFieldEnum = exports.ZoneOrderByRelevanceFieldEnum = exports.WarehouseOrderByRelevanceFieldEnum = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/client"));
 exports.PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError;
 exports.PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError;
@@ -61,6 +61,9 @@ exports.DbNull = runtime.DbNull;
 exports.JsonNull = runtime.JsonNull;
 exports.AnyNull = runtime.AnyNull;
 exports.ModelName = {
+    Permission: 'Permission',
+    RolePermission: 'RolePermission',
+    Role: 'Role',
     User: 'User',
     UserProfile: 'UserProfile',
     Category: 'Category',
@@ -85,11 +88,33 @@ exports.TransactionIsolationLevel = runtime.makeStrictEnum({
     RepeatableRead: 'RepeatableRead',
     Serializable: 'Serializable'
 });
+exports.PermissionScalarFieldEnum = {
+    id: 'id',
+    module: 'module',
+    action: 'action',
+    code: 'code',
+    description: 'description',
+    createdAt: 'createdAt'
+};
+exports.RolePermissionScalarFieldEnum = {
+    roleId: 'roleId',
+    permissionId: 'permissionId'
+};
+exports.RoleScalarFieldEnum = {
+    id: 'id',
+    name: 'name',
+    code: 'code',
+    description: 'description',
+    isSystem: 'isSystem',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
 exports.UserScalarFieldEnum = {
     id: 'id',
     email: 'email',
     password: 'password',
-    role: 'role',
+    roleId: 'roleId',
     isActive: 'isActive',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -260,15 +285,32 @@ exports.SortOrder = {
     asc: 'asc',
     desc: 'desc'
 };
+exports.NullsOrder = {
+    first: 'first',
+    last: 'last'
+};
+exports.PermissionOrderByRelevanceFieldEnum = {
+    id: 'id',
+    module: 'module',
+    action: 'action',
+    code: 'code',
+    description: 'description'
+};
+exports.RolePermissionOrderByRelevanceFieldEnum = {
+    roleId: 'roleId',
+    permissionId: 'permissionId'
+};
+exports.RoleOrderByRelevanceFieldEnum = {
+    id: 'id',
+    name: 'name',
+    code: 'code',
+    description: 'description'
+};
 exports.UserOrderByRelevanceFieldEnum = {
     id: 'id',
     email: 'email',
     password: 'password',
-    role: 'role'
-};
-exports.NullsOrder = {
-    first: 'first',
-    last: 'last'
+    roleId: 'roleId'
 };
 exports.UserProfileOrderByRelevanceFieldEnum = {
     id: 'id',
