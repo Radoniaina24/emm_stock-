@@ -213,7 +213,7 @@ function DataTablePagination<TData>({
   table,
   pageSizes,
 }: DataTablePaginationProps<TData>) {
-  const sizes = pageSizes ?? [10, 20, 30, 50, 100]
+  const sizes = pageSizes ?? [10, 15, 20, 30, 50, 100]
   const [pageSizeOpen, setPageSizeOpen] = React.useState(false)
 
   return (
@@ -396,7 +396,7 @@ function DataTable<TData>({
   data,
   searchKey,
   searchPlaceholder,
-  pageSize = 10,
+  pageSize = 15,
   pageSizes,
   loading,
   onRowClick,
