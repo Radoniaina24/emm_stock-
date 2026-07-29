@@ -94,7 +94,74 @@ function cuid() {
 }
 cuid._counter = 0
 
+type PermissionSeed = {
+  module: string
+  action: string
+  code: string
+  description: string
+}
+
+const permissions: PermissionSeed[] = [
+  { module: "Produits", action: "Voir", code: "products.view", description: "Autorise l'utilisateur à consulter la liste des produits." },
+  { module: "Produits", action: "Créer", code: "products.create", description: "Autorise la création d'un nouveau produit." },
+  { module: "Produits", action: "Modifier", code: "products.update", description: "Autorise la modification des informations d'un produit." },
+  { module: "Produits", action: "Supprimer", code: "products.delete", description: "Autorise la suppression d'un produit." },
+  { module: "Produits", action: "Importer", code: "products.import", description: "Autorise l'importation de produits depuis un fichier Excel ou CSV." },
+  { module: "Produits", action: "Exporter", code: "products.export", description: "Autorise l'exportation de la liste des produits." },
+  { module: "Produits", action: "Imprimer", code: "products.print", description: "Autorise l'impression de la liste des produits." },
+  { module: "Catégories", action: "Voir", code: "categories.view", description: "Consulter la liste des catégories." },
+  { module: "Catégories", action: "Créer", code: "categories.create", description: "Créer une nouvelle catégorie." },
+  { module: "Catégories", action: "Modifier", code: "categories.update", description: "Modifier une catégorie existante." },
+  { module: "Catégories", action: "Supprimer", code: "categories.delete", description: "Supprimer une catégorie." },
+  { module: "Entrepôts", action: "Voir", code: "warehouses.view", description: "Consulter les entrepôts." },
+  { module: "Entrepôts", action: "Créer", code: "warehouses.create", description: "Créer un nouvel entrepôt." },
+  { module: "Entrepôts", action: "Modifier", code: "warehouses.update", description: "Modifier les informations d'un entrepôt." },
+  { module: "Entrepôts", action: "Supprimer", code: "warehouses.delete", description: "Supprimer un entrepôt." },
+  { module: "Entrepôts", action: "Transférer", code: "warehouses.transfer", description: "Autorise le transfert de stock entre entrepôts." },
+  { module: "Stocks", action: "Voir", code: "stocks.view", description: "Consulter les quantités en stock." },
+  { module: "Stocks", action: "Ajuster", code: "stocks.adjust", description: "Corriger les quantités de stock." },
+  { module: "Stocks", action: "Transférer", code: "stocks.transfer", description: "Déplacer des produits entre entrepôts." },
+  { module: "Stocks", action: "Réserver", code: "stocks.reserve", description: "Réserver des produits pour une commande." },
+  { module: "Stocks", action: "Libérer", code: "stocks.release", description: "Annuler une réservation de stock." },
+  { module: "Stocks", action: "Exporter", code: "stocks.export", description: "Exporter les données du stock." },
+  { module: "Inventaires", action: "Voir", code: "inventories.view", description: "Consulter les inventaires." },
+  { module: "Inventaires", action: "Créer", code: "inventories.create", description: "Démarrer un nouvel inventaire." },
+  { module: "Inventaires", action: "Modifier", code: "inventories.update", description: "Modifier un inventaire." },
+  { module: "Inventaires", action: "Valider", code: "inventories.validate", description: "Valider les résultats d'un inventaire." },
+  { module: "Inventaires", action: "Annuler", code: "inventories.cancel", description: "Annuler un inventaire." },
+  { module: "Fournisseurs", action: "Voir", code: "suppliers.view", description: "Consulter la liste des fournisseurs." },
+  { module: "Fournisseurs", action: "Créer", code: "suppliers.create", description: "Ajouter un nouveau fournisseur." },
+  { module: "Fournisseurs", action: "Modifier", code: "suppliers.update", description: "Modifier les informations d'un fournisseur." },
+  { module: "Fournisseurs", action: "Supprimer", code: "suppliers.delete", description: "Supprimer un fournisseur." },
+  { module: "Achats", action: "Voir", code: "purchases.view", description: "Consulter les commandes d'achat." },
+  { module: "Achats", action: "Créer", code: "purchases.create", description: "Créer une commande d'achat." },
+  { module: "Achats", action: "Modifier", code: "purchases.update", description: "Modifier une commande d'achat." },
+  { module: "Achats", action: "Valider", code: "purchases.approve", description: "Valider une commande d'achat." },
+  { module: "Achats", action: "Annuler", code: "purchases.cancel", description: "Annuler une commande d'achat." },
+  { module: "Achats", action: "Réceptionner", code: "purchases.receive", description: "Enregistrer la réception des produits." },
+  { module: "Clients", action: "Voir", code: "customers.view", description: "Consulter la liste des clients." },
+  { module: "Clients", action: "Créer", code: "customers.create", description: "Ajouter un client." },
+  { module: "Clients", action: "Modifier", code: "customers.update", description: "Modifier un client." },
+  { module: "Clients", action: "Supprimer", code: "customers.delete", description: "Supprimer un client." },
+  { module: "Ventes", action: "Voir", code: "sales.view", description: "Consulter les ventes." },
+  { module: "Ventes", action: "Créer", code: "sales.create", description: "Enregistrer une nouvelle vente." },
+  { module: "Ventes", action: "Modifier", code: "sales.update", description: "Modifier une vente." },
+  { module: "Ventes", action: "Valider", code: "sales.approve", description: "Confirmer une vente." },
+  { module: "Ventes", action: "Annuler", code: "sales.cancel", description: "Annuler une vente." },
+  { module: "Utilisateurs", action: "Voir", code: "users.view", description: "Consulter la liste des utilisateurs." },
+  { module: "Utilisateurs", action: "Créer", code: "users.create", description: "Créer un nouvel utilisateur." },
+  { module: "Utilisateurs", action: "Modifier", code: "users.update", description: "Modifier un utilisateur." },
+  { module: "Utilisateurs", action: "Supprimer", code: "users.delete", description: "Supprimer un utilisateur." },
+  { module: "Utilisateurs", action: "Réinitialiser", code: "users.reset_password", description: "Réinitialiser le mot de passe d'un utilisateur." },
+  { module: "Rôles", action: "Voir", code: "roles.view", description: "Consulter les rôles." },
+  { module: "Rôles", action: "Créer", code: "roles.create", description: "Créer un nouveau rôle." },
+  { module: "Rôles", action: "Modifier", code: "roles.update", description: "Modifier un rôle." },
+  { module: "Rôles", action: "Supprimer", code: "roles.delete", description: "Supprimer un rôle." },
+  { module: "Rôles", action: "Attribuer", code: "roles.assign_permissions", description: "Attribuer ou retirer des permissions à un rôle." },
+]
+
 const roleCodeToId: Record<string, string> = {}
+const permissionCodeToId: Record<string, string> = {}
 
 async function main() {
   const conn = await mysql.createConnection({
@@ -147,6 +214,41 @@ async function main() {
     }
 
     console.log(`ℹ️  ${Object.keys(roleCodeToId).length} rôles disponibles`)
+  }
+
+  const [permRows] = await conn.execute("SELECT COUNT(*) as cnt FROM permissions")
+  const permCount = (permRows as any)[0].cnt
+  if (permCount === 0) {
+    for (const p of permissions) {
+      const id = crypto.randomUUID()
+      permissionCodeToId[p.code] = id
+      await conn.execute(
+        "INSERT INTO permissions (id, module, action, code, description, created_at) VALUES (?, ?, ?, ?, ?, NOW())",
+        [id, p.module, p.action, p.code, p.description]
+      )
+    }
+    console.log(`✅ ${permissions.length} permissions créées avec succès`)
+  } else {
+    const [permRows] = await conn.execute("SELECT id, code FROM permissions")
+    for (const row of (permRows as any[])) {
+      permissionCodeToId[row.code] = row.id
+    }
+
+    const missingPerms = permissions.filter((p) => !permissionCodeToId[p.code])
+    if (missingPerms.length > 0) {
+      console.log(`ℹ️  ${missingPerms.length} nouvelles permissions à ajouter…`)
+      for (const p of missingPerms) {
+        const id = crypto.randomUUID()
+        permissionCodeToId[p.code] = id
+        await conn.execute(
+          "INSERT INTO permissions (id, module, action, code, description, created_at) VALUES (?, ?, ?, ?, ?, NOW())",
+          [id, p.module, p.action, p.code, p.description]
+        )
+      }
+      console.log(`✅ ${missingPerms.length} permissions ajoutées`)
+    }
+
+    console.log(`ℹ️  ${Object.keys(permissionCodeToId).length} permissions disponibles`)
   }
 
   const [userRows] = await conn.execute("SELECT COUNT(*) as cnt FROM users")
