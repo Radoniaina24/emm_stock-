@@ -181,7 +181,7 @@ export function UtilisateursPage() {
                 {selectedUser?.role && (
                   <div className="flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-sm ring-1 ring-white/20 sm:px-3.5 sm:py-1.5 sm:text-xs">
                     <Shield className="size-3 sm:size-3.5" />
-                    {selectedUser.role}
+                    {selectedUser.role.name}
                   </div>
                 )}
               </div>
@@ -201,7 +201,7 @@ export function UtilisateursPage() {
                     <p className="text-sm font-semibold text-foreground">Général</p>
                   </div>
                   <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
-                    <InfoRow label="Rôle" value={selectedUser?.role} icon={Shield} />
+                    <InfoRow label="Rôle" value={selectedUser?.role?.name ?? null} icon={Shield} />
                     <InfoRow label="Département" value={selectedUser?.department} icon={Shield} />
                     <InfoRow label="Téléphone" value={selectedUser?.phone} icon={Phone} />
                     <InfoRow label="Membre depuis" value={formatDate(selectedUser?.createdAt)} icon={Shield} />
