@@ -58,32 +58,51 @@ let UsersService = class UsersService {
         this.prisma = prisma;
     }
     async create(dto) {
-        const existing = await this.prisma.user.findUnique({
+        const existingEmail = await this.prisma.user.findUnique({
             where: { email: dto.email },
         });
-        if (existing)
+        if (existingEmail)
             throw new common_1.ConflictException('Cet email est déjà utilisé');
-        const hashed = await bcrypt.hash(dto.password, 10);
-        const names = (0, user_mapper_js_1.splitDisplayName)(dto.name);
-        const employeeCode = `EMP-${Date.now().toString(36).slice(-6).toUpperCase()}`;
-        const roleName = dto.role ?? 'Gestionnaire';
-        const role = await this.prisma.role.findFirst({
-            where: { OR: [{ code: roleName }, { name: roleName }] },
+        const existingUsername = await this.prisma.user.findUnique({
+            where: { username: dto.username },
         });
-        const username = dto.email.split('@')[0];
+        if (existingUsername)
+            throw new common_1.ConflictException('Ce nom d\'utilisateur est déjà utilisé');
+        const existingCode = await this.prisma.userProfile.findUnique({
+            where: { employeeCode: dto.employeeCode },
+        });
+        if (existingCode)
+            throw new common_1.ConflictException('Ce matricule est déjà utilisé');
+        const role = await this.prisma.role.findUnique({ where: { id: dto.roleId } });
+        if (!role)
+            throw new common_1.BadRequestException('Rôle introuvable');
+        const department = await this.prisma.department.findUnique({ where: { id: dto.departmentId } });
+        if (!department)
+            throw new common_1.BadRequestException('Département introuvable');
+        const jobTitle = await this.prisma.jobTitle.findUnique({ where: { id: dto.jobTitleId } });
+        if (!jobTitle)
+            throw new common_1.BadRequestException('Poste introuvable');
+        if (dto.warehouseId) {
+            const warehouse = await this.prisma.warehouse.findUnique({ where: { id: dto.warehouseId } });
+            if (!warehouse)
+                throw new common_1.BadRequestException('Entrepôt introuvable');
+        }
+        const hashed = await bcrypt.hash(dto.password, 10);
         const user = await this.prisma.user.create({
             data: {
                 email: dto.email,
-                username,
+                username: dto.username,
                 password: hashed,
-                role: { connect: { id: role?.id ?? '' } },
+                roleId: dto.roleId,
                 profile: {
                     create: {
-                        employeeCode,
-                        firstName: names.firstName,
-                        lastName: names.lastName,
-                        displayName: names.displayName,
-                        phone: dto.phone ?? null,
+                        employeeCode: dto.employeeCode,
+                        firstName: dto.firstName,
+                        lastName: dto.lastName,
+                        displayName: `${dto.firstName} ${dto.lastName}`,
+                        departmentId: dto.departmentId,
+                        jobTitleId: dto.jobTitleId,
+                        warehouseId: dto.warehouseId ?? null,
                     },
                 },
             },
@@ -97,6 +116,15 @@ let UsersService = class UsersService {
             orderBy: { createdAt: 'desc' },
         });
         return users.map((u) => (0, user_mapper_js_1.toAuthUserDto)(u));
+    }
+    async findOne(id) {
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+            select: user_mapper_js_1.userWithProfileSelect,
+        });
+        if (!user)
+            throw new common_1.NotFoundException('Utilisateur introuvable');
+        return (0, user_mapper_js_1.toAuthUserDto)(user);
     }
     async getMe(userId) {
         const user = await this.prisma.user.findUnique({

@@ -1,4 +1,5 @@
 export type UserProfile = {
+  employeeCode: string
   firstName: string
   lastName: string
   displayName: string
@@ -12,21 +13,23 @@ export type UserProfile = {
   region?: string | null
   country?: string | null
   postalCode?: string | null
-  jobTitle?: string | null
-  department?: string | null
+  jobTitle?: { id: string; name: string; code: string } | null
+  department?: { id: string; name: string; code: string } | null
+  warehouse?: { id: string; name: string } | null
   signature?: string | null
 }
 
 export type User = {
   id: string
   email: string
-  role: string
+  username: string
+  status: string
+  role: { id: string; name: string; code: string } | null
   /** Raccourci = profile.displayName */
   name: string
   /** Raccourci = profile.profilePhoto */
   avatar?: string | null
   phone?: string | null
-  department?: string | null
   createdAt?: string
   profile?: UserProfile | null
 }
@@ -45,12 +48,16 @@ export type RegisterPayload = {
 }
 
 export type CreateUserPayload = {
-  name: string
+  firstName: string
+  lastName: string
+  username: string
   email: string
   password: string
-  role?: string
-  phone?: string
-  department?: string
+  employeeCode: string
+  roleId: string
+  departmentId: string
+  jobTitleId: string
+  warehouseId?: string
 }
 
 export type UpdateProfilePayload = Partial<

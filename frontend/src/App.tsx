@@ -25,6 +25,7 @@ import { DepartementsPage } from "@/pages/parametres/DepartementsPage"
 import { JobTitlesPage } from "@/pages/parametres/JobTitlesPage"
 import { WarehousesPage } from "@/pages/entrepots/WarehousesPage"
 import { UtilisateursPage } from "@/pages/administration/UtilisateursPage"
+import { CreateUserPage } from "@/pages/administration/create/CreateUserPage"
 import { RolesPage } from "@/pages/administration/RolesPage"
 import { PermissionsPage } from "@/pages/administration/PermissionsPage"
 import { RolePermissionPage } from "@/pages/administration/RolePermissionPage"
@@ -127,6 +128,7 @@ function App() {
             <Route path="rapports/export" element={<div className="text-muted-foreground">Export Excel/PDF</div>} />
             <Route path="administration" element={<div className="text-muted-foreground">Administration</div>} />
             <Route path="administration/utilisateurs" element={<UtilisateursPage />} />
+            <Route path="administration/utilisateurs/creer" element={<CreateUserPage />} />
             <Route path="administration/roles" element={<RolesPage />} />
             <Route path="administration/roles/:roleId/permissions" element={<RolePermissionPage />} />
             <Route path="administration/permissions" element={<PermissionsPage />} />

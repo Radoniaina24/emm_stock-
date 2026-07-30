@@ -1,33 +1,78 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class CreateUserDto {
-  @ApiProperty({ example: 'Jean Dupont' })
+  @ApiProperty({ example: 'Jean' })
   @IsString()
+  @IsNotEmpty()
   @MinLength(2)
-  name: string;
+  @MaxLength(100)
+  firstName: string;
+
+  @ApiProperty({ example: 'Dupont' })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(2)
+  @MaxLength(100)
+  lastName: string;
+
+  @ApiProperty({ example: 'jean.dupont' })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(4)
+  @MaxLength(50)
+  @Matches(/^[a-zA-Z0-9_.]+$/, {
+    message: "Le nom d'utilisateur ne peut contenir que des lettres, chiffres, _ et .",
+  })
+  username: string;
 
   @ApiProperty({ example: 'jean.dupont@email.com' })
   @IsEmail()
   email: string;
 
-  @ApiProperty({ example: 'password123', minLength: 6 })
+  @ApiProperty({ example: 'Password123!' })
   @IsString()
-  @MinLength(6)
+  @IsNotEmpty()
+  @MinLength(8)
+  @Matches(/[A-Z]/, { message: 'Le mot de passe doit contenir au moins une majuscule' })
+  @Matches(/[a-z]/, { message: 'Le mot de passe doit contenir au moins une minuscule' })
+  @Matches(/[0-9]/, { message: 'Le mot de passe doit contenir au moins un chiffre' })
+  @Matches(/[!@#$%^&*(),.?":{}|<>]/, {
+    message: 'Le mot de passe doit contenir au moins un caractère spécial',
+  })
   password: string;
 
-  @ApiPropertyOptional({ example: 'Gestionnaire' })
-  @IsOptional()
+  @ApiProperty({ example: 'EMP001' })
   @IsString()
-  role?: string;
+  @IsNotEmpty()
+  @MaxLength(30)
+  employeeCode: string;
 
-  @ApiPropertyOptional({ example: '+261 34 00 000 00' })
-  @IsOptional()
+  @ApiProperty({ example: 'role-id' })
   @IsString()
-  phone?: string;
+  @IsNotEmpty()
+  roleId: string;
 
-  @ApiPropertyOptional({ example: 'Direction des opérations' })
+  @ApiProperty({ example: 'dept-id' })
+  @IsString()
+  @IsNotEmpty()
+  departmentId: string;
+
+  @ApiProperty({ example: 'job-title-id' })
+  @IsString()
+  @IsNotEmpty()
+  jobTitleId: string;
+
+  @ApiPropertyOptional({ example: 'warehouse-id' })
   @IsOptional()
   @IsString()
-  department?: string;
+  warehouseId?: string;
 }

@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Patch,
   Post,
   UploadedFile,
@@ -56,6 +57,13 @@ export class UsersController {
   @ApiUnauthorizedResponse({ description: 'Non authentifié' })
   getMe(@CurrentUser('id') userId: string) {
     return this.users.getMe(userId);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Détail d\'un utilisateur' })
+  @ApiOkResponse({ description: 'Utilisateur trouvé' })
+  findOne(@Param('id') id: string) {
+    return this.users.findOne(id);
   }
 
   @Patch('me/profile')

@@ -5,6 +5,7 @@ exports.toAuthUserDto = toAuthUserDto;
 exports.splitDisplayName = splitDisplayName;
 function mapProfile(profile) {
     return {
+        employeeCode: profile.employeeCode,
         firstName: profile.firstName,
         lastName: profile.lastName,
         displayName: profile.displayName,
@@ -20,9 +21,10 @@ function mapProfile(profile) {
         region: profile.region,
         country: profile.country,
         postalCode: profile.postalCode,
-        jobTitle: profile.jobTitle,
-        department: profile.department,
         signature: profile.signature,
+        department: profile.department,
+        jobTitle: profile.jobTitle,
+        warehouse: profile.warehouse,
     };
 }
 function toAuthUserDto(user) {
@@ -30,12 +32,14 @@ function toAuthUserDto(user) {
     return {
         id: user.id,
         email: user.email,
-        role: user.role?.name ?? '',
+        username: user.username,
+        status: user.status,
+        role: user.role,
         createdAt: user.createdAt,
         name: profile?.displayName ?? user.email,
         avatar: profile?.profilePhoto ?? null,
         phone: profile?.phone ?? null,
-        department: profile?.department ?? null,
+        department: profile?.department?.name ?? null,
         profile,
     };
 }
@@ -48,9 +52,16 @@ function splitDisplayName(fullName) {
 exports.userWithProfileSelect = {
     id: true,
     email: true,
+    username: true,
     status: true,
-    role: { select: { name: true, code: true } },
+    role: { select: { id: true, name: true, code: true } },
     createdAt: true,
-    profile: true,
+    profile: {
+        include: {
+            department: { select: { id: true, name: true, code: true } },
+            jobTitle: { select: { id: true, name: true, code: true } },
+            warehouse: { select: { id: true, name: true } },
+        },
+    },
 };
 //# sourceMappingURL=user.mapper.js.map

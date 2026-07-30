@@ -11,7 +11,6 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import {
-  splitDisplayName,
   toAuthUserDto,
   userWithProfileSelect,
 } from './user.mapper.js';
@@ -25,35 +24,52 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateUserDto) {
-    const existing = await this.prisma.user.findUnique({
+    const existingEmail = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
-    if (existing) throw new ConflictException('Cet email est déjà utilisé');
+    if (existingEmail) throw new ConflictException('Cet email est déjà utilisé');
+
+    const existingUsername = await this.prisma.user.findUnique({
+      where: { username: dto.username },
+    });
+    if (existingUsername) throw new ConflictException('Ce nom d\'utilisateur est déjà utilisé');
+
+    const existingCode = await this.prisma.userProfile.findUnique({
+      where: { employeeCode: dto.employeeCode },
+    });
+    if (existingCode) throw new ConflictException('Ce matricule est déjà utilisé');
+
+    const role = await this.prisma.role.findUnique({ where: { id: dto.roleId } });
+    if (!role) throw new BadRequestException('Rôle introuvable');
+
+    const department = await this.prisma.department.findUnique({ where: { id: dto.departmentId } });
+    if (!department) throw new BadRequestException('Département introuvable');
+
+    const jobTitle = await this.prisma.jobTitle.findUnique({ where: { id: dto.jobTitleId } });
+    if (!jobTitle) throw new BadRequestException('Poste introuvable');
+
+    if (dto.warehouseId) {
+      const warehouse = await this.prisma.warehouse.findUnique({ where: { id: dto.warehouseId } });
+      if (!warehouse) throw new BadRequestException('Entrepôt introuvable');
+    }
 
     const hashed = await bcrypt.hash(dto.password, 10);
-    const names = splitDisplayName(dto.name);
-    const employeeCode = `EMP-${Date.now().toString(36).slice(-6).toUpperCase()}`;
-
-    const roleName = dto.role ?? 'Gestionnaire';
-    const role = await this.prisma.role.findFirst({
-      where: { OR: [{ code: roleName }, { name: roleName }] },
-    });
-
-    const username = dto.email.split('@')[0];
 
     const user = await this.prisma.user.create({
       data: {
         email: dto.email,
-        username,
+        username: dto.username,
         password: hashed,
-        role: { connect: { id: role?.id ?? '' } },
+        roleId: dto.roleId,
         profile: {
           create: {
-            employeeCode,
-            firstName: names.firstName,
-            lastName: names.lastName,
-            displayName: names.displayName,
-            phone: dto.phone ?? null,
+            employeeCode: dto.employeeCode,
+            firstName: dto.firstName,
+            lastName: dto.lastName,
+            displayName: `${dto.firstName} ${dto.lastName}`,
+            departmentId: dto.departmentId,
+            jobTitleId: dto.jobTitleId,
+            warehouseId: dto.warehouseId ?? null,
           },
         },
       },
@@ -69,6 +85,15 @@ export class UsersService {
       orderBy: { createdAt: 'desc' },
     });
     return users.map((u) => toAuthUserDto(u));
+  }
+
+  async findOne(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: userWithProfileSelect,
+    });
+    if (!user) throw new NotFoundException('Utilisateur introuvable');
+    return toAuthUserDto(user);
   }
 
   async getMe(userId: string) {

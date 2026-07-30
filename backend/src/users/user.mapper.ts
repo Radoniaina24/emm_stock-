@@ -1,4 +1,5 @@
 type ProfileRecord = {
+  employeeCode: string;
   firstName: string;
   lastName: string;
   displayName: string;
@@ -12,12 +13,14 @@ type ProfileRecord = {
   region: string | null;
   country: string | null;
   postalCode: string | null;
-  jobTitle: string | null;
-  department: string | null;
   signature: string | null;
+  department: { id: string; name: string; code: string } | null;
+  jobTitle: { id: string; name: string; code: string } | null;
+  warehouse: { id: string; name: string } | null;
 };
 
 export type UserProfileDto = {
+  employeeCode: string;
   firstName: string;
   lastName: string;
   displayName: string;
@@ -31,16 +34,20 @@ export type UserProfileDto = {
   region: string | null;
   country: string | null;
   postalCode: string | null;
-  jobTitle: string | null;
-  department: string | null;
   signature: string | null;
+  department: { id: string; name: string; code: string } | null;
+  jobTitle: { id: string; name: string; code: string } | null;
+  warehouse: { id: string; name: string } | null;
 };
 
 export type AuthUserDto = {
   id: string;
   email: string;
-  role: string;
+  username: string;
+  status: string;
+  role: { id: string; name: string; code: string } | null;
   createdAt?: Date;
+  /** backward-compat: shorthands */
   name: string;
   avatar: string | null;
   phone: string | null;
@@ -51,13 +58,16 @@ export type AuthUserDto = {
 type UserWithProfile = {
   id: string;
   email: string;
-  role: { name: string; code: string } | null;
+  username: string;
+  status: string;
+  role: { id: string; name: string; code: string } | null;
   createdAt?: Date;
   profile?: ProfileRecord | null;
 };
 
 function mapProfile(profile: ProfileRecord): UserProfileDto {
   return {
+    employeeCode: profile.employeeCode,
     firstName: profile.firstName,
     lastName: profile.lastName,
     displayName: profile.displayName,
@@ -73,9 +83,10 @@ function mapProfile(profile: ProfileRecord): UserProfileDto {
     region: profile.region,
     country: profile.country,
     postalCode: profile.postalCode,
-    jobTitle: profile.jobTitle,
-    department: profile.department,
     signature: profile.signature,
+    department: profile.department,
+    jobTitle: profile.jobTitle,
+    warehouse: profile.warehouse,
   };
 }
 
@@ -84,12 +95,14 @@ export function toAuthUserDto(user: UserWithProfile): AuthUserDto {
   return {
     id: user.id,
     email: user.email,
-    role: user.role?.name ?? '',
+    username: user.username,
+    status: user.status,
+    role: user.role,
     createdAt: user.createdAt,
     name: profile?.displayName ?? user.email,
     avatar: profile?.profilePhoto ?? null,
     phone: profile?.phone ?? null,
-    department: profile?.department ?? null,
+    department: profile?.department?.name ?? null,
     profile,
   };
 }
@@ -104,8 +117,15 @@ export function splitDisplayName(fullName: string) {
 export const userWithProfileSelect = {
   id: true,
   email: true,
+  username: true,
   status: true,
-  role: { select: { name: true, code: true } },
+  role: { select: { id: true, name: true, code: true } },
   createdAt: true,
-  profile: true,
+  profile: {
+    include: {
+      department: { select: { id: true, name: true, code: true } },
+      jobTitle: { select: { id: true, name: true, code: true } },
+      warehouse: { select: { id: true, name: true } },
+    },
+  },
 } as const;

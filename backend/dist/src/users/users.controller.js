@@ -37,6 +37,9 @@ let UsersController = class UsersController {
     getMe(userId) {
         return this.users.getMe(userId);
     }
+    findOne(id) {
+        return this.users.findOne(id);
+    }
     updateProfile(userId, dto) {
         return this.users.updateProfile(userId, dto);
     }
@@ -75,6 +78,15 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "getMe", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, swagger_2.ApiOperation)({ summary: 'Détail d\'un utilisateur' }),
+    (0, swagger_2.ApiOkResponse)({ description: 'Utilisateur trouvé' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)('me/profile'),
     (0, swagger_2.ApiOperation)({ summary: 'Mettre à jour les informations personnelles' }),
