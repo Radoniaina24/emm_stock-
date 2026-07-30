@@ -6,6 +6,7 @@ import {
   ArrowRightLeft,
   ArrowUpFromLine,
   BadgeCheck,
+  Briefcase,
   BarChart3,
   Bell,
   Boxes,
@@ -197,6 +198,7 @@ const parametresSubNav = [
   { label: "Notifications", icon: Bell, to: "/dashboard/parametres/notifications" },
   { label: "Sauvegarde", icon: HardDrive, to: "/dashboard/parametres/sauvegarde" },
   { label: "Départements", icon: Building2, to: "/dashboard/parametres/departements" },
+  { label: "Fonctions", icon: Briefcase, to: "/dashboard/parametres/fonctions" },
   { label: "Configuration générale", icon: Settings, to: "/dashboard/parametres/configuration" },
 ]
 

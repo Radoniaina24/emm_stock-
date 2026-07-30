@@ -7,6 +7,12 @@ type DepartmentSeed = {
   description: string
 }
 
+type JobTitleSeed = {
+  code: string
+  name: string
+  description: string
+}
+
 type RoleSeed = {
   code: string
   name: string
@@ -42,6 +48,69 @@ const departments: DepartmentSeed[] = [
   { code: "MARKETING", name: "Marketing", description: "Communication et campagnes commerciales" },
   { code: "AUDIT", name: "Audit Interne", description: "Contrôle interne et conformité" },
   { code: "MAINTENANCE", name: "Maintenance", description: "Maintenance des équipements et des machines" },
+]
+
+const jobTitlesList: JobTitleSeed[] = [
+  { code: "DG", name: "Directeur Général", description: "Direction générale de l'entreprise" },
+  { code: "DGA", name: "Directeur Général Adjoint", description: "Assistance à la direction générale" },
+  { code: "DAF", name: "Directeur Administratif et Financier", description: "Gestion administrative et financière" },
+  { code: "DSI", name: "Directeur des Systèmes d'Information", description: "Direction des systèmes informatiques" },
+  { code: "DRH", name: "Directeur des Ressources Humaines", description: "Gestion des ressources humaines" },
+  { code: "DCM", name: "Directeur Commercial", description: "Direction de l'activité commerciale" },
+  { code: "DLOG", name: "Directeur Logistique", description: "Direction de la logistique et des transports" },
+  { code: "DPROD", name: "Directeur de Production", description: "Direction de la production" },
+  { code: "DA", name: "Directeur des Achats", description: "Direction des achats et approvisionnements" },
+  { code: "DQ", name: "Directeur Qualité", description: "Direction du contrôle qualité" },
+  { code: "CDS", name: "Chef de Service", description: "Encadrement d'un service" },
+  { code: "CDP", name: "Chef de Département", description: "Encadrement d'un département" },
+  { code: "CDE", name: "Chef d'Équipe", description: "Encadrement d'une équipe" },
+  { code: "CPROD", name: "Chef de Produit", description: "Gestion d'une gamme de produits" },
+  { code: "CPRJ", name: "Chef de Projet", description: "Coordination et suivi de projets" },
+  { code: "COMPTA", name: "Comptable", description: "Tenue de la comptabilité" },
+  { code: "COMPTA_S", name: "Comptable Senior", description: "Comptabilité avancée et reporting" },
+  { code: "COMPTA_J", name: "Comptable Junior", description: "Comptabilité courante" },
+  { code: "ANALYSTE", name: "Analyste Financier", description: "Analyse financière et reporting" },
+  { code: "CONTROLEUR", name: "Contrôleur de Gestion", description: "Contrôle budgétaire et reporting" },
+  { code: "DEV", name: "Développeur", description: "Développement d'applications" },
+  { code: "DEV_S", name: "Développeur Senior", description: "Développement avancé et architecture" },
+  { code: "DEV_F", name: "Développeur Fullstack", description: "Développement frontend et backend" },
+  { code: "ADMIN_RES", name: "Administrateur Réseau", description: "Gestion du réseau et des serveurs" },
+  { code: "ADMIN_SYS", name: "Administrateur Système", description: "Gestion des systèmes d'exploitation" },
+  { code: "SUPPORT", name: "Support Technique", description: "Assistance technique aux utilisateurs" },
+  { code: "RH", name: "Responsable RH", description: "Gestion des ressources humaines" },
+  { code: "ASSIST_RH", name: "Assistant RH", description: "Assistance administrative RH" },
+  { code: "CHARGE_RH", name: "Chargé de Recrutement", description: "Recrutement et sélection" },
+  { code: "COMMERCIAL", name: "Commercial", description: "Développement des ventes" },
+  { code: "COMM_S", name: "Commercial Senior", description: "Gestion des grands comptes" },
+  { code: "TELECONSEIL", name: "Téléconseiller", description: "Relation client à distance" },
+  { code: "RESP_VENTES", name: "Responsable des Ventes", description: "Supervision de l'équipe commerciale" },
+  { code: "RESP_MARKETING", name: "Responsable Marketing", description: "Stratégie marketing et communication" },
+  { code: "CM", name: "Community Manager", description: "Gestion des réseaux sociaux" },
+  { code: "GEST_STOCK", name: "Gestionnaire de Stock", description: "Gestion des stocks et approvisionnements" },
+  { code: "MAGASINIER", name: "Magasinier", description: "Réception et expédition des marchandises" },
+  { code: "PREPARATEUR", name: "Préparateur de Commandes", description: "Préparation des commandes clients" },
+  { code: "CARISTE", name: "Cariste", description: "Conduite d'engins de manutention" },
+  { code: "CHEF_ENTREPOT", name: "Chef d'Entrepôt", description: "Gestion de l'entrepôt" },
+  { code: "RESP_LOG", name: "Responsable Logistique", description: "Gestion de la logistique" },
+  { code: "ACHETEUR", name: "Acheteur", description: "Gestion des achats" },
+  { code: "ACHETEUR_S", name: "Acheteur Senior", description: "Négociation et stratégie achats" },
+  { code: "CATEGORIE_MGR", name: "Catégorie Manager", description: "Gestion par catégorie d'achats" },
+  { code: "CONTROLEUR_Q", name: "Contrôleur Qualité", description: "Contrôle qualité des produits" },
+  { code: "RESP_Q", name: "Responsable Qualité", description: "Gestion du système qualité" },
+  { code: "EXPEDIT", name: "Responsable Expédition", description: "Gestion des expéditions" },
+  { code: "RECEPT", name: "Réceptionnaire", description: "Réception des marchandises" },
+  { code: "OP_LOG", name: "Opérateur Logistique", description: "Opérations logistiques courantes" },
+  { code: "MANUT", name: "Manutentionnaire", description: "Manutention des marchandises" },
+  { code: "AGENT_QUAI", name: "Agent de Quai", description: "Gestion des quais de chargement" },
+  { code: "ASSIST_COMPTA", name: "Assistant Comptable", description: "Assistance comptable" },
+  { code: "ASSIST_ADMIN", name: "Assistant Administratif", description: "Assistance administrative" },
+  { code: "ASSIST_COMM", name: "Assistant Commercial", description: "Assistance à l'équipe commerciale" },
+  { code: "ASSIST_ACHATS", name: "Assistant Achats", description: "Assistance aux achats" },
+  { code: "CONSEIL_CLIENT", name: "Conseiller Client", description: "Conseil et vente aux clients" },
+  { code: "RESP_SAV", name: "Responsable SAV", description: "Gestion du service après-vente" },
+  { code: "SECRETAIRE", name: "Secrétaire", description: "Tâches administratives et secrétariat" },
+  { code: "STAGIAIRE", name: "Stagiaire", description: "Stage en entreprise" },
+  { code: "ALTERNANT", name: "Alternant", description: "Formation en alternance" },
 ]
 
 const roles: RoleSeed[] = [
@@ -426,6 +495,34 @@ async function main() {
       console.log(`✅ ${missing.length} nouveaux départements ajoutés`)
     }
     console.log(`ℹ️  ${departments.length} départements disponibles`)
+  }
+
+  const [jtRows] = await conn.execute("SELECT COUNT(*) as cnt FROM job_titles")
+  const jtCount = (jtRows as any)[0].cnt
+  if (jtCount === 0) {
+    for (const jt of jobTitlesList) {
+      const id = crypto.randomUUID()
+      await conn.execute(
+        "INSERT INTO job_titles (id, name, code, description, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
+        [id, jt.name, jt.code, jt.description, true]
+      )
+    }
+    console.log(`✅ ${jobTitlesList.length} titres créés avec succès`)
+  } else {
+    const [existingJt] = await conn.execute("SELECT code FROM job_titles")
+    const existingJtCodes = new Set((existingJt as any[]).map((r: any) => r.code))
+    const missing = jobTitlesList.filter((j) => !existingJtCodes.has(j.code))
+    if (missing.length > 0) {
+      for (const jt of missing) {
+        const id = crypto.randomUUID()
+        await conn.execute(
+          "INSERT INTO job_titles (id, name, code, description, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
+          [id, jt.name, jt.code, jt.description, true]
+        )
+      }
+      console.log(`✅ ${missing.length} nouveaux titres ajoutés`)
+    }
+    console.log(`ℹ️  ${jobTitlesList.length} titres disponibles`)
   }
 
   const [rows] = await conn.execute("SELECT COUNT(*) as cnt FROM roles")

@@ -22,6 +22,7 @@ import { ProfilePage } from "@/pages/ProfilePage"
 import { LoginPage } from "@/pages/LoginPage"
 import { ConfigurationPage } from "@/pages/parametres/ConfigurationPage"
 import { DepartementsPage } from "@/pages/parametres/DepartementsPage"
+import { JobTitlesPage } from "@/pages/parametres/JobTitlesPage"
 import { UtilisateursPage } from "@/pages/administration/UtilisateursPage"
 import { RolesPage } from "@/pages/administration/RolesPage"
 import { PermissionsPage } from "@/pages/administration/PermissionsPage"
@@ -140,6 +141,7 @@ function App() {
             <Route path="parametres/notifications" element={<div className="text-muted-foreground">Notifications</div>} />
             <Route path="parametres/sauvegarde" element={<div className="text-muted-foreground">Sauvegarde</div>} />
             <Route path="parametres/departements" element={<DepartementsPage />} />
+            <Route path="parametres/fonctions" element={<JobTitlesPage />} />
             <Route path="parametres/configuration" element={<ConfigurationPage />} />
             <Route path="composants" element={<ComponentShowcase />} />
             <Route path="composants/boutons" element={<BoutonsPage />} />
