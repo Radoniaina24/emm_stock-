@@ -13,6 +13,11 @@ type JobTitleSeed = {
   description: string
 }
 
+type WarehouseSeed = {
+  name: string
+  location: string
+}
+
 type RoleSeed = {
   code: string
   name: string
@@ -111,6 +116,17 @@ const jobTitlesList: JobTitleSeed[] = [
   { code: "SECRETAIRE", name: "Secrétaire", description: "Tâches administratives et secrétariat" },
   { code: "STAGIAIRE", name: "Stagiaire", description: "Stage en entreprise" },
   { code: "ALTERNANT", name: "Alternant", description: "Formation en alternance" },
+]
+
+const warehouses: WarehouseSeed[] = [
+  { name: "Entrepôt Principal", location: "Zone Industrielle, Antananarivo" },
+  { name: "Entrepôt Secondaire", location: "Lot II V 76, Ankorondrano, Antananarivo" },
+  { name: "Dépôt Toamasina", location: "Port de Toamasina, Zone Franche" },
+  { name: "Dépôt Mahajanga", location: "Quai des Pêcheurs, Mahajanga" },
+  { name: "Site de Production", location: "Usine, Route d'Alarobia, Antananarivo" },
+  { name: "Magasin de Pièces Détachées", location: "Anosizato, Antananarivo" },
+  { name: "Plateforme Logistique", location: "Ivato, Près de l'Aéroport" },
+  { name: "Stock Produits Finis", location: "Zone Industrielle, Antsirabe" },
 ]
 
 const roles: RoleSeed[] = [
@@ -523,6 +539,26 @@ async function main() {
       console.log(`✅ ${missing.length} nouveaux titres ajoutés`)
     }
     console.log(`ℹ️  ${jobTitlesList.length} titres disponibles`)
+  }
+
+  const [whRows] = await conn.execute("SELECT COUNT(*) as cnt FROM warehouses")
+  const whCount = (whRows as any)[0].cnt
+  if (whCount === 0) {
+    for (const w of warehouses) {
+      const id = crypto.randomUUID()
+      await conn.execute(
+        "INSERT INTO warehouses (id, name, location, isActive, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())",
+        [id, w.name, w.location, true]
+      )
+    }
+    console.log(`✅ ${warehouses.length} entrepôts créés avec succès`)
+  } else {
+    const [existingWh] = await conn.execute("SELECT COUNT(*) as cnt FROM warehouses")
+    const existingWhCount = (existingWh as any)[0].cnt
+    if (existingWhCount < warehouses.length) {
+      console.log(`ℹ️  ${warehouses.length - existingWhCount} entrepôts manquants ignorés`)
+    }
+    console.log(`ℹ️  ${Math.max(existingWhCount, warehouses.length)} entrepôts disponibles`)
   }
 
   const [rows] = await conn.execute("SELECT COUNT(*) as cnt FROM roles")

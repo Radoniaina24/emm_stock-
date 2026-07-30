@@ -117,6 +117,16 @@ const jobTitlesList = [
     { code: "STAGIAIRE", name: "Stagiaire", description: "Stage en entreprise" },
     { code: "ALTERNANT", name: "Alternant", description: "Formation en alternance" },
 ];
+const warehouses = [
+    { name: "Entrepôt Principal", location: "Zone Industrielle, Antananarivo" },
+    { name: "Entrepôt Secondaire", location: "Lot II V 76, Ankorondrano, Antananarivo" },
+    { name: "Dépôt Toamasina", location: "Port de Toamasina, Zone Franche" },
+    { name: "Dépôt Mahajanga", location: "Quai des Pêcheurs, Mahajanga" },
+    { name: "Site de Production", location: "Usine, Route d'Alarobia, Antananarivo" },
+    { name: "Magasin de Pièces Détachées", location: "Anosizato, Antananarivo" },
+    { name: "Plateforme Logistique", location: "Ivato, Près de l'Aéroport" },
+    { name: "Stock Produits Finis", location: "Zone Industrielle, Antsirabe" },
+];
 const roles = [
     { code: "SUPER_ADMIN", name: "Super Administrateur", description: "Accès complet à toutes les fonctionnalités de l'application, y compris la gestion des rôles, permissions et paramètres système.", isSystem: true },
     { code: "ADMIN", name: "Administrateur", description: "Gère les utilisateurs, les paramètres de l'entreprise, les produits et les opérations courantes.", isSystem: true },
@@ -497,6 +507,23 @@ async function main() {
             console.log(`✅ ${missing.length} nouveaux titres ajoutés`);
         }
         console.log(`ℹ️  ${jobTitlesList.length} titres disponibles`);
+    }
+    const [whRows] = await conn.execute("SELECT COUNT(*) as cnt FROM warehouses");
+    const whCount = whRows[0].cnt;
+    if (whCount === 0) {
+        for (const w of warehouses) {
+            const id = crypto.randomUUID();
+            await conn.execute("INSERT INTO warehouses (id, name, location, isActive, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())", [id, w.name, w.location, true]);
+        }
+        console.log(`✅ ${warehouses.length} entrepôts créés avec succès`);
+    }
+    else {
+        const [existingWh] = await conn.execute("SELECT COUNT(*) as cnt FROM warehouses");
+        const existingWhCount = existingWh[0].cnt;
+        if (existingWhCount < warehouses.length) {
+            console.log(`ℹ️  ${warehouses.length - existingWhCount} entrepôts manquants ignorés`);
+        }
+        console.log(`ℹ️  ${Math.max(existingWhCount, warehouses.length)} entrepôts disponibles`);
     }
     const [rows] = await conn.execute("SELECT COUNT(*) as cnt FROM roles");
     const roleCount = rows[0].cnt;

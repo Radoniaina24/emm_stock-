@@ -23,6 +23,7 @@ import { LoginPage } from "@/pages/LoginPage"
 import { ConfigurationPage } from "@/pages/parametres/ConfigurationPage"
 import { DepartementsPage } from "@/pages/parametres/DepartementsPage"
 import { JobTitlesPage } from "@/pages/parametres/JobTitlesPage"
+import { WarehousesPage } from "@/pages/entrepots/WarehousesPage"
 import { UtilisateursPage } from "@/pages/administration/UtilisateursPage"
 import { RolesPage } from "@/pages/administration/RolesPage"
 import { PermissionsPage } from "@/pages/administration/PermissionsPage"
@@ -63,7 +64,7 @@ function App() {
             <Route path="stock/faible" element={<div className="text-muted-foreground">Stock faible</div>} />
             <Route path="stock/valorisation" element={<div className="text-muted-foreground">Valorisation du stock</div>} />
             <Route path="stock/historique" element={<div className="text-muted-foreground">Historique des mouvements</div>} />
-            <Route path="entrepots" element={<div className="text-muted-foreground">Liste des entrepôts</div>} />
+            <Route path="entrepots" element={<WarehousesPage />} />
             <Route path="entrepots/zones" element={<div className="text-muted-foreground">Zones de stockage</div>} />
             <Route path="entrepots/emplacements" element={<div className="text-muted-foreground">Emplacements</div>} />
             <Route path="entrepots/transferts" element={<div className="text-muted-foreground">Transferts entre entrepôts</div>} />

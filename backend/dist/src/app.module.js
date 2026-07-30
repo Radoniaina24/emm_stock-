@@ -18,12 +18,13 @@ const permissions_module_js_1 = require("./permissions/permissions.module.js");
 const role_permissions_module_js_1 = require("./role-permissions/role-permissions.module.js");
 const departments_module_js_1 = require("./departments/departments.module.js");
 const job_titles_module_js_1 = require("./job-titles/job-titles.module.js");
+const warehouses_module_js_1 = require("./warehouses/warehouses.module.js");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_js_1.PrismaModule, auth_module_js_1.AuthModule, users_module_js_1.UsersModule, roles_module_js_1.RolesModule, permissions_module_js_1.PermissionsModule, role_permissions_module_js_1.RolePermissionsModule, departments_module_js_1.DepartmentsModule, job_titles_module_js_1.JobTitlesModule],
+        imports: [prisma_module_js_1.PrismaModule, auth_module_js_1.AuthModule, users_module_js_1.UsersModule, roles_module_js_1.RolesModule, permissions_module_js_1.PermissionsModule, role_permissions_module_js_1.RolePermissionsModule, departments_module_js_1.DepartmentsModule, job_titles_module_js_1.JobTitlesModule, warehouses_module_js_1.WarehousesModule],
         controllers: [app_controller_js_1.AppController],
         providers: [app_service_js_1.AppService],
     })
