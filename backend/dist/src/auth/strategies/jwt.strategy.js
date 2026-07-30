@@ -33,17 +33,17 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
                 id: true,
                 email: true,
                 role: { select: { name: true, code: true } },
-                isActive: true,
+                status: true,
                 profile: { select: { displayName: true } },
             },
         });
-        if (!user || !user.isActive)
+        if (!user || user.status !== 'ACTIVE')
             throw new common_1.UnauthorizedException();
         return {
             id: user.id,
             email: user.email,
             role: user.role?.code ?? '',
-            isActive: user.isActive,
+            status: user.status,
             name: user.profile?.displayName ?? user.email,
         };
     }
