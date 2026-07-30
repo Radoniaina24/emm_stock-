@@ -5,7 +5,6 @@ import {
   SelectPopup,
   SelectRoot,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select"
 import { useRolesQuery } from "@/hooks/use-roles"
 
@@ -17,6 +16,7 @@ type RoleSelectProps = {
 
 export function RoleSelect({ value, onValueChange, error }: RoleSelectProps) {
   const { data: roles, isLoading } = useRolesQuery()
+  const label = roles?.find((r) => r.id === value)?.name
 
   return (
     <div className="space-y-1.5">
@@ -24,10 +24,10 @@ export function RoleSelect({ value, onValueChange, error }: RoleSelectProps) {
         Rôle <span className="text-destructive">*</span>
       </label>
       <SelectRoot value={value} onValueChange={(v) => onValueChange(v ?? "")}>
-        <SelectTrigger
-          className={`h-10 ${error ? "border-destructive/60" : ""}`}
-        >
-          <SelectValue placeholder={isLoading ? "Chargement..." : "Sélectionner un rôle"} />
+        <SelectTrigger className={`h-10 ${error ? "border-destructive/60" : ""}`}>
+          <span className="flex-1 truncate text-left data-[placeholder]:text-muted-foreground/40">
+            {label ?? (isLoading ? "Chargement..." : "Sélectionner un rôle")}
+          </span>
         </SelectTrigger>
         <SelectPopup>
           <SelectList>

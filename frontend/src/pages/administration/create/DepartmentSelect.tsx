@@ -5,7 +5,6 @@ import {
   SelectPopup,
   SelectRoot,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select"
 import { useDepartmentsQuery } from "@/hooks/use-departments"
 
@@ -17,6 +16,7 @@ type DepartmentSelectProps = {
 
 export function DepartmentSelect({ value, onValueChange, error }: DepartmentSelectProps) {
   const { data: departments, isLoading } = useDepartmentsQuery()
+  const label = departments?.find((d) => d.id === value)?.name
 
   return (
     <div className="space-y-1.5">
@@ -24,10 +24,10 @@ export function DepartmentSelect({ value, onValueChange, error }: DepartmentSele
         Département <span className="text-destructive">*</span>
       </label>
       <SelectRoot value={value} onValueChange={(v) => onValueChange(v ?? "")}>
-        <SelectTrigger
-          className={`h-10 ${error ? "border-destructive/60" : ""}`}
-        >
-          <SelectValue placeholder={isLoading ? "Chargement..." : "Sélectionner un département"} />
+        <SelectTrigger className={`h-10 ${error ? "border-destructive/60" : ""}`}>
+          <span className="flex-1 truncate text-left">
+            {label ?? (isLoading ? "Chargement..." : "Sélectionner un département")}
+          </span>
         </SelectTrigger>
         <SelectPopup>
           <SelectList>

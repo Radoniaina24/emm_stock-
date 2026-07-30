@@ -5,7 +5,6 @@ import {
   SelectPopup,
   SelectRoot,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select"
 import { useJobTitlesQuery } from "@/hooks/use-job-titles"
 
@@ -17,6 +16,7 @@ type JobTitleSelectProps = {
 
 export function JobTitleSelect({ value, onValueChange, error }: JobTitleSelectProps) {
   const { data: jobTitles, isLoading } = useJobTitlesQuery()
+  const label = jobTitles?.find((j) => j.id === value)?.name
 
   return (
     <div className="space-y-1.5">
@@ -24,10 +24,10 @@ export function JobTitleSelect({ value, onValueChange, error }: JobTitleSelectPr
         Poste <span className="text-destructive">*</span>
       </label>
       <SelectRoot value={value} onValueChange={(v) => onValueChange(v ?? "")}>
-        <SelectTrigger
-          className={`h-10 ${error ? "border-destructive/60" : ""}`}
-        >
-          <SelectValue placeholder={isLoading ? "Chargement..." : "Sélectionner un poste"} />
+        <SelectTrigger className={`h-10 ${error ? "border-destructive/60" : ""}`}>
+          <span className="flex-1 truncate text-left">
+            {label ?? (isLoading ? "Chargement..." : "Sélectionner un poste")}
+          </span>
         </SelectTrigger>
         <SelectPopup>
           <SelectList>
