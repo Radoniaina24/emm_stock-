@@ -38,6 +38,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt = __importStar(require("bcrypt"));
 const promise_1 = __importDefault(require("mysql2/promise"));
+const departments = [
+    { code: "DIR", name: "Direction Générale", description: "Supervision et pilotage de l'entreprise" },
+    { code: "STOCK", name: "Gestion des Stocks", description: "Gestion des produits, mouvements et inventaires" },
+    { code: "PURCHASE", name: "Achats", description: "Gestion des fournisseurs et des commandes d'achat" },
+    { code: "SALES", name: "Ventes", description: "Gestion des clients, devis, commandes et facturation" },
+    { code: "FINANCE", name: "Finance", description: "Comptabilité, trésorerie et paiements" },
+    { code: "HR", name: "Ressources Humaines", description: "Gestion des employés et de la paie" },
+    { code: "LOGISTICS", name: "Logistique", description: "Livraison, transport et expédition" },
+    { code: "PROCUREMENT", name: "Approvisionnement", description: "Planification et réapprovisionnement des stocks" },
+    { code: "QUALITY", name: "Qualité", description: "Contrôle qualité des produits" },
+    { code: "CUSTOMER_SERVICE", name: "Service Client", description: "Assistance et gestion des réclamations" },
+    { code: "IT", name: "Informatique", description: "Infrastructure, maintenance et support technique" },
+    { code: "SECURITY", name: "Sécurité", description: "Gestion de la sécurité physique et des accès" },
+    { code: "MARKETING", name: "Marketing", description: "Communication et campagnes commerciales" },
+    { code: "AUDIT", name: "Audit Interne", description: "Contrôle interne et conformité" },
+    { code: "MAINTENANCE", name: "Maintenance", description: "Maintenance des équipements et des machines" },
+];
 const roles = [
     { code: "SUPER_ADMIN", name: "Super Administrateur", description: "Accès complet à toutes les fonctionnalités de l'application, y compris la gestion des rôles, permissions et paramètres système.", isSystem: true },
     { code: "ADMIN", name: "Administrateur", description: "Gère les utilisateurs, les paramètres de l'entreprise, les produits et les opérations courantes.", isSystem: true },
@@ -375,6 +392,28 @@ async function main() {
         password: "",
         database: "gestion_stock",
     });
+    const [deptRows] = await conn.execute("SELECT COUNT(*) as cnt FROM departments");
+    const deptCount = deptRows[0].cnt;
+    if (deptCount === 0) {
+        for (const d of departments) {
+            const id = crypto.randomUUID();
+            await conn.execute("INSERT INTO departments (id, name, code, description, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())", [id, d.name, d.code, d.description, true]);
+        }
+        console.log(`✅ ${departments.length} départements créés avec succès`);
+    }
+    else {
+        const [existingDepts] = await conn.execute("SELECT code FROM departments");
+        const existingCodes = new Set(existingDepts.map((r) => r.code));
+        const missing = departments.filter((d) => !existingCodes.has(d.code));
+        if (missing.length > 0) {
+            for (const d of missing) {
+                const id = crypto.randomUUID();
+                await conn.execute("INSERT INTO departments (id, name, code, description, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())", [id, d.name, d.code, d.description, true]);
+            }
+            console.log(`✅ ${missing.length} nouveaux départements ajoutés`);
+        }
+        console.log(`ℹ️  ${departments.length} départements disponibles`);
+    }
     const [rows] = await conn.execute("SELECT COUNT(*) as cnt FROM roles");
     const roleCount = rows[0].cnt;
     if (roleCount === 0) {

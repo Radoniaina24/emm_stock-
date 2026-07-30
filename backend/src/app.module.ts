@@ -7,9 +7,10 @@ import { UsersModule } from './users/users.module.js';
 import { RolesModule } from './roles/roles.module.js';
 import { PermissionsModule } from './permissions/permissions.module.js';
 import { RolePermissionsModule } from './role-permissions/role-permissions.module.js';
+import { DepartmentsModule } from './departments/departments.module.js';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, RolesModule, PermissionsModule, RolePermissionsModule],
+  imports: [PrismaModule, AuthModule, UsersModule, RolesModule, PermissionsModule, RolePermissionsModule, DepartmentsModule],
   controllers: [AppController],
   providers: [AppService],
 })

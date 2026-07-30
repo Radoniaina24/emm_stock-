@@ -196,6 +196,7 @@ const parametresSubNav = [
   { label: "Numérotation documents", icon: FileDigit, to: "/dashboard/parametres/numerotation" },
   { label: "Notifications", icon: Bell, to: "/dashboard/parametres/notifications" },
   { label: "Sauvegarde", icon: HardDrive, to: "/dashboard/parametres/sauvegarde" },
+  { label: "Départements", icon: Building2, to: "/dashboard/parametres/departements" },
   { label: "Configuration générale", icon: Settings, to: "/dashboard/parametres/configuration" },
 ]
 
