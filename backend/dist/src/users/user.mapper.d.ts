@@ -64,6 +64,7 @@ export declare function splitDisplayName(fullName: string): {
 export declare const userWithProfileSelect: {
     readonly id: true;
     readonly email: true;
+    readonly status: true;
     readonly role: {
         readonly select: {
             readonly name: true;

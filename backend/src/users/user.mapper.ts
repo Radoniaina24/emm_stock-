@@ -104,6 +104,7 @@ export function splitDisplayName(fullName: string) {
 export const userWithProfileSelect = {
   id: true,
   email: true,
+  status: true,
   role: { select: { name: true, code: true } },
   createdAt: true,
   profile: true,

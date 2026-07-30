@@ -48,6 +48,7 @@ function splitDisplayName(fullName) {
 exports.userWithProfileSelect = {
     id: true,
     email: true,
+    status: true,
     role: { select: { name: true, code: true } },
     createdAt: true,
     profile: true,
