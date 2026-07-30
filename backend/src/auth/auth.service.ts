@@ -29,18 +29,23 @@ export class AuthService {
 
     const hashed = await bcrypt.hash(dto.password, 10);
     const names = splitDisplayName(dto.name);
+    const employeeCode = `EMP-${Date.now().toString(36).slice(-6).toUpperCase()}`;
+    const username = dto.email.split('@')[0];
+    const defaultRole = await this.prisma.role.findFirst({ where: { code: 'VIEWER' } });
 
     const user = await this.prisma.user.create({
       data: {
         email: dto.email,
+        username,
         password: hashed,
+        role: { connect: { id: defaultRole?.id ?? '' } },
         profile: {
           create: {
+            employeeCode,
             firstName: names.firstName,
             lastName: names.lastName,
             displayName: names.displayName,
             phone: dto.phone,
-            department: dto.department,
           },
         },
       },
@@ -57,16 +62,11 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
       select: {
-        id: true,
-        email: true,
+        ...userWithProfileSelect,
         password: true,
-        role: true,
-        isActive: true,
-        createdAt: true,
-        profile: true,
       },
     });
-    if (!user || !user.isActive)
+    if (!user || user.status !== 'ACTIVE')
       throw new UnauthorizedException('Invalid credentials');
 
     const valid = await bcrypt.compare(dto.password, user.password);

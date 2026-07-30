@@ -65,22 +65,25 @@ let UsersService = class UsersService {
             throw new common_1.ConflictException('Cet email est déjà utilisé');
         const hashed = await bcrypt.hash(dto.password, 10);
         const names = (0, user_mapper_js_1.splitDisplayName)(dto.name);
+        const employeeCode = `EMP-${Date.now().toString(36).slice(-6).toUpperCase()}`;
         const roleName = dto.role ?? 'Gestionnaire';
         const role = await this.prisma.role.findFirst({
             where: { OR: [{ code: roleName }, { name: roleName }] },
         });
+        const username = dto.email.split('@')[0];
         const user = await this.prisma.user.create({
             data: {
                 email: dto.email,
+                username,
                 password: hashed,
-                roleId: role?.id ?? null,
+                role: { connect: { id: role?.id ?? '' } },
                 profile: {
                     create: {
+                        employeeCode,
                         firstName: names.firstName,
                         lastName: names.lastName,
                         displayName: names.displayName,
                         phone: dto.phone ?? null,
-                        department: dto.department ?? null,
                     },
                 },
             },
@@ -141,8 +144,8 @@ let UsersService = class UsersService {
                 region: emptyToNull(dto.region),
                 country: emptyToNull(dto.country),
                 postalCode: emptyToNull(dto.postalCode),
-                jobTitle: emptyToNull(dto.jobTitle),
-                department: emptyToNull(dto.department),
+                jobTitleId: emptyToNull(dto.jobTitle),
+                departmentId: emptyToNull(dto.department),
                 signature: emptyToNull(dto.signature),
             },
         });

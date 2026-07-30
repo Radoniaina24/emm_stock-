@@ -3,6 +3,8 @@ export type * from './models/RolePermission';
 export type * from './models/Role';
 export type * from './models/User';
 export type * from './models/UserProfile';
+export type * from './models/Department';
+export type * from './models/JobTitle';
 export type * from './models/Category';
 export type * from './models/Brand';
 export type * from './models/Unit';

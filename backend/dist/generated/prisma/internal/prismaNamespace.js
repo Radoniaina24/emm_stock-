@@ -33,8 +33,8 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProductOrderByRelevanceFieldEnum = exports.UnitOrderByRelevanceFieldEnum = exports.BrandOrderByRelevanceFieldEnum = exports.CategoryOrderByRelevanceFieldEnum = exports.UserProfileOrderByRelevanceFieldEnum = exports.UserOrderByRelevanceFieldEnum = exports.RoleOrderByRelevanceFieldEnum = exports.RolePermissionOrderByRelevanceFieldEnum = exports.PermissionOrderByRelevanceFieldEnum = exports.NullsOrder = exports.SortOrder = exports.InventoryLineScalarFieldEnum = exports.InventoryScalarFieldEnum = exports.MovementScalarFieldEnum = exports.ExitLineScalarFieldEnum = exports.ExitScalarFieldEnum = exports.EntryLineScalarFieldEnum = exports.EntryScalarFieldEnum = exports.SupplierScalarFieldEnum = exports.StockScalarFieldEnum = exports.ZoneScalarFieldEnum = exports.WarehouseScalarFieldEnum = exports.ProductScalarFieldEnum = exports.UnitScalarFieldEnum = exports.BrandScalarFieldEnum = exports.CategoryScalarFieldEnum = exports.UserProfileScalarFieldEnum = exports.UserScalarFieldEnum = exports.RoleScalarFieldEnum = exports.RolePermissionScalarFieldEnum = exports.PermissionScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
-exports.defineExtension = exports.InventoryLineOrderByRelevanceFieldEnum = exports.InventoryOrderByRelevanceFieldEnum = exports.MovementOrderByRelevanceFieldEnum = exports.ExitLineOrderByRelevanceFieldEnum = exports.ExitOrderByRelevanceFieldEnum = exports.EntryLineOrderByRelevanceFieldEnum = exports.EntryOrderByRelevanceFieldEnum = exports.SupplierOrderByRelevanceFieldEnum = exports.StockOrderByRelevanceFieldEnum = exports.ZoneOrderByRelevanceFieldEnum = exports.WarehouseOrderByRelevanceFieldEnum = void 0;
+exports.JobTitleOrderByRelevanceFieldEnum = exports.DepartmentOrderByRelevanceFieldEnum = exports.UserProfileOrderByRelevanceFieldEnum = exports.UserOrderByRelevanceFieldEnum = exports.RoleOrderByRelevanceFieldEnum = exports.RolePermissionOrderByRelevanceFieldEnum = exports.PermissionOrderByRelevanceFieldEnum = exports.NullsOrder = exports.SortOrder = exports.InventoryLineScalarFieldEnum = exports.InventoryScalarFieldEnum = exports.MovementScalarFieldEnum = exports.ExitLineScalarFieldEnum = exports.ExitScalarFieldEnum = exports.EntryLineScalarFieldEnum = exports.EntryScalarFieldEnum = exports.SupplierScalarFieldEnum = exports.StockScalarFieldEnum = exports.ZoneScalarFieldEnum = exports.WarehouseScalarFieldEnum = exports.ProductScalarFieldEnum = exports.UnitScalarFieldEnum = exports.BrandScalarFieldEnum = exports.CategoryScalarFieldEnum = exports.JobTitleScalarFieldEnum = exports.DepartmentScalarFieldEnum = exports.UserProfileScalarFieldEnum = exports.UserScalarFieldEnum = exports.RoleScalarFieldEnum = exports.RolePermissionScalarFieldEnum = exports.PermissionScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
+exports.defineExtension = exports.InventoryLineOrderByRelevanceFieldEnum = exports.InventoryOrderByRelevanceFieldEnum = exports.MovementOrderByRelevanceFieldEnum = exports.ExitLineOrderByRelevanceFieldEnum = exports.ExitOrderByRelevanceFieldEnum = exports.EntryLineOrderByRelevanceFieldEnum = exports.EntryOrderByRelevanceFieldEnum = exports.SupplierOrderByRelevanceFieldEnum = exports.StockOrderByRelevanceFieldEnum = exports.ZoneOrderByRelevanceFieldEnum = exports.WarehouseOrderByRelevanceFieldEnum = exports.ProductOrderByRelevanceFieldEnum = exports.UnitOrderByRelevanceFieldEnum = exports.BrandOrderByRelevanceFieldEnum = exports.CategoryOrderByRelevanceFieldEnum = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/client"));
 exports.PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError;
 exports.PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError;
@@ -66,6 +66,8 @@ exports.ModelName = {
     Role: 'Role',
     User: 'User',
     UserProfile: 'UserProfile',
+    Department: 'Department',
+    JobTitle: 'JobTitle',
     Category: 'Category',
     Brand: 'Brand',
     Unit: 'Unit',
@@ -98,7 +100,8 @@ exports.PermissionScalarFieldEnum = {
 };
 exports.RolePermissionScalarFieldEnum = {
     roleId: 'roleId',
-    permissionId: 'permissionId'
+    permissionId: 'permissionId',
+    createdAt: 'createdAt'
 };
 exports.RoleScalarFieldEnum = {
     id: 'id',
@@ -113,15 +116,23 @@ exports.RoleScalarFieldEnum = {
 exports.UserScalarFieldEnum = {
     id: 'id',
     email: 'email',
+    username: 'username',
     password: 'password',
+    status: 'status',
+    mustChangePassword: 'mustChangePassword',
+    twoFactorEnabled: 'twoFactorEnabled',
+    failedLoginAttempts: 'failedLoginAttempts',
+    lockedUntil: 'lockedUntil',
+    lastLoginAt: 'lastLoginAt',
+    emailVerifiedAt: 'emailVerifiedAt',
     roleId: 'roleId',
-    isActive: 'isActive',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
 exports.UserProfileScalarFieldEnum = {
     id: 'id',
     userId: 'userId',
+    employeeCode: 'employeeCode',
     firstName: 'firstName',
     lastName: 'lastName',
     displayName: 'displayName',
@@ -135,9 +146,28 @@ exports.UserProfileScalarFieldEnum = {
     region: 'region',
     country: 'country',
     postalCode: 'postalCode',
-    jobTitle: 'jobTitle',
-    department: 'department',
+    departmentId: 'departmentId',
+    jobTitleId: 'jobTitleId',
+    warehouseId: 'warehouseId',
     signature: 'signature',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+exports.DepartmentScalarFieldEnum = {
+    id: 'id',
+    name: 'name',
+    code: 'code',
+    description: 'description',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+exports.JobTitleScalarFieldEnum = {
+    id: 'id',
+    name: 'name',
+    code: 'code',
+    description: 'description',
+    isActive: 'isActive',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
@@ -309,12 +339,14 @@ exports.RoleOrderByRelevanceFieldEnum = {
 exports.UserOrderByRelevanceFieldEnum = {
     id: 'id',
     email: 'email',
+    username: 'username',
     password: 'password',
     roleId: 'roleId'
 };
 exports.UserProfileOrderByRelevanceFieldEnum = {
     id: 'id',
     userId: 'userId',
+    employeeCode: 'employeeCode',
     firstName: 'firstName',
     lastName: 'lastName',
     displayName: 'displayName',
@@ -327,9 +359,22 @@ exports.UserProfileOrderByRelevanceFieldEnum = {
     region: 'region',
     country: 'country',
     postalCode: 'postalCode',
-    jobTitle: 'jobTitle',
-    department: 'department',
+    departmentId: 'departmentId',
+    jobTitleId: 'jobTitleId',
+    warehouseId: 'warehouseId',
     signature: 'signature'
+};
+exports.DepartmentOrderByRelevanceFieldEnum = {
+    id: 'id',
+    name: 'name',
+    code: 'code',
+    description: 'description'
+};
+exports.JobTitleOrderByRelevanceFieldEnum = {
+    id: 'id',
+    name: 'name',
+    code: 'code',
+    description: 'description'
 };
 exports.CategoryOrderByRelevanceFieldEnum = {
     id: 'id',

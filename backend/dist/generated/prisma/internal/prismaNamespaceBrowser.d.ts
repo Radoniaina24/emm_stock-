@@ -16,6 +16,8 @@ export declare const ModelName: {
     readonly Role: "Role";
     readonly User: "User";
     readonly UserProfile: "UserProfile";
+    readonly Department: "Department";
+    readonly JobTitle: "JobTitle";
     readonly Category: "Category";
     readonly Brand: "Brand";
     readonly Unit: "Unit";
@@ -47,6 +49,7 @@ export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof
 export declare const RolePermissionScalarFieldEnum: {
     readonly roleId: "roleId";
     readonly permissionId: "permissionId";
+    readonly createdAt: "createdAt";
 };
 export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum];
 export declare const RoleScalarFieldEnum: {
@@ -63,9 +66,16 @@ export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof Role
 export declare const UserScalarFieldEnum: {
     readonly id: "id";
     readonly email: "email";
+    readonly username: "username";
     readonly password: "password";
+    readonly status: "status";
+    readonly mustChangePassword: "mustChangePassword";
+    readonly twoFactorEnabled: "twoFactorEnabled";
+    readonly failedLoginAttempts: "failedLoginAttempts";
+    readonly lockedUntil: "lockedUntil";
+    readonly lastLoginAt: "lastLoginAt";
+    readonly emailVerifiedAt: "emailVerifiedAt";
     readonly roleId: "roleId";
-    readonly isActive: "isActive";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
@@ -73,6 +83,7 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 export declare const UserProfileScalarFieldEnum: {
     readonly id: "id";
     readonly userId: "userId";
+    readonly employeeCode: "employeeCode";
     readonly firstName: "firstName";
     readonly lastName: "lastName";
     readonly displayName: "displayName";
@@ -86,13 +97,34 @@ export declare const UserProfileScalarFieldEnum: {
     readonly region: "region";
     readonly country: "country";
     readonly postalCode: "postalCode";
-    readonly jobTitle: "jobTitle";
-    readonly department: "department";
+    readonly departmentId: "departmentId";
+    readonly jobTitleId: "jobTitleId";
+    readonly warehouseId: "warehouseId";
     readonly signature: "signature";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
 export type UserProfileScalarFieldEnum = (typeof UserProfileScalarFieldEnum)[keyof typeof UserProfileScalarFieldEnum];
+export declare const DepartmentScalarFieldEnum: {
+    readonly id: "id";
+    readonly name: "name";
+    readonly code: "code";
+    readonly description: "description";
+    readonly isActive: "isActive";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum];
+export declare const JobTitleScalarFieldEnum: {
+    readonly id: "id";
+    readonly name: "name";
+    readonly code: "code";
+    readonly description: "description";
+    readonly isActive: "isActive";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type JobTitleScalarFieldEnum = (typeof JobTitleScalarFieldEnum)[keyof typeof JobTitleScalarFieldEnum];
 export declare const CategoryScalarFieldEnum: {
     readonly id: "id";
     readonly name: "name";
@@ -281,6 +313,7 @@ export type RoleOrderByRelevanceFieldEnum = (typeof RoleOrderByRelevanceFieldEnu
 export declare const UserOrderByRelevanceFieldEnum: {
     readonly id: "id";
     readonly email: "email";
+    readonly username: "username";
     readonly password: "password";
     readonly roleId: "roleId";
 };
@@ -288,6 +321,7 @@ export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnu
 export declare const UserProfileOrderByRelevanceFieldEnum: {
     readonly id: "id";
     readonly userId: "userId";
+    readonly employeeCode: "employeeCode";
     readonly firstName: "firstName";
     readonly lastName: "lastName";
     readonly displayName: "displayName";
@@ -300,11 +334,26 @@ export declare const UserProfileOrderByRelevanceFieldEnum: {
     readonly region: "region";
     readonly country: "country";
     readonly postalCode: "postalCode";
-    readonly jobTitle: "jobTitle";
-    readonly department: "department";
+    readonly departmentId: "departmentId";
+    readonly jobTitleId: "jobTitleId";
+    readonly warehouseId: "warehouseId";
     readonly signature: "signature";
 };
 export type UserProfileOrderByRelevanceFieldEnum = (typeof UserProfileOrderByRelevanceFieldEnum)[keyof typeof UserProfileOrderByRelevanceFieldEnum];
+export declare const DepartmentOrderByRelevanceFieldEnum: {
+    readonly id: "id";
+    readonly name: "name";
+    readonly code: "code";
+    readonly description: "description";
+};
+export type DepartmentOrderByRelevanceFieldEnum = (typeof DepartmentOrderByRelevanceFieldEnum)[keyof typeof DepartmentOrderByRelevanceFieldEnum];
+export declare const JobTitleOrderByRelevanceFieldEnum: {
+    readonly id: "id";
+    readonly name: "name";
+    readonly code: "code";
+    readonly description: "description";
+};
+export type JobTitleOrderByRelevanceFieldEnum = (typeof JobTitleOrderByRelevanceFieldEnum)[keyof typeof JobTitleOrderByRelevanceFieldEnum];
 export declare const CategoryOrderByRelevanceFieldEnum: {
     readonly id: "id";
     readonly name: "name";

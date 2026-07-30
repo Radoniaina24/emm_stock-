@@ -111,6 +111,7 @@ export type WarehouseWhereInput = {
     fromMovements?: Prisma.MovementListRelationFilter;
     toMovements?: Prisma.MovementListRelationFilter;
     inventories?: Prisma.InventoryListRelationFilter;
+    userProfiles?: Prisma.UserProfileListRelationFilter;
 };
 export type WarehouseOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -126,6 +127,7 @@ export type WarehouseOrderByWithRelationInput = {
     fromMovements?: Prisma.MovementOrderByRelationAggregateInput;
     toMovements?: Prisma.MovementOrderByRelationAggregateInput;
     inventories?: Prisma.InventoryOrderByRelationAggregateInput;
+    userProfiles?: Prisma.UserProfileOrderByRelationAggregateInput;
     _relevance?: Prisma.WarehouseOrderByRelevanceInput;
 };
 export type WarehouseWhereUniqueInput = Prisma.AtLeast<{
@@ -145,6 +147,7 @@ export type WarehouseWhereUniqueInput = Prisma.AtLeast<{
     fromMovements?: Prisma.MovementListRelationFilter;
     toMovements?: Prisma.MovementListRelationFilter;
     inventories?: Prisma.InventoryListRelationFilter;
+    userProfiles?: Prisma.UserProfileListRelationFilter;
 }, "id">;
 export type WarehouseOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -182,6 +185,7 @@ export type WarehouseCreateInput = {
     fromMovements?: Prisma.MovementCreateNestedManyWithoutFromWarehouseInput;
     toMovements?: Prisma.MovementCreateNestedManyWithoutToWarehouseInput;
     inventories?: Prisma.InventoryCreateNestedManyWithoutWarehouseInput;
+    userProfiles?: Prisma.UserProfileCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseUncheckedCreateInput = {
     id?: string;
@@ -197,6 +201,7 @@ export type WarehouseUncheckedCreateInput = {
     fromMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutFromWarehouseInput;
     toMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutToWarehouseInput;
     inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutWarehouseInput;
+    userProfiles?: Prisma.UserProfileUncheckedCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -212,6 +217,7 @@ export type WarehouseUpdateInput = {
     fromMovements?: Prisma.MovementUpdateManyWithoutFromWarehouseNestedInput;
     toMovements?: Prisma.MovementUpdateManyWithoutToWarehouseNestedInput;
     inventories?: Prisma.InventoryUpdateManyWithoutWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -227,6 +233,7 @@ export type WarehouseUncheckedUpdateInput = {
     fromMovements?: Prisma.MovementUncheckedUpdateManyWithoutFromWarehouseNestedInput;
     toMovements?: Prisma.MovementUncheckedUpdateManyWithoutToWarehouseNestedInput;
     inventories?: Prisma.InventoryUncheckedUpdateManyWithoutWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUncheckedUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseCreateManyInput = {
     id?: string;
@@ -251,6 +258,10 @@ export type WarehouseUncheckedUpdateManyInput = {
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type WarehouseNullableScalarRelationFilter = {
+    is?: Prisma.WarehouseWhereInput | null;
+    isNot?: Prisma.WarehouseWhereInput | null;
 };
 export type WarehouseOrderByRelevanceInput = {
     fields: Prisma.WarehouseOrderByRelevanceFieldEnum | Prisma.WarehouseOrderByRelevanceFieldEnum[];
@@ -285,9 +296,19 @@ export type WarehouseScalarRelationFilter = {
     is?: Prisma.WarehouseWhereInput;
     isNot?: Prisma.WarehouseWhereInput;
 };
-export type WarehouseNullableScalarRelationFilter = {
-    is?: Prisma.WarehouseWhereInput | null;
-    isNot?: Prisma.WarehouseWhereInput | null;
+export type WarehouseCreateNestedOneWithoutUserProfilesInput = {
+    create?: Prisma.XOR<Prisma.WarehouseCreateWithoutUserProfilesInput, Prisma.WarehouseUncheckedCreateWithoutUserProfilesInput>;
+    connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutUserProfilesInput;
+    connect?: Prisma.WarehouseWhereUniqueInput;
+};
+export type WarehouseUpdateOneWithoutUserProfilesNestedInput = {
+    create?: Prisma.XOR<Prisma.WarehouseCreateWithoutUserProfilesInput, Prisma.WarehouseUncheckedCreateWithoutUserProfilesInput>;
+    connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutUserProfilesInput;
+    upsert?: Prisma.WarehouseUpsertWithoutUserProfilesInput;
+    disconnect?: Prisma.WarehouseWhereInput | boolean;
+    delete?: Prisma.WarehouseWhereInput | boolean;
+    connect?: Prisma.WarehouseWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutUserProfilesInput, Prisma.WarehouseUpdateWithoutUserProfilesInput>, Prisma.WarehouseUncheckedUpdateWithoutUserProfilesInput>;
 };
 export type WarehouseCreateNestedOneWithoutZonesInput = {
     create?: Prisma.XOR<Prisma.WarehouseCreateWithoutZonesInput, Prisma.WarehouseUncheckedCreateWithoutZonesInput>;
@@ -377,6 +398,79 @@ export type WarehouseUpdateOneRequiredWithoutInventoriesNestedInput = {
     connect?: Prisma.WarehouseWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutInventoriesInput, Prisma.WarehouseUpdateWithoutInventoriesInput>, Prisma.WarehouseUncheckedUpdateWithoutInventoriesInput>;
 };
+export type WarehouseCreateWithoutUserProfilesInput = {
+    id?: string;
+    name: string;
+    location?: string | null;
+    isActive?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    zones?: Prisma.ZoneCreateNestedManyWithoutWarehouseInput;
+    stocks?: Prisma.StockCreateNestedManyWithoutWarehouseInput;
+    entries?: Prisma.EntryCreateNestedManyWithoutWarehouseInput;
+    exits?: Prisma.ExitCreateNestedManyWithoutWarehouseInput;
+    fromMovements?: Prisma.MovementCreateNestedManyWithoutFromWarehouseInput;
+    toMovements?: Prisma.MovementCreateNestedManyWithoutToWarehouseInput;
+    inventories?: Prisma.InventoryCreateNestedManyWithoutWarehouseInput;
+};
+export type WarehouseUncheckedCreateWithoutUserProfilesInput = {
+    id?: string;
+    name: string;
+    location?: string | null;
+    isActive?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    zones?: Prisma.ZoneUncheckedCreateNestedManyWithoutWarehouseInput;
+    stocks?: Prisma.StockUncheckedCreateNestedManyWithoutWarehouseInput;
+    entries?: Prisma.EntryUncheckedCreateNestedManyWithoutWarehouseInput;
+    exits?: Prisma.ExitUncheckedCreateNestedManyWithoutWarehouseInput;
+    fromMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutFromWarehouseInput;
+    toMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutToWarehouseInput;
+    inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutWarehouseInput;
+};
+export type WarehouseCreateOrConnectWithoutUserProfilesInput = {
+    where: Prisma.WarehouseWhereUniqueInput;
+    create: Prisma.XOR<Prisma.WarehouseCreateWithoutUserProfilesInput, Prisma.WarehouseUncheckedCreateWithoutUserProfilesInput>;
+};
+export type WarehouseUpsertWithoutUserProfilesInput = {
+    update: Prisma.XOR<Prisma.WarehouseUpdateWithoutUserProfilesInput, Prisma.WarehouseUncheckedUpdateWithoutUserProfilesInput>;
+    create: Prisma.XOR<Prisma.WarehouseCreateWithoutUserProfilesInput, Prisma.WarehouseUncheckedCreateWithoutUserProfilesInput>;
+    where?: Prisma.WarehouseWhereInput;
+};
+export type WarehouseUpdateToOneWithWhereWithoutUserProfilesInput = {
+    where?: Prisma.WarehouseWhereInput;
+    data: Prisma.XOR<Prisma.WarehouseUpdateWithoutUserProfilesInput, Prisma.WarehouseUncheckedUpdateWithoutUserProfilesInput>;
+};
+export type WarehouseUpdateWithoutUserProfilesInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    zones?: Prisma.ZoneUpdateManyWithoutWarehouseNestedInput;
+    stocks?: Prisma.StockUpdateManyWithoutWarehouseNestedInput;
+    entries?: Prisma.EntryUpdateManyWithoutWarehouseNestedInput;
+    exits?: Prisma.ExitUpdateManyWithoutWarehouseNestedInput;
+    fromMovements?: Prisma.MovementUpdateManyWithoutFromWarehouseNestedInput;
+    toMovements?: Prisma.MovementUpdateManyWithoutToWarehouseNestedInput;
+    inventories?: Prisma.InventoryUpdateManyWithoutWarehouseNestedInput;
+};
+export type WarehouseUncheckedUpdateWithoutUserProfilesInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    zones?: Prisma.ZoneUncheckedUpdateManyWithoutWarehouseNestedInput;
+    stocks?: Prisma.StockUncheckedUpdateManyWithoutWarehouseNestedInput;
+    entries?: Prisma.EntryUncheckedUpdateManyWithoutWarehouseNestedInput;
+    exits?: Prisma.ExitUncheckedUpdateManyWithoutWarehouseNestedInput;
+    fromMovements?: Prisma.MovementUncheckedUpdateManyWithoutFromWarehouseNestedInput;
+    toMovements?: Prisma.MovementUncheckedUpdateManyWithoutToWarehouseNestedInput;
+    inventories?: Prisma.InventoryUncheckedUpdateManyWithoutWarehouseNestedInput;
+};
 export type WarehouseCreateWithoutZonesInput = {
     id?: string;
     name: string;
@@ -390,6 +484,7 @@ export type WarehouseCreateWithoutZonesInput = {
     fromMovements?: Prisma.MovementCreateNestedManyWithoutFromWarehouseInput;
     toMovements?: Prisma.MovementCreateNestedManyWithoutToWarehouseInput;
     inventories?: Prisma.InventoryCreateNestedManyWithoutWarehouseInput;
+    userProfiles?: Prisma.UserProfileCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseUncheckedCreateWithoutZonesInput = {
     id?: string;
@@ -404,6 +499,7 @@ export type WarehouseUncheckedCreateWithoutZonesInput = {
     fromMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutFromWarehouseInput;
     toMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutToWarehouseInput;
     inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutWarehouseInput;
+    userProfiles?: Prisma.UserProfileUncheckedCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseCreateOrConnectWithoutZonesInput = {
     where: Prisma.WarehouseWhereUniqueInput;
@@ -431,6 +527,7 @@ export type WarehouseUpdateWithoutZonesInput = {
     fromMovements?: Prisma.MovementUpdateManyWithoutFromWarehouseNestedInput;
     toMovements?: Prisma.MovementUpdateManyWithoutToWarehouseNestedInput;
     inventories?: Prisma.InventoryUpdateManyWithoutWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseUncheckedUpdateWithoutZonesInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -445,6 +542,7 @@ export type WarehouseUncheckedUpdateWithoutZonesInput = {
     fromMovements?: Prisma.MovementUncheckedUpdateManyWithoutFromWarehouseNestedInput;
     toMovements?: Prisma.MovementUncheckedUpdateManyWithoutToWarehouseNestedInput;
     inventories?: Prisma.InventoryUncheckedUpdateManyWithoutWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUncheckedUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseCreateWithoutStocksInput = {
     id?: string;
@@ -459,6 +557,7 @@ export type WarehouseCreateWithoutStocksInput = {
     fromMovements?: Prisma.MovementCreateNestedManyWithoutFromWarehouseInput;
     toMovements?: Prisma.MovementCreateNestedManyWithoutToWarehouseInput;
     inventories?: Prisma.InventoryCreateNestedManyWithoutWarehouseInput;
+    userProfiles?: Prisma.UserProfileCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseUncheckedCreateWithoutStocksInput = {
     id?: string;
@@ -473,6 +572,7 @@ export type WarehouseUncheckedCreateWithoutStocksInput = {
     fromMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutFromWarehouseInput;
     toMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutToWarehouseInput;
     inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutWarehouseInput;
+    userProfiles?: Prisma.UserProfileUncheckedCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseCreateOrConnectWithoutStocksInput = {
     where: Prisma.WarehouseWhereUniqueInput;
@@ -500,6 +600,7 @@ export type WarehouseUpdateWithoutStocksInput = {
     fromMovements?: Prisma.MovementUpdateManyWithoutFromWarehouseNestedInput;
     toMovements?: Prisma.MovementUpdateManyWithoutToWarehouseNestedInput;
     inventories?: Prisma.InventoryUpdateManyWithoutWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseUncheckedUpdateWithoutStocksInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -514,6 +615,7 @@ export type WarehouseUncheckedUpdateWithoutStocksInput = {
     fromMovements?: Prisma.MovementUncheckedUpdateManyWithoutFromWarehouseNestedInput;
     toMovements?: Prisma.MovementUncheckedUpdateManyWithoutToWarehouseNestedInput;
     inventories?: Prisma.InventoryUncheckedUpdateManyWithoutWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUncheckedUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseCreateWithoutEntriesInput = {
     id?: string;
@@ -528,6 +630,7 @@ export type WarehouseCreateWithoutEntriesInput = {
     fromMovements?: Prisma.MovementCreateNestedManyWithoutFromWarehouseInput;
     toMovements?: Prisma.MovementCreateNestedManyWithoutToWarehouseInput;
     inventories?: Prisma.InventoryCreateNestedManyWithoutWarehouseInput;
+    userProfiles?: Prisma.UserProfileCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseUncheckedCreateWithoutEntriesInput = {
     id?: string;
@@ -542,6 +645,7 @@ export type WarehouseUncheckedCreateWithoutEntriesInput = {
     fromMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutFromWarehouseInput;
     toMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutToWarehouseInput;
     inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutWarehouseInput;
+    userProfiles?: Prisma.UserProfileUncheckedCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseCreateOrConnectWithoutEntriesInput = {
     where: Prisma.WarehouseWhereUniqueInput;
@@ -569,6 +673,7 @@ export type WarehouseUpdateWithoutEntriesInput = {
     fromMovements?: Prisma.MovementUpdateManyWithoutFromWarehouseNestedInput;
     toMovements?: Prisma.MovementUpdateManyWithoutToWarehouseNestedInput;
     inventories?: Prisma.InventoryUpdateManyWithoutWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseUncheckedUpdateWithoutEntriesInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -583,6 +688,7 @@ export type WarehouseUncheckedUpdateWithoutEntriesInput = {
     fromMovements?: Prisma.MovementUncheckedUpdateManyWithoutFromWarehouseNestedInput;
     toMovements?: Prisma.MovementUncheckedUpdateManyWithoutToWarehouseNestedInput;
     inventories?: Prisma.InventoryUncheckedUpdateManyWithoutWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUncheckedUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseCreateWithoutExitsInput = {
     id?: string;
@@ -597,6 +703,7 @@ export type WarehouseCreateWithoutExitsInput = {
     fromMovements?: Prisma.MovementCreateNestedManyWithoutFromWarehouseInput;
     toMovements?: Prisma.MovementCreateNestedManyWithoutToWarehouseInput;
     inventories?: Prisma.InventoryCreateNestedManyWithoutWarehouseInput;
+    userProfiles?: Prisma.UserProfileCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseUncheckedCreateWithoutExitsInput = {
     id?: string;
@@ -611,6 +718,7 @@ export type WarehouseUncheckedCreateWithoutExitsInput = {
     fromMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutFromWarehouseInput;
     toMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutToWarehouseInput;
     inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutWarehouseInput;
+    userProfiles?: Prisma.UserProfileUncheckedCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseCreateOrConnectWithoutExitsInput = {
     where: Prisma.WarehouseWhereUniqueInput;
@@ -638,6 +746,7 @@ export type WarehouseUpdateWithoutExitsInput = {
     fromMovements?: Prisma.MovementUpdateManyWithoutFromWarehouseNestedInput;
     toMovements?: Prisma.MovementUpdateManyWithoutToWarehouseNestedInput;
     inventories?: Prisma.InventoryUpdateManyWithoutWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseUncheckedUpdateWithoutExitsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -652,6 +761,7 @@ export type WarehouseUncheckedUpdateWithoutExitsInput = {
     fromMovements?: Prisma.MovementUncheckedUpdateManyWithoutFromWarehouseNestedInput;
     toMovements?: Prisma.MovementUncheckedUpdateManyWithoutToWarehouseNestedInput;
     inventories?: Prisma.InventoryUncheckedUpdateManyWithoutWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUncheckedUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseCreateWithoutFromMovementsInput = {
     id?: string;
@@ -666,6 +776,7 @@ export type WarehouseCreateWithoutFromMovementsInput = {
     exits?: Prisma.ExitCreateNestedManyWithoutWarehouseInput;
     toMovements?: Prisma.MovementCreateNestedManyWithoutToWarehouseInput;
     inventories?: Prisma.InventoryCreateNestedManyWithoutWarehouseInput;
+    userProfiles?: Prisma.UserProfileCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseUncheckedCreateWithoutFromMovementsInput = {
     id?: string;
@@ -680,6 +791,7 @@ export type WarehouseUncheckedCreateWithoutFromMovementsInput = {
     exits?: Prisma.ExitUncheckedCreateNestedManyWithoutWarehouseInput;
     toMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutToWarehouseInput;
     inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutWarehouseInput;
+    userProfiles?: Prisma.UserProfileUncheckedCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseCreateOrConnectWithoutFromMovementsInput = {
     where: Prisma.WarehouseWhereUniqueInput;
@@ -698,6 +810,7 @@ export type WarehouseCreateWithoutToMovementsInput = {
     exits?: Prisma.ExitCreateNestedManyWithoutWarehouseInput;
     fromMovements?: Prisma.MovementCreateNestedManyWithoutFromWarehouseInput;
     inventories?: Prisma.InventoryCreateNestedManyWithoutWarehouseInput;
+    userProfiles?: Prisma.UserProfileCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseUncheckedCreateWithoutToMovementsInput = {
     id?: string;
@@ -712,6 +825,7 @@ export type WarehouseUncheckedCreateWithoutToMovementsInput = {
     exits?: Prisma.ExitUncheckedCreateNestedManyWithoutWarehouseInput;
     fromMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutFromWarehouseInput;
     inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutWarehouseInput;
+    userProfiles?: Prisma.UserProfileUncheckedCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseCreateOrConnectWithoutToMovementsInput = {
     where: Prisma.WarehouseWhereUniqueInput;
@@ -739,6 +853,7 @@ export type WarehouseUpdateWithoutFromMovementsInput = {
     exits?: Prisma.ExitUpdateManyWithoutWarehouseNestedInput;
     toMovements?: Prisma.MovementUpdateManyWithoutToWarehouseNestedInput;
     inventories?: Prisma.InventoryUpdateManyWithoutWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseUncheckedUpdateWithoutFromMovementsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -753,6 +868,7 @@ export type WarehouseUncheckedUpdateWithoutFromMovementsInput = {
     exits?: Prisma.ExitUncheckedUpdateManyWithoutWarehouseNestedInput;
     toMovements?: Prisma.MovementUncheckedUpdateManyWithoutToWarehouseNestedInput;
     inventories?: Prisma.InventoryUncheckedUpdateManyWithoutWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUncheckedUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseUpsertWithoutToMovementsInput = {
     update: Prisma.XOR<Prisma.WarehouseUpdateWithoutToMovementsInput, Prisma.WarehouseUncheckedUpdateWithoutToMovementsInput>;
@@ -776,6 +892,7 @@ export type WarehouseUpdateWithoutToMovementsInput = {
     exits?: Prisma.ExitUpdateManyWithoutWarehouseNestedInput;
     fromMovements?: Prisma.MovementUpdateManyWithoutFromWarehouseNestedInput;
     inventories?: Prisma.InventoryUpdateManyWithoutWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseUncheckedUpdateWithoutToMovementsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -790,6 +907,7 @@ export type WarehouseUncheckedUpdateWithoutToMovementsInput = {
     exits?: Prisma.ExitUncheckedUpdateManyWithoutWarehouseNestedInput;
     fromMovements?: Prisma.MovementUncheckedUpdateManyWithoutFromWarehouseNestedInput;
     inventories?: Prisma.InventoryUncheckedUpdateManyWithoutWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUncheckedUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseCreateWithoutInventoriesInput = {
     id?: string;
@@ -804,6 +922,7 @@ export type WarehouseCreateWithoutInventoriesInput = {
     exits?: Prisma.ExitCreateNestedManyWithoutWarehouseInput;
     fromMovements?: Prisma.MovementCreateNestedManyWithoutFromWarehouseInput;
     toMovements?: Prisma.MovementCreateNestedManyWithoutToWarehouseInput;
+    userProfiles?: Prisma.UserProfileCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseUncheckedCreateWithoutInventoriesInput = {
     id?: string;
@@ -818,6 +937,7 @@ export type WarehouseUncheckedCreateWithoutInventoriesInput = {
     exits?: Prisma.ExitUncheckedCreateNestedManyWithoutWarehouseInput;
     fromMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutFromWarehouseInput;
     toMovements?: Prisma.MovementUncheckedCreateNestedManyWithoutToWarehouseInput;
+    userProfiles?: Prisma.UserProfileUncheckedCreateNestedManyWithoutWarehouseInput;
 };
 export type WarehouseCreateOrConnectWithoutInventoriesInput = {
     where: Prisma.WarehouseWhereUniqueInput;
@@ -845,6 +965,7 @@ export type WarehouseUpdateWithoutInventoriesInput = {
     exits?: Prisma.ExitUpdateManyWithoutWarehouseNestedInput;
     fromMovements?: Prisma.MovementUpdateManyWithoutFromWarehouseNestedInput;
     toMovements?: Prisma.MovementUpdateManyWithoutToWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseUncheckedUpdateWithoutInventoriesInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -859,6 +980,7 @@ export type WarehouseUncheckedUpdateWithoutInventoriesInput = {
     exits?: Prisma.ExitUncheckedUpdateManyWithoutWarehouseNestedInput;
     fromMovements?: Prisma.MovementUncheckedUpdateManyWithoutFromWarehouseNestedInput;
     toMovements?: Prisma.MovementUncheckedUpdateManyWithoutToWarehouseNestedInput;
+    userProfiles?: Prisma.UserProfileUncheckedUpdateManyWithoutWarehouseNestedInput;
 };
 export type WarehouseCountOutputType = {
     zones: number;
@@ -868,6 +990,7 @@ export type WarehouseCountOutputType = {
     fromMovements: number;
     toMovements: number;
     inventories: number;
+    userProfiles: number;
 };
 export type WarehouseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     zones?: boolean | WarehouseCountOutputTypeCountZonesArgs;
@@ -877,6 +1000,7 @@ export type WarehouseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
     fromMovements?: boolean | WarehouseCountOutputTypeCountFromMovementsArgs;
     toMovements?: boolean | WarehouseCountOutputTypeCountToMovementsArgs;
     inventories?: boolean | WarehouseCountOutputTypeCountInventoriesArgs;
+    userProfiles?: boolean | WarehouseCountOutputTypeCountUserProfilesArgs;
 };
 export type WarehouseCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.WarehouseCountOutputTypeSelect<ExtArgs> | null;
@@ -902,6 +1026,9 @@ export type WarehouseCountOutputTypeCountToMovementsArgs<ExtArgs extends runtime
 export type WarehouseCountOutputTypeCountInventoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.InventoryWhereInput;
 };
+export type WarehouseCountOutputTypeCountUserProfilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.UserProfileWhereInput;
+};
 export type WarehouseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
     name?: boolean;
@@ -916,6 +1043,7 @@ export type WarehouseSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
     fromMovements?: boolean | Prisma.Warehouse$fromMovementsArgs<ExtArgs>;
     toMovements?: boolean | Prisma.Warehouse$toMovementsArgs<ExtArgs>;
     inventories?: boolean | Prisma.Warehouse$inventoriesArgs<ExtArgs>;
+    userProfiles?: boolean | Prisma.Warehouse$userProfilesArgs<ExtArgs>;
     _count?: boolean | Prisma.WarehouseCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["warehouse"]>;
 export type WarehouseSelectScalar = {
@@ -935,6 +1063,7 @@ export type WarehouseInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
     fromMovements?: boolean | Prisma.Warehouse$fromMovementsArgs<ExtArgs>;
     toMovements?: boolean | Prisma.Warehouse$toMovementsArgs<ExtArgs>;
     inventories?: boolean | Prisma.Warehouse$inventoriesArgs<ExtArgs>;
+    userProfiles?: boolean | Prisma.Warehouse$userProfilesArgs<ExtArgs>;
     _count?: boolean | Prisma.WarehouseCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type $WarehousePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -947,6 +1076,7 @@ export type $WarehousePayload<ExtArgs extends runtime.Types.Extensions.InternalA
         fromMovements: Prisma.$MovementPayload<ExtArgs>[];
         toMovements: Prisma.$MovementPayload<ExtArgs>[];
         inventories: Prisma.$InventoryPayload<ExtArgs>[];
+        userProfiles: Prisma.$UserProfilePayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -1012,6 +1142,7 @@ export interface Prisma__WarehouseClient<T, Null = never, ExtArgs extends runtim
     fromMovements<T extends Prisma.Warehouse$fromMovementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$fromMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     toMovements<T extends Prisma.Warehouse$toMovementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$toMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     inventories<T extends Prisma.Warehouse$inventoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$inventoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    userProfiles<T extends Prisma.Warehouse$userProfilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$userProfilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
@@ -1185,6 +1316,17 @@ export type Warehouse$inventoriesArgs<ExtArgs extends runtime.Types.Extensions.I
     take?: number;
     skip?: number;
     distinct?: Prisma.InventoryScalarFieldEnum | Prisma.InventoryScalarFieldEnum[];
+};
+export type Warehouse$userProfilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.UserProfileSelect<ExtArgs> | null;
+    omit?: Prisma.UserProfileOmit<ExtArgs> | null;
+    include?: Prisma.UserProfileInclude<ExtArgs> | null;
+    where?: Prisma.UserProfileWhereInput;
+    orderBy?: Prisma.UserProfileOrderByWithRelationInput | Prisma.UserProfileOrderByWithRelationInput[];
+    cursor?: Prisma.UserProfileWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.UserProfileScalarFieldEnum | Prisma.UserProfileScalarFieldEnum[];
 };
 export type WarehouseDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.WarehouseSelect<ExtArgs> | null;

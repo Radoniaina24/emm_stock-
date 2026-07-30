@@ -294,10 +294,6 @@ export type RoleMinOrderByAggregateInput = {
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
 };
-export type RoleNullableScalarRelationFilter = {
-    is?: Prisma.RoleWhereInput | null;
-    isNot?: Prisma.RoleWhereInput | null;
-};
 export type RoleCreateNestedOneWithoutRolePermissionsInput = {
     create?: Prisma.XOR<Prisma.RoleCreateWithoutRolePermissionsInput, Prisma.RoleUncheckedCreateWithoutRolePermissionsInput>;
     connectOrCreate?: Prisma.RoleCreateOrConnectWithoutRolePermissionsInput;
@@ -318,12 +314,10 @@ export type RoleCreateNestedOneWithoutUsersInput = {
     connectOrCreate?: Prisma.RoleCreateOrConnectWithoutUsersInput;
     connect?: Prisma.RoleWhereUniqueInput;
 };
-export type RoleUpdateOneWithoutUsersNestedInput = {
+export type RoleUpdateOneRequiredWithoutUsersNestedInput = {
     create?: Prisma.XOR<Prisma.RoleCreateWithoutUsersInput, Prisma.RoleUncheckedCreateWithoutUsersInput>;
     connectOrCreate?: Prisma.RoleCreateOrConnectWithoutUsersInput;
     upsert?: Prisma.RoleUpsertWithoutUsersInput;
-    disconnect?: Prisma.RoleWhereInput | boolean;
-    delete?: Prisma.RoleWhereInput | boolean;
     connect?: Prisma.RoleWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.RoleUpdateToOneWithWhereWithoutUsersInput, Prisma.RoleUpdateWithoutUsersInput>, Prisma.RoleUncheckedUpdateWithoutUsersInput>;
 };

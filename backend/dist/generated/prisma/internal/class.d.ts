@@ -45,6 +45,12 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
     get userProfile(): Prisma.UserProfileDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
+    get department(): Prisma.DepartmentDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get jobTitle(): Prisma.JobTitleDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
     get category(): Prisma.CategoryDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;

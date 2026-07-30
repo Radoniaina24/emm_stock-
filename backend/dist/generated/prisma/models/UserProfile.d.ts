@@ -9,6 +9,7 @@ export type AggregateUserProfile = {
 export type UserProfileMinAggregateOutputType = {
     id: string | null;
     userId: string | null;
+    employeeCode: string | null;
     firstName: string | null;
     lastName: string | null;
     displayName: string | null;
@@ -22,8 +23,9 @@ export type UserProfileMinAggregateOutputType = {
     region: string | null;
     country: string | null;
     postalCode: string | null;
-    jobTitle: string | null;
-    department: string | null;
+    departmentId: string | null;
+    jobTitleId: string | null;
+    warehouseId: string | null;
     signature: string | null;
     createdAt: Date | null;
     updatedAt: Date | null;
@@ -31,6 +33,7 @@ export type UserProfileMinAggregateOutputType = {
 export type UserProfileMaxAggregateOutputType = {
     id: string | null;
     userId: string | null;
+    employeeCode: string | null;
     firstName: string | null;
     lastName: string | null;
     displayName: string | null;
@@ -44,8 +47,9 @@ export type UserProfileMaxAggregateOutputType = {
     region: string | null;
     country: string | null;
     postalCode: string | null;
-    jobTitle: string | null;
-    department: string | null;
+    departmentId: string | null;
+    jobTitleId: string | null;
+    warehouseId: string | null;
     signature: string | null;
     createdAt: Date | null;
     updatedAt: Date | null;
@@ -53,6 +57,7 @@ export type UserProfileMaxAggregateOutputType = {
 export type UserProfileCountAggregateOutputType = {
     id: number;
     userId: number;
+    employeeCode: number;
     firstName: number;
     lastName: number;
     displayName: number;
@@ -66,8 +71,9 @@ export type UserProfileCountAggregateOutputType = {
     region: number;
     country: number;
     postalCode: number;
-    jobTitle: number;
-    department: number;
+    departmentId: number;
+    jobTitleId: number;
+    warehouseId: number;
     signature: number;
     createdAt: number;
     updatedAt: number;
@@ -76,6 +82,7 @@ export type UserProfileCountAggregateOutputType = {
 export type UserProfileMinAggregateInputType = {
     id?: true;
     userId?: true;
+    employeeCode?: true;
     firstName?: true;
     lastName?: true;
     displayName?: true;
@@ -89,8 +96,9 @@ export type UserProfileMinAggregateInputType = {
     region?: true;
     country?: true;
     postalCode?: true;
-    jobTitle?: true;
-    department?: true;
+    departmentId?: true;
+    jobTitleId?: true;
+    warehouseId?: true;
     signature?: true;
     createdAt?: true;
     updatedAt?: true;
@@ -98,6 +106,7 @@ export type UserProfileMinAggregateInputType = {
 export type UserProfileMaxAggregateInputType = {
     id?: true;
     userId?: true;
+    employeeCode?: true;
     firstName?: true;
     lastName?: true;
     displayName?: true;
@@ -111,8 +120,9 @@ export type UserProfileMaxAggregateInputType = {
     region?: true;
     country?: true;
     postalCode?: true;
-    jobTitle?: true;
-    department?: true;
+    departmentId?: true;
+    jobTitleId?: true;
+    warehouseId?: true;
     signature?: true;
     createdAt?: true;
     updatedAt?: true;
@@ -120,6 +130,7 @@ export type UserProfileMaxAggregateInputType = {
 export type UserProfileCountAggregateInputType = {
     id?: true;
     userId?: true;
+    employeeCode?: true;
     firstName?: true;
     lastName?: true;
     displayName?: true;
@@ -133,8 +144,9 @@ export type UserProfileCountAggregateInputType = {
     region?: true;
     country?: true;
     postalCode?: true;
-    jobTitle?: true;
-    department?: true;
+    departmentId?: true;
+    jobTitleId?: true;
+    warehouseId?: true;
     signature?: true;
     createdAt?: true;
     updatedAt?: true;
@@ -167,6 +179,7 @@ export type UserProfileGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 export type UserProfileGroupByOutputType = {
     id: string;
     userId: string;
+    employeeCode: string;
     firstName: string;
     lastName: string;
     displayName: string;
@@ -180,8 +193,9 @@ export type UserProfileGroupByOutputType = {
     region: string | null;
     country: string | null;
     postalCode: string | null;
-    jobTitle: string | null;
-    department: string | null;
+    departmentId: string | null;
+    jobTitleId: string | null;
+    warehouseId: string | null;
     signature: string | null;
     createdAt: Date;
     updatedAt: Date;
@@ -198,6 +212,7 @@ export type UserProfileWhereInput = {
     NOT?: Prisma.UserProfileWhereInput | Prisma.UserProfileWhereInput[];
     id?: Prisma.StringFilter<"UserProfile"> | string;
     userId?: Prisma.StringFilter<"UserProfile"> | string;
+    employeeCode?: Prisma.StringFilter<"UserProfile"> | string;
     firstName?: Prisma.StringFilter<"UserProfile"> | string;
     lastName?: Prisma.StringFilter<"UserProfile"> | string;
     displayName?: Prisma.StringFilter<"UserProfile"> | string;
@@ -211,16 +226,21 @@ export type UserProfileWhereInput = {
     region?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
     country?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
     postalCode?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
-    jobTitle?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
-    department?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    departmentId?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    jobTitleId?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    warehouseId?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
     signature?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"UserProfile"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"UserProfile"> | Date | string;
     user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
+    department?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null;
+    jobTitle?: Prisma.XOR<Prisma.JobTitleNullableScalarRelationFilter, Prisma.JobTitleWhereInput> | null;
+    warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null;
 };
 export type UserProfileOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
     userId?: Prisma.SortOrder;
+    employeeCode?: Prisma.SortOrder;
     firstName?: Prisma.SortOrder;
     lastName?: Prisma.SortOrder;
     displayName?: Prisma.SortOrder;
@@ -234,17 +254,22 @@ export type UserProfileOrderByWithRelationInput = {
     region?: Prisma.SortOrderInput | Prisma.SortOrder;
     country?: Prisma.SortOrderInput | Prisma.SortOrder;
     postalCode?: Prisma.SortOrderInput | Prisma.SortOrder;
-    jobTitle?: Prisma.SortOrderInput | Prisma.SortOrder;
-    department?: Prisma.SortOrderInput | Prisma.SortOrder;
+    departmentId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    jobTitleId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    warehouseId?: Prisma.SortOrderInput | Prisma.SortOrder;
     signature?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     user?: Prisma.UserOrderByWithRelationInput;
+    department?: Prisma.DepartmentOrderByWithRelationInput;
+    jobTitle?: Prisma.JobTitleOrderByWithRelationInput;
+    warehouse?: Prisma.WarehouseOrderByWithRelationInput;
     _relevance?: Prisma.UserProfileOrderByRelevanceInput;
 };
 export type UserProfileWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
     userId?: string;
+    employeeCode?: string;
     AND?: Prisma.UserProfileWhereInput | Prisma.UserProfileWhereInput[];
     OR?: Prisma.UserProfileWhereInput[];
     NOT?: Prisma.UserProfileWhereInput | Prisma.UserProfileWhereInput[];
@@ -261,16 +286,21 @@ export type UserProfileWhereUniqueInput = Prisma.AtLeast<{
     region?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
     country?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
     postalCode?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
-    jobTitle?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
-    department?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    departmentId?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    jobTitleId?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    warehouseId?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
     signature?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"UserProfile"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"UserProfile"> | Date | string;
     user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
-}, "id" | "userId">;
+    department?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null;
+    jobTitle?: Prisma.XOR<Prisma.JobTitleNullableScalarRelationFilter, Prisma.JobTitleWhereInput> | null;
+    warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null;
+}, "id" | "userId" | "employeeCode">;
 export type UserProfileOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
     userId?: Prisma.SortOrder;
+    employeeCode?: Prisma.SortOrder;
     firstName?: Prisma.SortOrder;
     lastName?: Prisma.SortOrder;
     displayName?: Prisma.SortOrder;
@@ -284,8 +314,9 @@ export type UserProfileOrderByWithAggregationInput = {
     region?: Prisma.SortOrderInput | Prisma.SortOrder;
     country?: Prisma.SortOrderInput | Prisma.SortOrder;
     postalCode?: Prisma.SortOrderInput | Prisma.SortOrder;
-    jobTitle?: Prisma.SortOrderInput | Prisma.SortOrder;
-    department?: Prisma.SortOrderInput | Prisma.SortOrder;
+    departmentId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    jobTitleId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    warehouseId?: Prisma.SortOrderInput | Prisma.SortOrder;
     signature?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -299,6 +330,7 @@ export type UserProfileScalarWhereWithAggregatesInput = {
     NOT?: Prisma.UserProfileScalarWhereWithAggregatesInput | Prisma.UserProfileScalarWhereWithAggregatesInput[];
     id?: Prisma.StringWithAggregatesFilter<"UserProfile"> | string;
     userId?: Prisma.StringWithAggregatesFilter<"UserProfile"> | string;
+    employeeCode?: Prisma.StringWithAggregatesFilter<"UserProfile"> | string;
     firstName?: Prisma.StringWithAggregatesFilter<"UserProfile"> | string;
     lastName?: Prisma.StringWithAggregatesFilter<"UserProfile"> | string;
     displayName?: Prisma.StringWithAggregatesFilter<"UserProfile"> | string;
@@ -312,14 +344,16 @@ export type UserProfileScalarWhereWithAggregatesInput = {
     region?: Prisma.StringNullableWithAggregatesFilter<"UserProfile"> | string | null;
     country?: Prisma.StringNullableWithAggregatesFilter<"UserProfile"> | string | null;
     postalCode?: Prisma.StringNullableWithAggregatesFilter<"UserProfile"> | string | null;
-    jobTitle?: Prisma.StringNullableWithAggregatesFilter<"UserProfile"> | string | null;
-    department?: Prisma.StringNullableWithAggregatesFilter<"UserProfile"> | string | null;
+    departmentId?: Prisma.StringNullableWithAggregatesFilter<"UserProfile"> | string | null;
+    jobTitleId?: Prisma.StringNullableWithAggregatesFilter<"UserProfile"> | string | null;
+    warehouseId?: Prisma.StringNullableWithAggregatesFilter<"UserProfile"> | string | null;
     signature?: Prisma.StringNullableWithAggregatesFilter<"UserProfile"> | string | null;
     createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserProfile"> | Date | string;
     updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserProfile"> | Date | string;
 };
 export type UserProfileCreateInput = {
     id?: string;
+    employeeCode: string;
     firstName: string;
     lastName: string;
     displayName: string;
@@ -333,16 +367,18 @@ export type UserProfileCreateInput = {
     region?: string | null;
     country?: string | null;
     postalCode?: string | null;
-    jobTitle?: string | null;
-    department?: string | null;
     signature?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     user: Prisma.UserCreateNestedOneWithoutProfileInput;
+    department?: Prisma.DepartmentCreateNestedOneWithoutUserProfilesInput;
+    jobTitle?: Prisma.JobTitleCreateNestedOneWithoutUserProfilesInput;
+    warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserProfilesInput;
 };
 export type UserProfileUncheckedCreateInput = {
     id?: string;
     userId: string;
+    employeeCode: string;
     firstName: string;
     lastName: string;
     displayName: string;
@@ -356,14 +392,16 @@ export type UserProfileUncheckedCreateInput = {
     region?: string | null;
     country?: string | null;
     postalCode?: string | null;
-    jobTitle?: string | null;
-    department?: string | null;
+    departmentId?: string | null;
+    jobTitleId?: string | null;
+    warehouseId?: string | null;
     signature?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
 };
 export type UserProfileUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
     firstName?: Prisma.StringFieldUpdateOperationsInput | string;
     lastName?: Prisma.StringFieldUpdateOperationsInput | string;
     displayName?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -377,16 +415,18 @@ export type UserProfileUpdateInput = {
     region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     user?: Prisma.UserUpdateOneRequiredWithoutProfileNestedInput;
+    department?: Prisma.DepartmentUpdateOneWithoutUserProfilesNestedInput;
+    jobTitle?: Prisma.JobTitleUpdateOneWithoutUserProfilesNestedInput;
+    warehouse?: Prisma.WarehouseUpdateOneWithoutUserProfilesNestedInput;
 };
 export type UserProfileUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
     userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
     firstName?: Prisma.StringFieldUpdateOperationsInput | string;
     lastName?: Prisma.StringFieldUpdateOperationsInput | string;
     displayName?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -400,8 +440,9 @@ export type UserProfileUncheckedUpdateInput = {
     region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    jobTitleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -409,6 +450,7 @@ export type UserProfileUncheckedUpdateInput = {
 export type UserProfileCreateManyInput = {
     id?: string;
     userId: string;
+    employeeCode: string;
     firstName: string;
     lastName: string;
     displayName: string;
@@ -422,14 +464,16 @@ export type UserProfileCreateManyInput = {
     region?: string | null;
     country?: string | null;
     postalCode?: string | null;
-    jobTitle?: string | null;
-    department?: string | null;
+    departmentId?: string | null;
+    jobTitleId?: string | null;
+    warehouseId?: string | null;
     signature?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
 };
 export type UserProfileUpdateManyMutationInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
     firstName?: Prisma.StringFieldUpdateOperationsInput | string;
     lastName?: Prisma.StringFieldUpdateOperationsInput | string;
     displayName?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -443,8 +487,6 @@ export type UserProfileUpdateManyMutationInput = {
     region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -452,6 +494,7 @@ export type UserProfileUpdateManyMutationInput = {
 export type UserProfileUncheckedUpdateManyInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
     userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
     firstName?: Prisma.StringFieldUpdateOperationsInput | string;
     lastName?: Prisma.StringFieldUpdateOperationsInput | string;
     displayName?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -465,8 +508,9 @@ export type UserProfileUncheckedUpdateManyInput = {
     region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    jobTitleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -483,6 +527,7 @@ export type UserProfileOrderByRelevanceInput = {
 export type UserProfileCountOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     userId?: Prisma.SortOrder;
+    employeeCode?: Prisma.SortOrder;
     firstName?: Prisma.SortOrder;
     lastName?: Prisma.SortOrder;
     displayName?: Prisma.SortOrder;
@@ -496,8 +541,9 @@ export type UserProfileCountOrderByAggregateInput = {
     region?: Prisma.SortOrder;
     country?: Prisma.SortOrder;
     postalCode?: Prisma.SortOrder;
-    jobTitle?: Prisma.SortOrder;
-    department?: Prisma.SortOrder;
+    departmentId?: Prisma.SortOrder;
+    jobTitleId?: Prisma.SortOrder;
+    warehouseId?: Prisma.SortOrder;
     signature?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -505,6 +551,7 @@ export type UserProfileCountOrderByAggregateInput = {
 export type UserProfileMaxOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     userId?: Prisma.SortOrder;
+    employeeCode?: Prisma.SortOrder;
     firstName?: Prisma.SortOrder;
     lastName?: Prisma.SortOrder;
     displayName?: Prisma.SortOrder;
@@ -518,8 +565,9 @@ export type UserProfileMaxOrderByAggregateInput = {
     region?: Prisma.SortOrder;
     country?: Prisma.SortOrder;
     postalCode?: Prisma.SortOrder;
-    jobTitle?: Prisma.SortOrder;
-    department?: Prisma.SortOrder;
+    departmentId?: Prisma.SortOrder;
+    jobTitleId?: Prisma.SortOrder;
+    warehouseId?: Prisma.SortOrder;
     signature?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -527,6 +575,7 @@ export type UserProfileMaxOrderByAggregateInput = {
 export type UserProfileMinOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     userId?: Prisma.SortOrder;
+    employeeCode?: Prisma.SortOrder;
     firstName?: Prisma.SortOrder;
     lastName?: Prisma.SortOrder;
     displayName?: Prisma.SortOrder;
@@ -540,11 +589,20 @@ export type UserProfileMinOrderByAggregateInput = {
     region?: Prisma.SortOrder;
     country?: Prisma.SortOrder;
     postalCode?: Prisma.SortOrder;
-    jobTitle?: Prisma.SortOrder;
-    department?: Prisma.SortOrder;
+    departmentId?: Prisma.SortOrder;
+    jobTitleId?: Prisma.SortOrder;
+    warehouseId?: Prisma.SortOrder;
     signature?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
+};
+export type UserProfileListRelationFilter = {
+    every?: Prisma.UserProfileWhereInput;
+    some?: Prisma.UserProfileWhereInput;
+    none?: Prisma.UserProfileWhereInput;
+};
+export type UserProfileOrderByRelationAggregateInput = {
+    _count?: Prisma.SortOrder;
 };
 export type UserProfileCreateNestedOneWithoutUserInput = {
     create?: Prisma.XOR<Prisma.UserProfileCreateWithoutUserInput, Prisma.UserProfileUncheckedCreateWithoutUserInput>;
@@ -574,11 +632,123 @@ export type UserProfileUncheckedUpdateOneWithoutUserNestedInput = {
     connect?: Prisma.UserProfileWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutUserInput, Prisma.UserProfileUpdateWithoutUserInput>, Prisma.UserProfileUncheckedUpdateWithoutUserInput>;
 };
-export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null;
+export type UserProfileCreateNestedManyWithoutDepartmentInput = {
+    create?: Prisma.XOR<Prisma.UserProfileCreateWithoutDepartmentInput, Prisma.UserProfileUncheckedCreateWithoutDepartmentInput> | Prisma.UserProfileCreateWithoutDepartmentInput[] | Prisma.UserProfileUncheckedCreateWithoutDepartmentInput[];
+    connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutDepartmentInput | Prisma.UserProfileCreateOrConnectWithoutDepartmentInput[];
+    createMany?: Prisma.UserProfileCreateManyDepartmentInputEnvelope;
+    connect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+};
+export type UserProfileUncheckedCreateNestedManyWithoutDepartmentInput = {
+    create?: Prisma.XOR<Prisma.UserProfileCreateWithoutDepartmentInput, Prisma.UserProfileUncheckedCreateWithoutDepartmentInput> | Prisma.UserProfileCreateWithoutDepartmentInput[] | Prisma.UserProfileUncheckedCreateWithoutDepartmentInput[];
+    connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutDepartmentInput | Prisma.UserProfileCreateOrConnectWithoutDepartmentInput[];
+    createMany?: Prisma.UserProfileCreateManyDepartmentInputEnvelope;
+    connect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+};
+export type UserProfileUpdateManyWithoutDepartmentNestedInput = {
+    create?: Prisma.XOR<Prisma.UserProfileCreateWithoutDepartmentInput, Prisma.UserProfileUncheckedCreateWithoutDepartmentInput> | Prisma.UserProfileCreateWithoutDepartmentInput[] | Prisma.UserProfileUncheckedCreateWithoutDepartmentInput[];
+    connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutDepartmentInput | Prisma.UserProfileCreateOrConnectWithoutDepartmentInput[];
+    upsert?: Prisma.UserProfileUpsertWithWhereUniqueWithoutDepartmentInput | Prisma.UserProfileUpsertWithWhereUniqueWithoutDepartmentInput[];
+    createMany?: Prisma.UserProfileCreateManyDepartmentInputEnvelope;
+    set?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    disconnect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    delete?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    connect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    update?: Prisma.UserProfileUpdateWithWhereUniqueWithoutDepartmentInput | Prisma.UserProfileUpdateWithWhereUniqueWithoutDepartmentInput[];
+    updateMany?: Prisma.UserProfileUpdateManyWithWhereWithoutDepartmentInput | Prisma.UserProfileUpdateManyWithWhereWithoutDepartmentInput[];
+    deleteMany?: Prisma.UserProfileScalarWhereInput | Prisma.UserProfileScalarWhereInput[];
+};
+export type UserProfileUncheckedUpdateManyWithoutDepartmentNestedInput = {
+    create?: Prisma.XOR<Prisma.UserProfileCreateWithoutDepartmentInput, Prisma.UserProfileUncheckedCreateWithoutDepartmentInput> | Prisma.UserProfileCreateWithoutDepartmentInput[] | Prisma.UserProfileUncheckedCreateWithoutDepartmentInput[];
+    connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutDepartmentInput | Prisma.UserProfileCreateOrConnectWithoutDepartmentInput[];
+    upsert?: Prisma.UserProfileUpsertWithWhereUniqueWithoutDepartmentInput | Prisma.UserProfileUpsertWithWhereUniqueWithoutDepartmentInput[];
+    createMany?: Prisma.UserProfileCreateManyDepartmentInputEnvelope;
+    set?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    disconnect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    delete?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    connect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    update?: Prisma.UserProfileUpdateWithWhereUniqueWithoutDepartmentInput | Prisma.UserProfileUpdateWithWhereUniqueWithoutDepartmentInput[];
+    updateMany?: Prisma.UserProfileUpdateManyWithWhereWithoutDepartmentInput | Prisma.UserProfileUpdateManyWithWhereWithoutDepartmentInput[];
+    deleteMany?: Prisma.UserProfileScalarWhereInput | Prisma.UserProfileScalarWhereInput[];
+};
+export type UserProfileCreateNestedManyWithoutJobTitleInput = {
+    create?: Prisma.XOR<Prisma.UserProfileCreateWithoutJobTitleInput, Prisma.UserProfileUncheckedCreateWithoutJobTitleInput> | Prisma.UserProfileCreateWithoutJobTitleInput[] | Prisma.UserProfileUncheckedCreateWithoutJobTitleInput[];
+    connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutJobTitleInput | Prisma.UserProfileCreateOrConnectWithoutJobTitleInput[];
+    createMany?: Prisma.UserProfileCreateManyJobTitleInputEnvelope;
+    connect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+};
+export type UserProfileUncheckedCreateNestedManyWithoutJobTitleInput = {
+    create?: Prisma.XOR<Prisma.UserProfileCreateWithoutJobTitleInput, Prisma.UserProfileUncheckedCreateWithoutJobTitleInput> | Prisma.UserProfileCreateWithoutJobTitleInput[] | Prisma.UserProfileUncheckedCreateWithoutJobTitleInput[];
+    connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutJobTitleInput | Prisma.UserProfileCreateOrConnectWithoutJobTitleInput[];
+    createMany?: Prisma.UserProfileCreateManyJobTitleInputEnvelope;
+    connect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+};
+export type UserProfileUpdateManyWithoutJobTitleNestedInput = {
+    create?: Prisma.XOR<Prisma.UserProfileCreateWithoutJobTitleInput, Prisma.UserProfileUncheckedCreateWithoutJobTitleInput> | Prisma.UserProfileCreateWithoutJobTitleInput[] | Prisma.UserProfileUncheckedCreateWithoutJobTitleInput[];
+    connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutJobTitleInput | Prisma.UserProfileCreateOrConnectWithoutJobTitleInput[];
+    upsert?: Prisma.UserProfileUpsertWithWhereUniqueWithoutJobTitleInput | Prisma.UserProfileUpsertWithWhereUniqueWithoutJobTitleInput[];
+    createMany?: Prisma.UserProfileCreateManyJobTitleInputEnvelope;
+    set?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    disconnect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    delete?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    connect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    update?: Prisma.UserProfileUpdateWithWhereUniqueWithoutJobTitleInput | Prisma.UserProfileUpdateWithWhereUniqueWithoutJobTitleInput[];
+    updateMany?: Prisma.UserProfileUpdateManyWithWhereWithoutJobTitleInput | Prisma.UserProfileUpdateManyWithWhereWithoutJobTitleInput[];
+    deleteMany?: Prisma.UserProfileScalarWhereInput | Prisma.UserProfileScalarWhereInput[];
+};
+export type UserProfileUncheckedUpdateManyWithoutJobTitleNestedInput = {
+    create?: Prisma.XOR<Prisma.UserProfileCreateWithoutJobTitleInput, Prisma.UserProfileUncheckedCreateWithoutJobTitleInput> | Prisma.UserProfileCreateWithoutJobTitleInput[] | Prisma.UserProfileUncheckedCreateWithoutJobTitleInput[];
+    connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutJobTitleInput | Prisma.UserProfileCreateOrConnectWithoutJobTitleInput[];
+    upsert?: Prisma.UserProfileUpsertWithWhereUniqueWithoutJobTitleInput | Prisma.UserProfileUpsertWithWhereUniqueWithoutJobTitleInput[];
+    createMany?: Prisma.UserProfileCreateManyJobTitleInputEnvelope;
+    set?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    disconnect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    delete?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    connect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    update?: Prisma.UserProfileUpdateWithWhereUniqueWithoutJobTitleInput | Prisma.UserProfileUpdateWithWhereUniqueWithoutJobTitleInput[];
+    updateMany?: Prisma.UserProfileUpdateManyWithWhereWithoutJobTitleInput | Prisma.UserProfileUpdateManyWithWhereWithoutJobTitleInput[];
+    deleteMany?: Prisma.UserProfileScalarWhereInput | Prisma.UserProfileScalarWhereInput[];
+};
+export type UserProfileCreateNestedManyWithoutWarehouseInput = {
+    create?: Prisma.XOR<Prisma.UserProfileCreateWithoutWarehouseInput, Prisma.UserProfileUncheckedCreateWithoutWarehouseInput> | Prisma.UserProfileCreateWithoutWarehouseInput[] | Prisma.UserProfileUncheckedCreateWithoutWarehouseInput[];
+    connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutWarehouseInput | Prisma.UserProfileCreateOrConnectWithoutWarehouseInput[];
+    createMany?: Prisma.UserProfileCreateManyWarehouseInputEnvelope;
+    connect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+};
+export type UserProfileUncheckedCreateNestedManyWithoutWarehouseInput = {
+    create?: Prisma.XOR<Prisma.UserProfileCreateWithoutWarehouseInput, Prisma.UserProfileUncheckedCreateWithoutWarehouseInput> | Prisma.UserProfileCreateWithoutWarehouseInput[] | Prisma.UserProfileUncheckedCreateWithoutWarehouseInput[];
+    connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutWarehouseInput | Prisma.UserProfileCreateOrConnectWithoutWarehouseInput[];
+    createMany?: Prisma.UserProfileCreateManyWarehouseInputEnvelope;
+    connect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+};
+export type UserProfileUpdateManyWithoutWarehouseNestedInput = {
+    create?: Prisma.XOR<Prisma.UserProfileCreateWithoutWarehouseInput, Prisma.UserProfileUncheckedCreateWithoutWarehouseInput> | Prisma.UserProfileCreateWithoutWarehouseInput[] | Prisma.UserProfileUncheckedCreateWithoutWarehouseInput[];
+    connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutWarehouseInput | Prisma.UserProfileCreateOrConnectWithoutWarehouseInput[];
+    upsert?: Prisma.UserProfileUpsertWithWhereUniqueWithoutWarehouseInput | Prisma.UserProfileUpsertWithWhereUniqueWithoutWarehouseInput[];
+    createMany?: Prisma.UserProfileCreateManyWarehouseInputEnvelope;
+    set?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    disconnect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    delete?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    connect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    update?: Prisma.UserProfileUpdateWithWhereUniqueWithoutWarehouseInput | Prisma.UserProfileUpdateWithWhereUniqueWithoutWarehouseInput[];
+    updateMany?: Prisma.UserProfileUpdateManyWithWhereWithoutWarehouseInput | Prisma.UserProfileUpdateManyWithWhereWithoutWarehouseInput[];
+    deleteMany?: Prisma.UserProfileScalarWhereInput | Prisma.UserProfileScalarWhereInput[];
+};
+export type UserProfileUncheckedUpdateManyWithoutWarehouseNestedInput = {
+    create?: Prisma.XOR<Prisma.UserProfileCreateWithoutWarehouseInput, Prisma.UserProfileUncheckedCreateWithoutWarehouseInput> | Prisma.UserProfileCreateWithoutWarehouseInput[] | Prisma.UserProfileUncheckedCreateWithoutWarehouseInput[];
+    connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutWarehouseInput | Prisma.UserProfileCreateOrConnectWithoutWarehouseInput[];
+    upsert?: Prisma.UserProfileUpsertWithWhereUniqueWithoutWarehouseInput | Prisma.UserProfileUpsertWithWhereUniqueWithoutWarehouseInput[];
+    createMany?: Prisma.UserProfileCreateManyWarehouseInputEnvelope;
+    set?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    disconnect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    delete?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    connect?: Prisma.UserProfileWhereUniqueInput | Prisma.UserProfileWhereUniqueInput[];
+    update?: Prisma.UserProfileUpdateWithWhereUniqueWithoutWarehouseInput | Prisma.UserProfileUpdateWithWhereUniqueWithoutWarehouseInput[];
+    updateMany?: Prisma.UserProfileUpdateManyWithWhereWithoutWarehouseInput | Prisma.UserProfileUpdateManyWithWhereWithoutWarehouseInput[];
+    deleteMany?: Prisma.UserProfileScalarWhereInput | Prisma.UserProfileScalarWhereInput[];
 };
 export type UserProfileCreateWithoutUserInput = {
     id?: string;
+    employeeCode: string;
     firstName: string;
     lastName: string;
     displayName: string;
@@ -592,14 +762,16 @@ export type UserProfileCreateWithoutUserInput = {
     region?: string | null;
     country?: string | null;
     postalCode?: string | null;
-    jobTitle?: string | null;
-    department?: string | null;
     signature?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    department?: Prisma.DepartmentCreateNestedOneWithoutUserProfilesInput;
+    jobTitle?: Prisma.JobTitleCreateNestedOneWithoutUserProfilesInput;
+    warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserProfilesInput;
 };
 export type UserProfileUncheckedCreateWithoutUserInput = {
     id?: string;
+    employeeCode: string;
     firstName: string;
     lastName: string;
     displayName: string;
@@ -613,8 +785,9 @@ export type UserProfileUncheckedCreateWithoutUserInput = {
     region?: string | null;
     country?: string | null;
     postalCode?: string | null;
-    jobTitle?: string | null;
-    department?: string | null;
+    departmentId?: string | null;
+    jobTitleId?: string | null;
+    warehouseId?: string | null;
     signature?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -634,6 +807,7 @@ export type UserProfileUpdateToOneWithWhereWithoutUserInput = {
 };
 export type UserProfileUpdateWithoutUserInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
     firstName?: Prisma.StringFieldUpdateOperationsInput | string;
     lastName?: Prisma.StringFieldUpdateOperationsInput | string;
     displayName?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -647,14 +821,290 @@ export type UserProfileUpdateWithoutUserInput = {
     region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    department?: Prisma.DepartmentUpdateOneWithoutUserProfilesNestedInput;
+    jobTitle?: Prisma.JobTitleUpdateOneWithoutUserProfilesNestedInput;
+    warehouse?: Prisma.WarehouseUpdateOneWithoutUserProfilesNestedInput;
+};
+export type UserProfileUncheckedUpdateWithoutUserInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    displayName?: Prisma.StringFieldUpdateOperationsInput | string;
+    profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    secondaryPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    jobTitleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
-export type UserProfileUncheckedUpdateWithoutUserInput = {
+export type UserProfileCreateWithoutDepartmentInput = {
+    id?: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    displayName: string;
+    profilePhoto?: string | null;
+    phone?: string | null;
+    secondaryPhone?: string | null;
+    birthDate?: Date | string | null;
+    gender?: string | null;
+    address?: string | null;
+    city?: string | null;
+    region?: string | null;
+    country?: string | null;
+    postalCode?: string | null;
+    signature?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    user: Prisma.UserCreateNestedOneWithoutProfileInput;
+    jobTitle?: Prisma.JobTitleCreateNestedOneWithoutUserProfilesInput;
+    warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserProfilesInput;
+};
+export type UserProfileUncheckedCreateWithoutDepartmentInput = {
+    id?: string;
+    userId: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    displayName: string;
+    profilePhoto?: string | null;
+    phone?: string | null;
+    secondaryPhone?: string | null;
+    birthDate?: Date | string | null;
+    gender?: string | null;
+    address?: string | null;
+    city?: string | null;
+    region?: string | null;
+    country?: string | null;
+    postalCode?: string | null;
+    jobTitleId?: string | null;
+    warehouseId?: string | null;
+    signature?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type UserProfileCreateOrConnectWithoutDepartmentInput = {
+    where: Prisma.UserProfileWhereUniqueInput;
+    create: Prisma.XOR<Prisma.UserProfileCreateWithoutDepartmentInput, Prisma.UserProfileUncheckedCreateWithoutDepartmentInput>;
+};
+export type UserProfileCreateManyDepartmentInputEnvelope = {
+    data: Prisma.UserProfileCreateManyDepartmentInput | Prisma.UserProfileCreateManyDepartmentInput[];
+    skipDuplicates?: boolean;
+};
+export type UserProfileUpsertWithWhereUniqueWithoutDepartmentInput = {
+    where: Prisma.UserProfileWhereUniqueInput;
+    update: Prisma.XOR<Prisma.UserProfileUpdateWithoutDepartmentInput, Prisma.UserProfileUncheckedUpdateWithoutDepartmentInput>;
+    create: Prisma.XOR<Prisma.UserProfileCreateWithoutDepartmentInput, Prisma.UserProfileUncheckedCreateWithoutDepartmentInput>;
+};
+export type UserProfileUpdateWithWhereUniqueWithoutDepartmentInput = {
+    where: Prisma.UserProfileWhereUniqueInput;
+    data: Prisma.XOR<Prisma.UserProfileUpdateWithoutDepartmentInput, Prisma.UserProfileUncheckedUpdateWithoutDepartmentInput>;
+};
+export type UserProfileUpdateManyWithWhereWithoutDepartmentInput = {
+    where: Prisma.UserProfileScalarWhereInput;
+    data: Prisma.XOR<Prisma.UserProfileUpdateManyMutationInput, Prisma.UserProfileUncheckedUpdateManyWithoutDepartmentInput>;
+};
+export type UserProfileScalarWhereInput = {
+    AND?: Prisma.UserProfileScalarWhereInput | Prisma.UserProfileScalarWhereInput[];
+    OR?: Prisma.UserProfileScalarWhereInput[];
+    NOT?: Prisma.UserProfileScalarWhereInput | Prisma.UserProfileScalarWhereInput[];
+    id?: Prisma.StringFilter<"UserProfile"> | string;
+    userId?: Prisma.StringFilter<"UserProfile"> | string;
+    employeeCode?: Prisma.StringFilter<"UserProfile"> | string;
+    firstName?: Prisma.StringFilter<"UserProfile"> | string;
+    lastName?: Prisma.StringFilter<"UserProfile"> | string;
+    displayName?: Prisma.StringFilter<"UserProfile"> | string;
+    profilePhoto?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    phone?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    secondaryPhone?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    birthDate?: Prisma.DateTimeNullableFilter<"UserProfile"> | Date | string | null;
+    gender?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    address?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    city?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    region?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    country?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    postalCode?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    departmentId?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    jobTitleId?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    warehouseId?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    signature?: Prisma.StringNullableFilter<"UserProfile"> | string | null;
+    createdAt?: Prisma.DateTimeFilter<"UserProfile"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"UserProfile"> | Date | string;
+};
+export type UserProfileCreateWithoutJobTitleInput = {
+    id?: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    displayName: string;
+    profilePhoto?: string | null;
+    phone?: string | null;
+    secondaryPhone?: string | null;
+    birthDate?: Date | string | null;
+    gender?: string | null;
+    address?: string | null;
+    city?: string | null;
+    region?: string | null;
+    country?: string | null;
+    postalCode?: string | null;
+    signature?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    user: Prisma.UserCreateNestedOneWithoutProfileInput;
+    department?: Prisma.DepartmentCreateNestedOneWithoutUserProfilesInput;
+    warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserProfilesInput;
+};
+export type UserProfileUncheckedCreateWithoutJobTitleInput = {
+    id?: string;
+    userId: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    displayName: string;
+    profilePhoto?: string | null;
+    phone?: string | null;
+    secondaryPhone?: string | null;
+    birthDate?: Date | string | null;
+    gender?: string | null;
+    address?: string | null;
+    city?: string | null;
+    region?: string | null;
+    country?: string | null;
+    postalCode?: string | null;
+    departmentId?: string | null;
+    warehouseId?: string | null;
+    signature?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type UserProfileCreateOrConnectWithoutJobTitleInput = {
+    where: Prisma.UserProfileWhereUniqueInput;
+    create: Prisma.XOR<Prisma.UserProfileCreateWithoutJobTitleInput, Prisma.UserProfileUncheckedCreateWithoutJobTitleInput>;
+};
+export type UserProfileCreateManyJobTitleInputEnvelope = {
+    data: Prisma.UserProfileCreateManyJobTitleInput | Prisma.UserProfileCreateManyJobTitleInput[];
+    skipDuplicates?: boolean;
+};
+export type UserProfileUpsertWithWhereUniqueWithoutJobTitleInput = {
+    where: Prisma.UserProfileWhereUniqueInput;
+    update: Prisma.XOR<Prisma.UserProfileUpdateWithoutJobTitleInput, Prisma.UserProfileUncheckedUpdateWithoutJobTitleInput>;
+    create: Prisma.XOR<Prisma.UserProfileCreateWithoutJobTitleInput, Prisma.UserProfileUncheckedCreateWithoutJobTitleInput>;
+};
+export type UserProfileUpdateWithWhereUniqueWithoutJobTitleInput = {
+    where: Prisma.UserProfileWhereUniqueInput;
+    data: Prisma.XOR<Prisma.UserProfileUpdateWithoutJobTitleInput, Prisma.UserProfileUncheckedUpdateWithoutJobTitleInput>;
+};
+export type UserProfileUpdateManyWithWhereWithoutJobTitleInput = {
+    where: Prisma.UserProfileScalarWhereInput;
+    data: Prisma.XOR<Prisma.UserProfileUpdateManyMutationInput, Prisma.UserProfileUncheckedUpdateManyWithoutJobTitleInput>;
+};
+export type UserProfileCreateWithoutWarehouseInput = {
+    id?: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    displayName: string;
+    profilePhoto?: string | null;
+    phone?: string | null;
+    secondaryPhone?: string | null;
+    birthDate?: Date | string | null;
+    gender?: string | null;
+    address?: string | null;
+    city?: string | null;
+    region?: string | null;
+    country?: string | null;
+    postalCode?: string | null;
+    signature?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    user: Prisma.UserCreateNestedOneWithoutProfileInput;
+    department?: Prisma.DepartmentCreateNestedOneWithoutUserProfilesInput;
+    jobTitle?: Prisma.JobTitleCreateNestedOneWithoutUserProfilesInput;
+};
+export type UserProfileUncheckedCreateWithoutWarehouseInput = {
+    id?: string;
+    userId: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    displayName: string;
+    profilePhoto?: string | null;
+    phone?: string | null;
+    secondaryPhone?: string | null;
+    birthDate?: Date | string | null;
+    gender?: string | null;
+    address?: string | null;
+    city?: string | null;
+    region?: string | null;
+    country?: string | null;
+    postalCode?: string | null;
+    departmentId?: string | null;
+    jobTitleId?: string | null;
+    signature?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type UserProfileCreateOrConnectWithoutWarehouseInput = {
+    where: Prisma.UserProfileWhereUniqueInput;
+    create: Prisma.XOR<Prisma.UserProfileCreateWithoutWarehouseInput, Prisma.UserProfileUncheckedCreateWithoutWarehouseInput>;
+};
+export type UserProfileCreateManyWarehouseInputEnvelope = {
+    data: Prisma.UserProfileCreateManyWarehouseInput | Prisma.UserProfileCreateManyWarehouseInput[];
+    skipDuplicates?: boolean;
+};
+export type UserProfileUpsertWithWhereUniqueWithoutWarehouseInput = {
+    where: Prisma.UserProfileWhereUniqueInput;
+    update: Prisma.XOR<Prisma.UserProfileUpdateWithoutWarehouseInput, Prisma.UserProfileUncheckedUpdateWithoutWarehouseInput>;
+    create: Prisma.XOR<Prisma.UserProfileCreateWithoutWarehouseInput, Prisma.UserProfileUncheckedCreateWithoutWarehouseInput>;
+};
+export type UserProfileUpdateWithWhereUniqueWithoutWarehouseInput = {
+    where: Prisma.UserProfileWhereUniqueInput;
+    data: Prisma.XOR<Prisma.UserProfileUpdateWithoutWarehouseInput, Prisma.UserProfileUncheckedUpdateWithoutWarehouseInput>;
+};
+export type UserProfileUpdateManyWithWhereWithoutWarehouseInput = {
+    where: Prisma.UserProfileScalarWhereInput;
+    data: Prisma.XOR<Prisma.UserProfileUpdateManyMutationInput, Prisma.UserProfileUncheckedUpdateManyWithoutWarehouseInput>;
+};
+export type UserProfileCreateManyDepartmentInput = {
+    id?: string;
+    userId: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    displayName: string;
+    profilePhoto?: string | null;
+    phone?: string | null;
+    secondaryPhone?: string | null;
+    birthDate?: Date | string | null;
+    gender?: string | null;
+    address?: string | null;
+    city?: string | null;
+    region?: string | null;
+    country?: string | null;
+    postalCode?: string | null;
+    jobTitleId?: string | null;
+    warehouseId?: string | null;
+    signature?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type UserProfileUpdateWithoutDepartmentInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
     firstName?: Prisma.StringFieldUpdateOperationsInput | string;
     lastName?: Prisma.StringFieldUpdateOperationsInput | string;
     displayName?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -668,8 +1118,239 @@ export type UserProfileUncheckedUpdateWithoutUserInput = {
     region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    user?: Prisma.UserUpdateOneRequiredWithoutProfileNestedInput;
+    jobTitle?: Prisma.JobTitleUpdateOneWithoutUserProfilesNestedInput;
+    warehouse?: Prisma.WarehouseUpdateOneWithoutUserProfilesNestedInput;
+};
+export type UserProfileUncheckedUpdateWithoutDepartmentInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    displayName?: Prisma.StringFieldUpdateOperationsInput | string;
+    profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    secondaryPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    jobTitleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type UserProfileUncheckedUpdateManyWithoutDepartmentInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    displayName?: Prisma.StringFieldUpdateOperationsInput | string;
+    profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    secondaryPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    jobTitleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type UserProfileCreateManyJobTitleInput = {
+    id?: string;
+    userId: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    displayName: string;
+    profilePhoto?: string | null;
+    phone?: string | null;
+    secondaryPhone?: string | null;
+    birthDate?: Date | string | null;
+    gender?: string | null;
+    address?: string | null;
+    city?: string | null;
+    region?: string | null;
+    country?: string | null;
+    postalCode?: string | null;
+    departmentId?: string | null;
+    warehouseId?: string | null;
+    signature?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type UserProfileUpdateWithoutJobTitleInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    displayName?: Prisma.StringFieldUpdateOperationsInput | string;
+    profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    secondaryPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    user?: Prisma.UserUpdateOneRequiredWithoutProfileNestedInput;
+    department?: Prisma.DepartmentUpdateOneWithoutUserProfilesNestedInput;
+    warehouse?: Prisma.WarehouseUpdateOneWithoutUserProfilesNestedInput;
+};
+export type UserProfileUncheckedUpdateWithoutJobTitleInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    displayName?: Prisma.StringFieldUpdateOperationsInput | string;
+    profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    secondaryPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type UserProfileUncheckedUpdateManyWithoutJobTitleInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    displayName?: Prisma.StringFieldUpdateOperationsInput | string;
+    profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    secondaryPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type UserProfileCreateManyWarehouseInput = {
+    id?: string;
+    userId: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    displayName: string;
+    profilePhoto?: string | null;
+    phone?: string | null;
+    secondaryPhone?: string | null;
+    birthDate?: Date | string | null;
+    gender?: string | null;
+    address?: string | null;
+    city?: string | null;
+    region?: string | null;
+    country?: string | null;
+    postalCode?: string | null;
+    departmentId?: string | null;
+    jobTitleId?: string | null;
+    signature?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type UserProfileUpdateWithoutWarehouseInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    displayName?: Prisma.StringFieldUpdateOperationsInput | string;
+    profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    secondaryPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    user?: Prisma.UserUpdateOneRequiredWithoutProfileNestedInput;
+    department?: Prisma.DepartmentUpdateOneWithoutUserProfilesNestedInput;
+    jobTitle?: Prisma.JobTitleUpdateOneWithoutUserProfilesNestedInput;
+};
+export type UserProfileUncheckedUpdateWithoutWarehouseInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    displayName?: Prisma.StringFieldUpdateOperationsInput | string;
+    profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    secondaryPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    jobTitleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type UserProfileUncheckedUpdateManyWithoutWarehouseInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    employeeCode?: Prisma.StringFieldUpdateOperationsInput | string;
+    firstName?: Prisma.StringFieldUpdateOperationsInput | string;
+    lastName?: Prisma.StringFieldUpdateOperationsInput | string;
+    displayName?: Prisma.StringFieldUpdateOperationsInput | string;
+    profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    secondaryPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    jobTitleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -677,6 +1358,7 @@ export type UserProfileUncheckedUpdateWithoutUserInput = {
 export type UserProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
     userId?: boolean;
+    employeeCode?: boolean;
     firstName?: boolean;
     lastName?: boolean;
     displayName?: boolean;
@@ -690,16 +1372,21 @@ export type UserProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalA
     region?: boolean;
     country?: boolean;
     postalCode?: boolean;
-    jobTitle?: boolean;
-    department?: boolean;
+    departmentId?: boolean;
+    jobTitleId?: boolean;
+    warehouseId?: boolean;
     signature?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
     user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+    department?: boolean | Prisma.UserProfile$departmentArgs<ExtArgs>;
+    jobTitle?: boolean | Prisma.UserProfile$jobTitleArgs<ExtArgs>;
+    warehouse?: boolean | Prisma.UserProfile$warehouseArgs<ExtArgs>;
 }, ExtArgs["result"]["userProfile"]>;
 export type UserProfileSelectScalar = {
     id?: boolean;
     userId?: boolean;
+    employeeCode?: boolean;
     firstName?: boolean;
     lastName?: boolean;
     displayName?: boolean;
@@ -713,24 +1400,32 @@ export type UserProfileSelectScalar = {
     region?: boolean;
     country?: boolean;
     postalCode?: boolean;
-    jobTitle?: boolean;
-    department?: boolean;
+    departmentId?: boolean;
+    jobTitleId?: boolean;
+    warehouseId?: boolean;
     signature?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
 };
-export type UserProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "firstName" | "lastName" | "displayName" | "profilePhoto" | "phone" | "secondaryPhone" | "birthDate" | "gender" | "address" | "city" | "region" | "country" | "postalCode" | "jobTitle" | "department" | "signature" | "createdAt" | "updatedAt", ExtArgs["result"]["userProfile"]>;
+export type UserProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "employeeCode" | "firstName" | "lastName" | "displayName" | "profilePhoto" | "phone" | "secondaryPhone" | "birthDate" | "gender" | "address" | "city" | "region" | "country" | "postalCode" | "departmentId" | "jobTitleId" | "warehouseId" | "signature" | "createdAt" | "updatedAt", ExtArgs["result"]["userProfile"]>;
 export type UserProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+    department?: boolean | Prisma.UserProfile$departmentArgs<ExtArgs>;
+    jobTitle?: boolean | Prisma.UserProfile$jobTitleArgs<ExtArgs>;
+    warehouse?: boolean | Prisma.UserProfile$warehouseArgs<ExtArgs>;
 };
 export type $UserProfilePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "UserProfile";
     objects: {
         user: Prisma.$UserPayload<ExtArgs>;
+        department: Prisma.$DepartmentPayload<ExtArgs> | null;
+        jobTitle: Prisma.$JobTitlePayload<ExtArgs> | null;
+        warehouse: Prisma.$WarehousePayload<ExtArgs> | null;
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
         userId: string;
+        employeeCode: string;
         firstName: string;
         lastName: string;
         displayName: string;
@@ -744,8 +1439,9 @@ export type $UserProfilePayload<ExtArgs extends runtime.Types.Extensions.Interna
         region: string | null;
         country: string | null;
         postalCode: string | null;
-        jobTitle: string | null;
-        department: string | null;
+        departmentId: string | null;
+        jobTitleId: string | null;
+        warehouseId: string | null;
         signature: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -800,6 +1496,9 @@ export interface UserProfileDelegate<ExtArgs extends runtime.Types.Extensions.In
 export interface Prisma__UserProfileClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
     user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    department<T extends Prisma.UserProfile$departmentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$departmentArgs<ExtArgs>>): Prisma.Prisma__DepartmentClient<runtime.Types.Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    jobTitle<T extends Prisma.UserProfile$jobTitleArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$jobTitleArgs<ExtArgs>>): Prisma.Prisma__JobTitleClient<runtime.Types.Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    warehouse<T extends Prisma.UserProfile$warehouseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$warehouseArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
@@ -807,6 +1506,7 @@ export interface Prisma__UserProfileClient<T, Null = never, ExtArgs extends runt
 export interface UserProfileFieldRefs {
     readonly id: Prisma.FieldRef<"UserProfile", 'String'>;
     readonly userId: Prisma.FieldRef<"UserProfile", 'String'>;
+    readonly employeeCode: Prisma.FieldRef<"UserProfile", 'String'>;
     readonly firstName: Prisma.FieldRef<"UserProfile", 'String'>;
     readonly lastName: Prisma.FieldRef<"UserProfile", 'String'>;
     readonly displayName: Prisma.FieldRef<"UserProfile", 'String'>;
@@ -820,8 +1520,9 @@ export interface UserProfileFieldRefs {
     readonly region: Prisma.FieldRef<"UserProfile", 'String'>;
     readonly country: Prisma.FieldRef<"UserProfile", 'String'>;
     readonly postalCode: Prisma.FieldRef<"UserProfile", 'String'>;
-    readonly jobTitle: Prisma.FieldRef<"UserProfile", 'String'>;
-    readonly department: Prisma.FieldRef<"UserProfile", 'String'>;
+    readonly departmentId: Prisma.FieldRef<"UserProfile", 'String'>;
+    readonly jobTitleId: Prisma.FieldRef<"UserProfile", 'String'>;
+    readonly warehouseId: Prisma.FieldRef<"UserProfile", 'String'>;
     readonly signature: Prisma.FieldRef<"UserProfile", 'String'>;
     readonly createdAt: Prisma.FieldRef<"UserProfile", 'DateTime'>;
     readonly updatedAt: Prisma.FieldRef<"UserProfile", 'DateTime'>;
@@ -910,6 +1611,24 @@ export type UserProfileDeleteArgs<ExtArgs extends runtime.Types.Extensions.Inter
 export type UserProfileDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.UserProfileWhereInput;
     limit?: number;
+};
+export type UserProfile$departmentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.DepartmentSelect<ExtArgs> | null;
+    omit?: Prisma.DepartmentOmit<ExtArgs> | null;
+    include?: Prisma.DepartmentInclude<ExtArgs> | null;
+    where?: Prisma.DepartmentWhereInput;
+};
+export type UserProfile$jobTitleArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.JobTitleSelect<ExtArgs> | null;
+    omit?: Prisma.JobTitleOmit<ExtArgs> | null;
+    include?: Prisma.JobTitleInclude<ExtArgs> | null;
+    where?: Prisma.JobTitleWhereInput;
+};
+export type UserProfile$warehouseArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.WarehouseSelect<ExtArgs> | null;
+    omit?: Prisma.WarehouseOmit<ExtArgs> | null;
+    include?: Prisma.WarehouseInclude<ExtArgs> | null;
+    where?: Prisma.WarehouseWhereInput;
 };
 export type UserProfileDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.UserProfileSelect<ExtArgs> | null;

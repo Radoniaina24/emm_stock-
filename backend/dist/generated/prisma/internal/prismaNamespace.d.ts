@@ -162,6 +162,8 @@ export declare const ModelName: {
     readonly Role: "Role";
     readonly User: "User";
     readonly UserProfile: "UserProfile";
+    readonly Department: "Department";
+    readonly JobTitle: "JobTitle";
     readonly Category: "Category";
     readonly Brand: "Brand";
     readonly Unit: "Unit";
@@ -189,7 +191,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "permission" | "rolePermission" | "role" | "user" | "userProfile" | "category" | "brand" | "unit" | "product" | "warehouse" | "zone" | "stock" | "supplier" | "entry" | "entryLine" | "exit" | "exitLine" | "movement" | "inventory" | "inventoryLine";
+        modelProps: "permission" | "rolePermission" | "role" | "user" | "userProfile" | "department" | "jobTitle" | "category" | "brand" | "unit" | "product" | "warehouse" | "zone" | "stock" | "supplier" | "entry" | "entryLine" | "exit" | "exitLine" | "movement" | "inventory" | "inventoryLine";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -520,6 +522,138 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 count: {
                     args: Prisma.UserProfileCountArgs<ExtArgs>;
                     result: runtime.Types.Utils.Optional<Prisma.UserProfileCountAggregateOutputType> | number;
+                };
+            };
+        };
+        Department: {
+            payload: Prisma.$DepartmentPayload<ExtArgs>;
+            fields: Prisma.DepartmentFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.DepartmentFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.DepartmentFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>;
+                };
+                findFirst: {
+                    args: Prisma.DepartmentFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.DepartmentFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>;
+                };
+                findMany: {
+                    args: Prisma.DepartmentFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>[];
+                };
+                create: {
+                    args: Prisma.DepartmentCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>;
+                };
+                createMany: {
+                    args: Prisma.DepartmentCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                delete: {
+                    args: Prisma.DepartmentDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>;
+                };
+                update: {
+                    args: Prisma.DepartmentUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.DepartmentDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.DepartmentUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                upsert: {
+                    args: Prisma.DepartmentUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>;
+                };
+                aggregate: {
+                    args: Prisma.DepartmentAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateDepartment>;
+                };
+                groupBy: {
+                    args: Prisma.DepartmentGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.DepartmentGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.DepartmentCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.DepartmentCountAggregateOutputType> | number;
+                };
+            };
+        };
+        JobTitle: {
+            payload: Prisma.$JobTitlePayload<ExtArgs>;
+            fields: Prisma.JobTitleFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.JobTitleFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTitlePayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.JobTitleFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTitlePayload>;
+                };
+                findFirst: {
+                    args: Prisma.JobTitleFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTitlePayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.JobTitleFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTitlePayload>;
+                };
+                findMany: {
+                    args: Prisma.JobTitleFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTitlePayload>[];
+                };
+                create: {
+                    args: Prisma.JobTitleCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTitlePayload>;
+                };
+                createMany: {
+                    args: Prisma.JobTitleCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                delete: {
+                    args: Prisma.JobTitleDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTitlePayload>;
+                };
+                update: {
+                    args: Prisma.JobTitleUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTitlePayload>;
+                };
+                deleteMany: {
+                    args: Prisma.JobTitleDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.JobTitleUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                upsert: {
+                    args: Prisma.JobTitleUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$JobTitlePayload>;
+                };
+                aggregate: {
+                    args: Prisma.JobTitleAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateJobTitle>;
+                };
+                groupBy: {
+                    args: Prisma.JobTitleGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.JobTitleGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.JobTitleCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.JobTitleCountAggregateOutputType> | number;
                 };
             };
         };
@@ -1551,6 +1685,7 @@ export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof
 export declare const RolePermissionScalarFieldEnum: {
     readonly roleId: "roleId";
     readonly permissionId: "permissionId";
+    readonly createdAt: "createdAt";
 };
 export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum];
 export declare const RoleScalarFieldEnum: {
@@ -1567,9 +1702,16 @@ export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof Role
 export declare const UserScalarFieldEnum: {
     readonly id: "id";
     readonly email: "email";
+    readonly username: "username";
     readonly password: "password";
+    readonly status: "status";
+    readonly mustChangePassword: "mustChangePassword";
+    readonly twoFactorEnabled: "twoFactorEnabled";
+    readonly failedLoginAttempts: "failedLoginAttempts";
+    readonly lockedUntil: "lockedUntil";
+    readonly lastLoginAt: "lastLoginAt";
+    readonly emailVerifiedAt: "emailVerifiedAt";
     readonly roleId: "roleId";
-    readonly isActive: "isActive";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
@@ -1577,6 +1719,7 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 export declare const UserProfileScalarFieldEnum: {
     readonly id: "id";
     readonly userId: "userId";
+    readonly employeeCode: "employeeCode";
     readonly firstName: "firstName";
     readonly lastName: "lastName";
     readonly displayName: "displayName";
@@ -1590,13 +1733,34 @@ export declare const UserProfileScalarFieldEnum: {
     readonly region: "region";
     readonly country: "country";
     readonly postalCode: "postalCode";
-    readonly jobTitle: "jobTitle";
-    readonly department: "department";
+    readonly departmentId: "departmentId";
+    readonly jobTitleId: "jobTitleId";
+    readonly warehouseId: "warehouseId";
     readonly signature: "signature";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
 export type UserProfileScalarFieldEnum = (typeof UserProfileScalarFieldEnum)[keyof typeof UserProfileScalarFieldEnum];
+export declare const DepartmentScalarFieldEnum: {
+    readonly id: "id";
+    readonly name: "name";
+    readonly code: "code";
+    readonly description: "description";
+    readonly isActive: "isActive";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum];
+export declare const JobTitleScalarFieldEnum: {
+    readonly id: "id";
+    readonly name: "name";
+    readonly code: "code";
+    readonly description: "description";
+    readonly isActive: "isActive";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type JobTitleScalarFieldEnum = (typeof JobTitleScalarFieldEnum)[keyof typeof JobTitleScalarFieldEnum];
 export declare const CategoryScalarFieldEnum: {
     readonly id: "id";
     readonly name: "name";
@@ -1785,6 +1949,7 @@ export type RoleOrderByRelevanceFieldEnum = (typeof RoleOrderByRelevanceFieldEnu
 export declare const UserOrderByRelevanceFieldEnum: {
     readonly id: "id";
     readonly email: "email";
+    readonly username: "username";
     readonly password: "password";
     readonly roleId: "roleId";
 };
@@ -1792,6 +1957,7 @@ export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnu
 export declare const UserProfileOrderByRelevanceFieldEnum: {
     readonly id: "id";
     readonly userId: "userId";
+    readonly employeeCode: "employeeCode";
     readonly firstName: "firstName";
     readonly lastName: "lastName";
     readonly displayName: "displayName";
@@ -1804,11 +1970,26 @@ export declare const UserProfileOrderByRelevanceFieldEnum: {
     readonly region: "region";
     readonly country: "country";
     readonly postalCode: "postalCode";
-    readonly jobTitle: "jobTitle";
-    readonly department: "department";
+    readonly departmentId: "departmentId";
+    readonly jobTitleId: "jobTitleId";
+    readonly warehouseId: "warehouseId";
     readonly signature: "signature";
 };
 export type UserProfileOrderByRelevanceFieldEnum = (typeof UserProfileOrderByRelevanceFieldEnum)[keyof typeof UserProfileOrderByRelevanceFieldEnum];
+export declare const DepartmentOrderByRelevanceFieldEnum: {
+    readonly id: "id";
+    readonly name: "name";
+    readonly code: "code";
+    readonly description: "description";
+};
+export type DepartmentOrderByRelevanceFieldEnum = (typeof DepartmentOrderByRelevanceFieldEnum)[keyof typeof DepartmentOrderByRelevanceFieldEnum];
+export declare const JobTitleOrderByRelevanceFieldEnum: {
+    readonly id: "id";
+    readonly name: "name";
+    readonly code: "code";
+    readonly description: "description";
+};
+export type JobTitleOrderByRelevanceFieldEnum = (typeof JobTitleOrderByRelevanceFieldEnum)[keyof typeof JobTitleOrderByRelevanceFieldEnum];
 export declare const CategoryOrderByRelevanceFieldEnum: {
     readonly id: "id";
     readonly name: "name";
@@ -1922,8 +2103,9 @@ export type InventoryLineOrderByRelevanceFieldEnum = (typeof InventoryLineOrderB
 export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>;
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>;
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
-export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>;
+export type EnumUserStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserStatus'>;
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>;
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>;
 export type BatchPayload = {
     count: number;
 };
@@ -1954,6 +2136,8 @@ export type GlobalOmitConfig = {
     role?: Prisma.RoleOmit;
     user?: Prisma.UserOmit;
     userProfile?: Prisma.UserProfileOmit;
+    department?: Prisma.DepartmentOmit;
+    jobTitle?: Prisma.JobTitleOmit;
     category?: Prisma.CategoryOmit;
     brand?: Prisma.BrandOmit;
     unit?: Prisma.UnitOmit;
