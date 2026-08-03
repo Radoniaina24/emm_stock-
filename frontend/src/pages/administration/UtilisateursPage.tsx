@@ -203,6 +203,8 @@ export function UtilisateursPage() {
                   <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
                     <InfoRow label="Rôle" value={selectedUser?.role?.name ?? null} icon={Shield} />
                     <InfoRow label="Département" value={selectedUser?.department} icon={Shield} />
+                    <InfoRow label="Poste" value={selectedUser?.profile?.jobTitle?.name ?? null} icon={Shield} />
+                    <InfoRow label="Entrepôt" value={selectedUser?.profile?.warehouse?.name ?? null} icon={MapPin} />
                     <InfoRow label="Téléphone" value={selectedUser?.phone} icon={Phone} />
                     <InfoRow label="Membre depuis" value={formatDate(selectedUser?.createdAt)} icon={Shield} />
                   </div>
