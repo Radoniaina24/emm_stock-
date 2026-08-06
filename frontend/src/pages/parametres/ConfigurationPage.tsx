@@ -53,7 +53,7 @@ import { useUpdateProfileMutation } from "@/hooks/use-avatar"
 import { useTheme } from "@/lib/theme"
 import { resolveUploadUrl } from "@/lib/api"
 import { cn } from "@/lib/utils"
-import { getUserInitials, type UpdateProfilePayload } from "@/types/auth"
+import { getUserDisplayName, getUserInitials, type UpdateProfilePayload } from "@/types/auth"
 
 type TabId =
   | "profil"
@@ -298,7 +298,7 @@ export function ConfigurationPage() {
   const avatarUrl = resolveUploadUrl(user.avatar ?? user.profile?.profilePhoto)
   const profile = user.profile
   const joinedAt = user.createdAt ?? new Date().toISOString()
-  const displayName = profile?.displayName || user.name
+  const displayName = getUserDisplayName(user)
 
   async function saveField(fieldKey: string, value: string) {
     const payload = { [fieldKey]: value } as UpdateProfilePayload

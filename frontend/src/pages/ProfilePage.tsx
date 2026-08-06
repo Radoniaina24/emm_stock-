@@ -32,7 +32,7 @@ import {
 import { useAuth } from "@/hooks/use-auth"
 import { useUpdateProfileMutation } from "@/hooks/use-avatar"
 import { resolveUploadUrl } from "@/lib/api"
-import { getUserInitials, type UpdateProfilePayload } from "@/types/auth"
+import { getUserDisplayName, getUserInitials, type UpdateProfilePayload } from "@/types/auth"
 
 function StatCard({
   icon: Icon,
@@ -96,7 +96,7 @@ export function ProfilePage() {
   const avatarUrl = resolveUploadUrl(user.avatar ?? user.profile?.profilePhoto)
   const profile = user.profile
   const joinedAt = user.createdAt ?? new Date().toISOString()
-  const displayName = profile?.displayName || user.name
+  const displayName = getUserDisplayName(user)
 
   async function saveField(fieldKey: string, value: string) {
     const payload = { [fieldKey]: value } as UpdateProfilePayload

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/use-auth"
 import { useTheme } from "@/lib/theme"
 import { useSidebar } from "@/lib/sidebar"
+import { getUserDisplayName } from "@/types/auth"
 
 export function Topbar({ title }: { title: string }) {
   const { logout, isLoggingOut, user } = useAuth()
@@ -95,7 +96,7 @@ export function Topbar({ title }: { title: string }) {
             </div>
             <div className="hidden sm:block">
               <p className="truncate text-sm font-semibold text-foreground">
-                {user?.name ?? "Utilisateur"}
+                {user ? getUserDisplayName(user) : "Utilisateur"}
               </p>
               <p className="truncate text-xs text-muted-foreground/70">
                 {user?.email ?? ""}
@@ -106,7 +107,7 @@ export function Topbar({ title }: { title: string }) {
           {menuOpen && (
             <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-border/50 bg-popover shadow-xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-1 duration-200">
               <div className="border-b border-border/50 px-4 py-3">
-                <p className="truncate text-sm font-semibold text-foreground">{user?.name ?? "Utilisateur"}</p>
+                <p className="truncate text-sm font-semibold text-foreground">{user ? getUserDisplayName(user) : "Utilisateur"}</p>
                 <p className="truncate text-xs text-muted-foreground/70">{user?.email ?? ""}</p>
               </div>
               <div className="p-1">

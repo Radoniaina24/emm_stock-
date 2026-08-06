@@ -65,11 +65,17 @@ export type UpdateProfilePayload = Partial<
 >
 
 export function getUserInitials(user: Pick<User, "name"> & { profile?: UserProfile | null }): string {
-  const label = user.profile?.displayName || user.name
+  const label = getUserDisplayName(user)
   return label
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("")
+}
+
+export function getUserDisplayName(user: Pick<User, "name"> & { profile?: UserProfile | null }): string {
+  const p = user.profile
+  const fullName = [p?.firstName, p?.lastName].filter(Boolean).join(" ").trim()
+  return fullName || p?.displayName || user.name || "Utilisateur"
 }
