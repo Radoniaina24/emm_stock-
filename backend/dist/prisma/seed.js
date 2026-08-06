@@ -468,7 +468,7 @@ async function main() {
     const deptCount = deptRows[0].cnt;
     if (deptCount === 0) {
         for (const d of departments) {
-            const id = crypto.randomUUID();
+            const id = cuid();
             await conn.execute("INSERT INTO departments (id, name, code, description, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())", [id, d.name, d.code, d.description, true]);
         }
         console.log(`✅ ${departments.length} départements créés avec succès`);
@@ -479,7 +479,7 @@ async function main() {
         const missing = departments.filter((d) => !existingCodes.has(d.code));
         if (missing.length > 0) {
             for (const d of missing) {
-                const id = crypto.randomUUID();
+                const id = cuid();
                 await conn.execute("INSERT INTO departments (id, name, code, description, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())", [id, d.name, d.code, d.description, true]);
             }
             console.log(`✅ ${missing.length} nouveaux départements ajoutés`);
@@ -490,7 +490,7 @@ async function main() {
     const jtCount = jtRows[0].cnt;
     if (jtCount === 0) {
         for (const jt of jobTitlesList) {
-            const id = crypto.randomUUID();
+            const id = cuid();
             await conn.execute("INSERT INTO job_titles (id, name, code, description, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())", [id, jt.name, jt.code, jt.description, true]);
         }
         console.log(`✅ ${jobTitlesList.length} titres créés avec succès`);
@@ -501,7 +501,7 @@ async function main() {
         const missing = jobTitlesList.filter((j) => !existingJtCodes.has(j.code));
         if (missing.length > 0) {
             for (const jt of missing) {
-                const id = crypto.randomUUID();
+                const id = cuid();
                 await conn.execute("INSERT INTO job_titles (id, name, code, description, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())", [id, jt.name, jt.code, jt.description, true]);
             }
             console.log(`✅ ${missing.length} nouveaux titres ajoutés`);
@@ -512,7 +512,7 @@ async function main() {
     const whCount = whRows[0].cnt;
     if (whCount === 0) {
         for (const w of warehouses) {
-            const id = crypto.randomUUID();
+            const id = cuid();
             await conn.execute("INSERT INTO warehouses (id, name, location, isActive, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())", [id, w.name, w.location, true]);
         }
         console.log(`✅ ${warehouses.length} entrepôts créés avec succès`);
@@ -529,7 +529,7 @@ async function main() {
     const roleCount = rows[0].cnt;
     if (roleCount === 0) {
         for (const r of roles) {
-            const id = crypto.randomUUID();
+            const id = cuid();
             roleCodeToId[r.code] = id;
             await conn.execute("INSERT INTO roles (id, name, code, description, is_system, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())", [id, r.name, r.code, r.description, r.isSystem, true]);
         }
@@ -544,7 +544,7 @@ async function main() {
         if (missing.length > 0) {
             console.log(`ℹ️  ${missing.length} nouveaux rôles à ajouter…`);
             for (const r of missing) {
-                const id = crypto.randomUUID();
+                const id = cuid();
                 roleCodeToId[r.code] = id;
                 await conn.execute("INSERT INTO roles (id, name, code, description, is_system, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())", [id, r.name, r.code, r.description, r.isSystem, true]);
             }
@@ -564,7 +564,7 @@ async function main() {
     const permCount = permRows[0].cnt;
     if (permCount === 0) {
         for (const p of permissions) {
-            const id = crypto.randomUUID();
+            const id = cuid();
             permissionCodeToId[p.code] = id;
             await conn.execute("INSERT INTO permissions (id, module, action, code, description, created_at) VALUES (?, ?, ?, ?, ?, NOW())", [id, p.module, p.action, p.code, p.description]);
         }
@@ -579,7 +579,7 @@ async function main() {
         if (missingPerms.length > 0) {
             console.log(`ℹ️  ${missingPerms.length} nouvelles permissions à ajouter…`);
             for (const p of missingPerms) {
-                const id = crypto.randomUUID();
+                const id = cuid();
                 permissionCodeToId[p.code] = id;
                 await conn.execute("INSERT INTO permissions (id, module, action, code, description, created_at) VALUES (?, ?, ?, ?, ?, NOW())", [id, p.module, p.action, p.code, p.description]);
             }
@@ -616,19 +616,39 @@ async function main() {
         await conn.end();
         return;
     }
-    const insertUser = "INSERT INTO users (id, email, password, role_id, isActive, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
-    const insertProfile = "INSERT INTO user_profiles (id, user_id, first_name, last_name, display_name, phone, department, job_title, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
-    for (const u of users) {
+    const deptRows2 = (await conn.execute("SELECT id, name FROM departments"))[0];
+    const departmentIdByName = {};
+    for (const d of deptRows2)
+        departmentIdByName[d.name.toLowerCase()] = d.id;
+    const jtRows2 = (await conn.execute("SELECT id, name FROM job_titles"))[0];
+    const jobTitleIdByName = {};
+    for (const j of jtRows2)
+        jobTitleIdByName[j.name.toLowerCase()] = j.id;
+    const insertUser = "INSERT INTO users (id, email, username, password, role_id, status, must_change_password, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 'ACTIVE', ?, NOW(), NOW())";
+    const insertProfile = "INSERT INTO user_profiles (id, user_id, employee_code, first_name, last_name, display_name, phone, department_id, job_title_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+    for (let i = 0; i < users.length; i++) {
+        const u = users[i];
         const userId = cuid();
         const hashed = await bcrypt.hash(u.password, 10);
         const roleId = roleCodeToId[u.roleCode];
-        await conn.execute(insertUser, [userId, u.email, hashed, roleId, u.isActive]);
+        if (!roleId) {
+            console.warn(`⚠️  Rôle ${u.roleCode} introuvable pour ${u.email}, utilisateur ignoré`);
+            continue;
+        }
+        const username = u.email.split("@")[0];
+        await conn.execute(insertUser, [userId, u.email, username, hashed, roleId, false]);
         const profileId = cuid();
+        const departmentId = departmentIdByName[u.department.toLowerCase()] ?? null;
+        const jobTitleId = jobTitleIdByName[u.jobTitle.toLowerCase()] ?? null;
+        if (!departmentId || !jobTitleId) {
+            console.warn(`ℹ️  ${u.email}: FK département/poste non résolues (${u.department} / ${u.jobTitle}), positionnées à NULL`);
+        }
         await conn.execute(insertProfile, [
             profileId, userId,
+            `LEG-${String(i + 1).padStart(4, "0")}`,
             u.firstName, u.lastName,
             `${u.firstName} ${u.lastName}`,
-            u.phone, u.department, u.jobTitle,
+            u.phone, departmentId, jobTitleId,
         ]);
     }
     console.log(`✅ ${users.length} utilisateurs créés avec succès`);
