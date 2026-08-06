@@ -481,7 +481,7 @@ export function ConfigurationPage() {
                     fieldKey="jobTitle"
                     value={profile?.jobTitle?.id ?? null}
                     displayValue={profile?.jobTitle?.name}
-                    type="select"
+                    type="combobox"
                     options={jobTitleOptions}
                     editable={isAdmin}
                     disabledReason="Modification réservée aux administrateurs"
@@ -493,7 +493,7 @@ export function ConfigurationPage() {
                     fieldKey="department"
                     value={profile?.department?.id ?? null}
                     displayValue={profile?.department?.name}
-                    type="select"
+                    type="combobox"
                     options={departmentOptions}
                     editable={isAdmin}
                     disabledReason="Modification réservée aux administrateurs"
@@ -530,9 +530,8 @@ export function ConfigurationPage() {
                     label="Pays"
                     fieldKey="country"
                     value={profile?.country}
-                    type="select"
+                    type="combobox"
                     options={countryOptions}
-                    searchable
                     placeholder="Rechercher un pays…"
                     {...fieldProps}
                   />

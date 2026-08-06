@@ -4,6 +4,7 @@ import { fr } from "date-fns/locale"
 import { Check, Loader2, Pencil, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { SearchableSelect } from "@/components/ui/searchable-select"
 import { DatePicker } from "@/components/ui/date-picker"
 import {
   SelectItem,
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 
-export type EditableFieldType = "text" | "tel" | "date" | "select" | "textarea"
+export type EditableFieldType = "text" | "tel" | "date" | "select" | "combobox" | "textarea"
 
 type Option = { value: string; label: string }
 
@@ -189,6 +190,13 @@ export function EditableInfoRow({
                   </SelectList>
                 </SelectPopup>
               </SelectRoot>
+            ) : type === "combobox" ? (
+              <SearchableSelect
+                value={draft}
+                placeholder={placeholder}
+                options={options ?? []}
+                onSelect={(next) => setDraft(next)}
+              />
             ) : type === "textarea" ? (
               <textarea
                 ref={inputRef as React.RefObject<HTMLTextAreaElement>}
