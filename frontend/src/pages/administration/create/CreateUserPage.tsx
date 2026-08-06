@@ -65,10 +65,10 @@ export function CreateUserPage() {
   const [dirty, setDirty] = useState(false)
 
   useEffect(() => {
-    if (nextCode?.employeeCode && !form.employeeCode) {
+    if (nextCode?.employeeCode) {
       setForm((prev) => ({ ...prev, employeeCode: nextCode!.employeeCode }))
     }
-  }, [nextCode, form.employeeCode])
+  }, [nextCode])
 
   const set = useCallback(<K extends keyof UserFormData>(key: K, value: UserFormData[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }))

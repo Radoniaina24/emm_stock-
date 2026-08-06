@@ -28,6 +28,7 @@ export function useCreateUserMutation() {
       usersApi.createUser(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: usersKeys.list })
+      queryClient.invalidateQueries({ queryKey: usersKeys.nextEmployeeCode })
     },
   })
 }
