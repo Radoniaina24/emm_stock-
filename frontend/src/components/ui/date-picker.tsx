@@ -30,7 +30,7 @@ function formatSelected(
   if (value instanceof Date && isValid(value)) {
     return {
       label: format(value, "d MMMM yyyy", { locale: fr }),
-      detail: format(value, "EEEE", { locale: fr }),
+      detail: null,
       hasValue: true,
     }
   }
