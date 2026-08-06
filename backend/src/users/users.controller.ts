@@ -51,6 +51,13 @@ export class UsersController {
     return this.users.findAll();
   }
 
+  @Get('next-employee-code')
+  @ApiOperation({ summary: 'Prochain matricule disponible (format EMP-YYYY-NNNN)' })
+  @ApiOkResponse({ description: 'Matricule suggéré' })
+  nextEmployeeCode() {
+    return this.users.nextEmployeeCode();
+  }
+
   @Get('me')
   @ApiOperation({ summary: 'Profil complet (user + user_profiles)' })
   @ApiOkResponse({ description: 'Utilisateur authentifié avec profil' })

@@ -1,4 +1,4 @@
-import { Briefcase, Hash } from "lucide-react"
+import { Briefcase, Hash, Sparkles } from "lucide-react"
 import { RoleSelect } from "./RoleSelect"
 import { DepartmentSelect } from "./DepartmentSelect"
 import { JobTitleSelect } from "./JobTitleSelect"
@@ -6,6 +6,8 @@ import { WarehouseSelect } from "./WarehouseSelect"
 
 type Props = {
   employeeCode: string
+  employeeCodeAuto?: boolean
+  employeeCodeLoading?: boolean
   roleId: string
   departmentId: string
   jobTitleId: string
@@ -27,7 +29,7 @@ function inputClass(error?: string) {
 }
 
 export function ProfessionalInformationCard({
-  employeeCode, roleId, departmentId, jobTitleId, warehouseId,
+  employeeCode, employeeCodeAuto, employeeCodeLoading, roleId, departmentId, jobTitleId, warehouseId,
   onEmployeeCodeChange, onRoleIdChange, onDepartmentIdChange, onJobTitleIdChange, onWarehouseIdChange,
   errors, warehouseRequired,
 }: Props) {
@@ -41,6 +43,12 @@ export function ProfessionalInformationCard({
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-foreground/80" htmlFor="create-employeeCode">
             Matricule <span className="text-destructive">*</span>
+            {employeeCodeAuto ? (
+              <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                <Sparkles className="size-3" />
+                Auto
+              </span>
+            ) : null}
           </label>
           <div className="relative">
             <Hash className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/40" />
@@ -48,10 +56,14 @@ export function ProfessionalInformationCard({
               id="create-employeeCode"
               value={employeeCode}
               onChange={(e) => onEmployeeCodeChange(e.target.value)}
-              placeholder="EMP001"
-              className={inputClass(errors.employeeCode)}
+              placeholder={employeeCodeLoading ? "Génération…" : "EMP-2026-0001"}
+              readOnly={employeeCodeAuto}
+              className={`${inputClass(errors.employeeCode)}${employeeCodeAuto ? " cursor-not-allowed opacity-80" : ""}`}
             />
           </div>
+          {employeeCodeAuto ? (
+            <p className="text-xs text-muted-foreground/60">Généré automatiquement, format EMP-année-séquence</p>
+          ) : null}
           {errors.employeeCode && <p className="text-xs text-destructive">{errors.employeeCode}</p>}
         </div>
         <div className="grid gap-4 sm:grid-cols-2">

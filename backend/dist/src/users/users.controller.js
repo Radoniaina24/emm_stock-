@@ -34,6 +34,9 @@ let UsersController = class UsersController {
     findAll() {
         return this.users.findAll();
     }
+    nextEmployeeCode() {
+        return this.users.nextEmployeeCode();
+    }
     getMe(userId) {
         return this.users.getMe(userId);
     }
@@ -68,6 +71,14 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('next-employee-code'),
+    (0, swagger_2.ApiOperation)({ summary: 'Prochain matricule disponible (format EMP-YYYY-NNNN)' }),
+    (0, swagger_2.ApiOkResponse)({ description: 'Matricule suggéré' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "nextEmployeeCode", null);
 __decorate([
     (0, common_1.Get)('me'),
     (0, swagger_2.ApiOperation)({ summary: 'Profil complet (user + user_profiles)' }),

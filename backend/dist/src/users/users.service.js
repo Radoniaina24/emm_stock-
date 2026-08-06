@@ -48,6 +48,7 @@ const bcrypt = __importStar(require("bcrypt"));
 const fs_1 = require("fs");
 const path_1 = require("path");
 const prisma_service_js_1 = require("../prisma/prisma.service.js");
+const employee_code_js_1 = require("./employee-code.js");
 const user_mapper_js_1 = require("./user.mapper.js");
 const AVATARS_DIR = (0, path_1.join)(process.cwd(), 'uploads', 'avatars');
 const MAX_SIZE = 2 * 1024 * 1024;
@@ -68,11 +69,24 @@ let UsersService = class UsersService {
         });
         if (existingUsername)
             throw new common_1.ConflictException('Ce nom d\'utilisateur est déjà utilisé');
-        const existingCode = await this.prisma.userProfile.findUnique({
-            where: { employeeCode: dto.employeeCode },
-        });
-        if (existingCode)
-            throw new common_1.ConflictException('Ce matricule est déjà utilisé');
+        let employeeCode = dto.employeeCode?.trim() ?? '';
+        if (employeeCode) {
+            const existingCode = await this.prisma.userProfile.findUnique({
+                where: { employeeCode },
+            });
+            if (existingCode)
+                throw new common_1.ConflictException('Ce matricule est déjà utilisé');
+        }
+        else {
+            for (let attempt = 0; attempt < 10; attempt++) {
+                employeeCode = await (0, employee_code_js_1.generateEmployeeCode)(this.prisma);
+                const taken = await this.prisma.userProfile.findUnique({
+                    where: { employeeCode },
+                });
+                if (!taken)
+                    break;
+            }
+        }
         const role = await this.prisma.role.findUnique({ where: { id: dto.roleId } });
         if (!role)
             throw new common_1.BadRequestException('Rôle introuvable');
@@ -96,7 +110,7 @@ let UsersService = class UsersService {
                 roleId: dto.roleId,
                 profile: {
                     create: {
-                        employeeCode: dto.employeeCode,
+                        employeeCode,
                         firstName: dto.firstName,
                         lastName: dto.lastName,
                         displayName: `${dto.firstName} ${dto.lastName}`,
@@ -109,6 +123,9 @@ let UsersService = class UsersService {
             select: user_mapper_js_1.userWithProfileSelect,
         });
         return (0, user_mapper_js_1.toAuthUserDto)(user);
+    }
+    async nextEmployeeCode() {
+        return { employeeCode: await (0, employee_code_js_1.generateEmployeeCode)(this.prisma) };
     }
     async findAll() {
         const users = await this.prisma.user.findMany({

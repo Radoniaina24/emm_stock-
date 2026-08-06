@@ -6,6 +6,9 @@ export declare class UsersController {
     constructor(users: UsersService);
     create(dto: CreateUserDto): Promise<import("./user.mapper.js").AuthUserDto>;
     findAll(): Promise<any>;
+    nextEmployeeCode(): Promise<{
+        employeeCode: string;
+    }>;
     getMe(userId: string): Promise<import("./user.mapper.js").AuthUserDto>;
     findOne(id: string): Promise<import("./user.mapper.js").AuthUserDto>;
     updateProfile(userId: string, dto: UpdateProfileDto): Promise<import("./user.mapper.js").AuthUserDto>;

@@ -1,0 +1,10 @@
+COMPTES DE CONNEXION - EMM STOCK
+=================================
+
+1. Administrateur principal (SUPER_ADMIN)
+   Email    : admin@stockflow.app
+   Mot de passe : admin123
+
+2. Responsable stock (ADMIN)
+   Email    : alice.rakoto@stockflow.app
+   Mot de passe : Password123!

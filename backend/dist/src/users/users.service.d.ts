@@ -5,6 +5,9 @@ export declare class UsersService {
     private readonly prisma;
     constructor(prisma: PrismaService);
     create(dto: CreateUserDto): Promise<import("./user.mapper.js").AuthUserDto>;
+    nextEmployeeCode(): Promise<{
+        employeeCode: string;
+    }>;
     findAll(): Promise<any>;
     findOne(id: string): Promise<import("./user.mapper.js").AuthUserDto>;
     getMe(userId: string): Promise<import("./user.mapper.js").AuthUserDto>;

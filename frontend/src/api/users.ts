@@ -8,6 +8,10 @@ export function createUser(payload: CreateUserPayload) {
   })
 }
 
+export function getNextEmployeeCode() {
+  return api<{ employeeCode: string }>("/users/next-employee-code")
+}
+
 export function getUsers() {
   return api<User[]>("/users")
 }

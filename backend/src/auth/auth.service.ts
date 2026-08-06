@@ -6,6 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { generateEmployeeCode } from '../users/employee-code.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import {
@@ -29,7 +30,7 @@ export class AuthService {
 
     const hashed = await bcrypt.hash(dto.password, 10);
     const names = splitDisplayName(dto.name);
-    const employeeCode = `EMP-${Date.now().toString(36).slice(-6).toUpperCase()}`;
+    const employeeCode = await generateEmployeeCode(this.prisma);
     const username = dto.email.split('@')[0];
     const defaultRole = await this.prisma.role.findFirst({ where: { code: 'VIEWER' } });
 
