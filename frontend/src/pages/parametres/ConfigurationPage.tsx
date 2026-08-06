@@ -50,6 +50,8 @@ import {
 } from "@/components/ui/card"
 import { useAuth } from "@/hooks/use-auth"
 import { useUpdateProfileMutation } from "@/hooks/use-avatar"
+import { useDepartmentsQuery } from "@/hooks/use-departments"
+import { useJobTitlesQuery } from "@/hooks/use-job-titles"
 import { useTheme } from "@/lib/theme"
 import { resolveUploadUrl } from "@/lib/api"
 import { cn } from "@/lib/utils"
@@ -291,8 +293,14 @@ export function ConfigurationPage() {
   const [avatarOpen, setAvatarOpen] = useState(false)
   const [activeField, setActiveField] = useState<string | null>(null)
   const updateProfile = useUpdateProfileMutation()
+  const { data: departments } = useDepartmentsQuery()
+  const { data: jobTitles } = useJobTitlesQuery()
 
   if (!user) return null
+
+  const isAdmin = user.role?.code === "ADMIN" || user.role?.code === "SUPER_ADMIN"
+  const departmentOptions = (departments ?? []).map((d) => ({ value: d.id, label: d.name }))
+  const jobTitleOptions = (jobTitles ?? []).map((j) => ({ value: j.id, label: j.name }))
 
   const initials = getUserInitials(user)
   const avatarUrl = resolveUploadUrl(user.avatar ?? user.profile?.profilePhoto)
@@ -469,14 +477,24 @@ export function ConfigurationPage() {
                     icon={Briefcase}
                     label="Poste / Fonction"
                     fieldKey="jobTitle"
-                    value={profile?.jobTitle?.name ?? null}
+                    value={profile?.jobTitle?.id ?? null}
+                    displayValue={profile?.jobTitle?.name}
+                    type="select"
+                    options={jobTitleOptions}
+                    editable={isAdmin}
+                    disabledReason="Modification réservée aux administrateurs"
                     {...fieldProps}
                   />
                   <EditableInfoRow
                     icon={Building2}
                     label="Département"
                     fieldKey="department"
-                    value={profile?.department?.name ?? null}
+                    value={profile?.department?.id ?? null}
+                    displayValue={profile?.department?.name}
+                    type="select"
+                    options={departmentOptions}
+                    editable={isAdmin}
+                    disabledReason="Modification réservée aux administrateurs"
                     {...fieldProps}
                   />
                 </div>
