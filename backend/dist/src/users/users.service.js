@@ -205,12 +205,25 @@ let UsersService = class UsersService {
             const trimmed = value.trim();
             return trimmed.length ? trimmed : fallback;
         };
+        const nextFirstName = required(dto.firstName, existing.firstName);
+        const nextLastName = required(dto.lastName, existing.lastName);
+        let displayName;
+        if (dto.displayName !== undefined) {
+            displayName =
+                required(dto.displayName, existing.displayName) ?? existing.displayName;
+        }
+        else if (dto.firstName !== undefined || dto.lastName !== undefined) {
+            displayName = `${nextFirstName} ${nextLastName}`.trim();
+        }
+        else {
+            displayName = existing.displayName;
+        }
         await this.prisma.userProfile.update({
             where: { userId },
             data: {
-                firstName: required(dto.firstName, existing.firstName),
-                lastName: required(dto.lastName, existing.lastName),
-                displayName: required(dto.displayName, existing.displayName),
+                firstName: nextFirstName,
+                lastName: nextLastName,
+                displayName,
                 phone: emptyToNull(dto.phone),
                 secondaryPhone: emptyToNull(dto.secondaryPhone),
                 birthDate: dto.birthDate === undefined
