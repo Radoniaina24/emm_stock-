@@ -287,7 +287,7 @@ export function ProfilePage() {
               fieldKey="jobTitle"
               value={profile?.jobTitle?.id ?? null}
               displayValue={profile?.jobTitle?.name}
-              type="select"
+              type="combobox"
               options={jobTitleOptions}
               editable={isAdmin}
               disabledReason="Modification réservée aux administrateurs"
@@ -299,7 +299,7 @@ export function ProfilePage() {
               fieldKey="department"
               value={profile?.department?.id ?? null}
               displayValue={profile?.department?.name}
-              type="select"
+              type="combobox"
               options={departmentOptions}
               editable={isAdmin}
               disabledReason="Modification réservée aux administrateurs"
@@ -351,9 +351,8 @@ export function ProfilePage() {
                 label="Pays"
                 fieldKey="country"
                 value={profile?.country}
-                type="select"
+                type="combobox"
                 options={countryOptions}
-                searchable
                 placeholder="Rechercher un pays…"
                 {...fieldProps}
               />
