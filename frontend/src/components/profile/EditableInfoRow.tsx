@@ -11,7 +11,6 @@ import {
   SelectPopup,
   SelectRoot,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 
@@ -151,7 +150,9 @@ export function EditableInfoRow({
                 disabled={isSaving}
               >
                 <SelectTrigger className="h-9 w-full rounded-lg">
-                  <SelectValue placeholder={placeholder || "Sélectionner…"} />
+                  <span className="flex-1 truncate text-left">
+                    {options?.find((opt) => opt.value === draft)?.label ?? placeholder}
+                  </span>
                 </SelectTrigger>
                 <SelectPopup className="z-[80]">
                   <SelectList>
