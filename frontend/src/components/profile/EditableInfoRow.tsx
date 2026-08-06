@@ -26,6 +26,7 @@ type EditableInfoRowProps = {
   displayValue?: string
   type?: EditableFieldType
   options?: Option[]
+  searchable?: boolean
   placeholder?: string
   editable?: boolean
   disabledReason?: string
@@ -55,6 +56,7 @@ export function EditableInfoRow({
   displayValue,
   type = "text",
   options,
+  searchable = false,
   placeholder = "Saisir…",
   editable = true,
   disabledReason,
@@ -66,16 +68,26 @@ export function EditableInfoRow({
 }: EditableInfoRowProps) {
   const editing = activeField === fieldKey
   const [draft, setDraft] = useState(value ?? "")
+  const [search, setSearch] = useState("")
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null)
 
   useEffect(() => {
     if (editing) {
       setDraft(value ?? "")
+      setSearch("")
       if (type !== "date" && type !== "select") {
         queueMicrotask(() => inputRef.current?.focus())
       }
     }
   }, [editing, value, type])
+
+  const normalize = (s: string) =>
+    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  const visibleOptions = searchable
+    ? (options ?? []).filter((opt) =>
+        normalize(opt.label).includes(normalize(search.trim())),
+      )
+    : options
 
   const shown = displayValue ?? (value?.trim() ? value : "Non renseigné")
   const empty = !value?.trim()
@@ -146,6 +158,7 @@ export function EditableInfoRow({
                 value={draft || null}
                 onValueChange={(next) => {
                   setDraft(next == null ? "" : String(next))
+                  setSearch("")
                 }}
                 disabled={isSaving}
               >
@@ -155,8 +168,20 @@ export function EditableInfoRow({
                   </span>
                 </SelectTrigger>
                 <SelectPopup className="z-[80]">
+                  {searchable && (
+                    <div className="border-b border-border/50 p-1.5">
+                      <input
+                        autoFocus
+                        type="text"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Rechercher…"
+                        className="h-8 w-full rounded-md border border-border/60 bg-background px-2.5 text-sm outline-none placeholder:text-muted-foreground/40 focus:border-primary/30"
+                      />
+                    </div>
+                  )}
                   <SelectList>
-                    {options?.map((opt) => (
+                    {visibleOptions?.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
                         {opt.label}
                       </SelectItem>

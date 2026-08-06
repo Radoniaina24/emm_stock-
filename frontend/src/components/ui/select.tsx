@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react"
 import { Select as SelectPrimitive } from "@base-ui/react/select"
 
 import { cn } from "@/lib/utils"
@@ -62,12 +63,43 @@ function SelectPopup({
   searchPlaceholder,
   ...props
 }: SelectPrimitive.Popup.Props & { className?: string; searchable?: boolean; searchPlaceholder?: string }) {
+  const popupRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const node = popupRef.current
+    if (!node) return
+
+    const onWheel = (event: WheelEvent) => {
+      const target = event.target instanceof Element ? event.target : null
+      const scroller = target?.closest(".overflow-y-auto") as HTMLElement | null
+      if (scroller) {
+        const { scrollTop, scrollHeight, clientHeight } = scroller
+        const atTop = scrollTop <= 0
+        const atBottom = scrollTop + clientHeight >= scrollHeight - 1
+        const scrollable = scrollHeight > clientHeight
+        if (
+          !scrollable ||
+          (event.deltaY > 0 && atBottom) ||
+          (event.deltaY < 0 && atTop)
+        ) {
+          event.preventDefault()
+        }
+      } else {
+        event.preventDefault()
+      }
+    }
+
+    node.addEventListener("wheel", onWheel, { passive: false })
+    return () => node.removeEventListener("wheel", onWheel)
+  }, [])
+
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner side="bottom" align="start" sideOffset={4}>
         <SelectPrimitive.Popup
+          ref={popupRef}
           className={cn(
-            "z-50 min-w-[var(--anchor-width)] origin-[var(--transform-origin)] overflow-hidden rounded-lg border border-border/60 bg-popover p-1 text-sm text-popover-foreground shadow-lg transition-[transform,opacity] duration-150 ease-in data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+            "z-50 min-w-[var(--anchor-width)] max-h-72 origin-[var(--transform-origin)] overflow-hidden rounded-lg border border-border/60 bg-popover p-1 text-sm text-popover-foreground shadow-lg transition-[transform,opacity] duration-150 ease-in data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
             className
           )}
           {...props}
@@ -81,10 +113,31 @@ function SelectList({
   className,
   ...props
 }: SelectPrimitive.List.Props & { className?: string }) {
+  const listRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const node = listRef.current
+    if (!node) return
+
+    const onWheel = (event: WheelEvent) => {
+      const { scrollTop, scrollHeight, clientHeight } = node
+      const atTop = scrollTop <= 0
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 1
+      const scrollable = scrollHeight > clientHeight
+      if (!scrollable || (event.deltaY > 0 && atBottom) || (event.deltaY < 0 && atTop)) {
+        event.preventDefault()
+      }
+    }
+
+    node.addEventListener("wheel", onWheel, { passive: false })
+    return () => node.removeEventListener("wheel", onWheel)
+  }, [])
+
   return (
     <SelectPrimitive.List
+      ref={listRef}
       className={cn(
-        "flex max-h-60 flex-col overflow-y-auto py-0.5",
+        "flex h-52 flex-col overflow-y-auto py-0.5 overscroll-contain",
         className
       )}
       {...props}
