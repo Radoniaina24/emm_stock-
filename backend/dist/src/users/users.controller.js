@@ -49,6 +49,9 @@ let UsersController = class UsersController {
     uploadAvatar(userId, file) {
         return this.users.uploadAvatar(userId, file);
     }
+    remove(id, currentUserId) {
+        return this.users.remove(id, currentUserId);
+    }
     deleteAvatar(userId) {
         return this.users.deleteAvatar(userId);
     }
@@ -137,6 +140,17 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "uploadAvatar", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_2.ApiOperation)({ summary: 'Supprimer un utilisateur' }),
+    (0, swagger_2.ApiOkResponse)({ description: 'Utilisateur supprimé' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_js_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "remove", null);
 __decorate([
     (0, common_1.Delete)('me/avatar'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),

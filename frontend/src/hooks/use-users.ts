@@ -32,3 +32,14 @@ export function useCreateUserMutation() {
     },
   })
 }
+
+export function useDeleteUserMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => usersApi.deleteUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: usersKeys.list })
+    },
+  })
+}
