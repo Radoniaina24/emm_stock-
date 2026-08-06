@@ -35,6 +35,7 @@ import { useDepartmentsQuery } from "@/hooks/use-departments"
 import { useJobTitlesQuery } from "@/hooks/use-job-titles"
 import { resolveUploadUrl } from "@/lib/api"
 import { getUserDisplayName, getUserInitials, type UpdateProfilePayload } from "@/types/auth"
+import { COUNTRIES } from "@/data/countries"
 
 function StatCard({
   icon: Icon,
@@ -99,6 +100,7 @@ export function ProfilePage() {
   const isAdmin = user.role?.code === "ADMIN" || user.role?.code === "SUPER_ADMIN"
   const departmentOptions = (departments ?? []).map((d) => ({ value: d.id, label: d.name }))
   const jobTitleOptions = (jobTitles ?? []).map((j) => ({ value: j.id, label: j.name }))
+  const countryOptions = COUNTRIES.map((c) => ({ value: c, label: c }))
 
   const initials = getUserInitials(user)
   const avatarUrl = resolveUploadUrl(user.avatar ?? user.profile?.profilePhoto)
@@ -349,6 +351,10 @@ export function ProfilePage() {
                 label="Pays"
                 fieldKey="country"
                 value={profile?.country}
+                type="select"
+                options={countryOptions}
+                searchable
+                placeholder="Rechercher un pays…"
                 {...fieldProps}
               />
               <EditableInfoRow

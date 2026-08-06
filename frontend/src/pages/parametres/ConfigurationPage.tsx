@@ -56,6 +56,7 @@ import { useTheme } from "@/lib/theme"
 import { resolveUploadUrl } from "@/lib/api"
 import { cn } from "@/lib/utils"
 import { getUserDisplayName, getUserInitials, type UpdateProfilePayload } from "@/types/auth"
+import { COUNTRIES } from "@/data/countries"
 
 type TabId =
   | "profil"
@@ -301,6 +302,7 @@ export function ConfigurationPage() {
   const isAdmin = user.role?.code === "ADMIN" || user.role?.code === "SUPER_ADMIN"
   const departmentOptions = (departments ?? []).map((d) => ({ value: d.id, label: d.name }))
   const jobTitleOptions = (jobTitles ?? []).map((j) => ({ value: j.id, label: j.name }))
+  const countryOptions = COUNTRIES.map((c) => ({ value: c, label: c }))
 
   const initials = getUserInitials(user)
   const avatarUrl = resolveUploadUrl(user.avatar ?? user.profile?.profilePhoto)
@@ -528,6 +530,10 @@ export function ConfigurationPage() {
                     label="Pays"
                     fieldKey="country"
                     value={profile?.country}
+                    type="select"
+                    options={countryOptions}
+                    searchable
+                    placeholder="Rechercher un pays…"
                     {...fieldProps}
                   />
                   <EditableInfoRow
