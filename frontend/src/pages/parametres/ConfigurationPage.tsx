@@ -347,20 +347,20 @@ export function ConfigurationPage() {
                   </div>
                   <Badge variant="secondary" className="shrink-0 gap-1.5 text-xs font-medium">
                     <Shield className="size-3" />
-                    {user.role}
+                    {user.role?.name ?? "Aucun rôle"}
                   </Badge>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-4">
                   {profile?.jobTitle && (
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground/60">
                       <Briefcase className="size-3.5" />
-                      <span>{profile.jobTitle}</span>
+                      <span>{profile.jobTitle.name}</span>
                     </div>
                   )}
                   {profile?.department && (
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground/60">
                       <Building2 className="size-3.5" />
-                      <span>{profile.department}</span>
+                      <span>{profile.department.name}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground/60">
@@ -469,14 +469,14 @@ export function ConfigurationPage() {
                     icon={Briefcase}
                     label="Poste / Fonction"
                     fieldKey="jobTitle"
-                    value={profile?.jobTitle}
+                    value={profile?.jobTitle?.name ?? null}
                     {...fieldProps}
                   />
                   <EditableInfoRow
                     icon={Building2}
                     label="Département"
                     fieldKey="department"
-                    value={profile?.department ?? user.department}
+                    value={profile?.department?.name ?? null}
                     {...fieldProps}
                   />
                 </div>
@@ -528,7 +528,7 @@ export function ConfigurationPage() {
                     icon={Shield}
                     label="Rôle"
                     fieldKey="role"
-                    value={user.role}
+                    value={user.role?.name ?? null}
                     editable={false}
                     disabledReason="Le rôle est géré par l'administration"
                     {...fieldProps}
