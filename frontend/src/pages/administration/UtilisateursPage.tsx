@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Edit, Eye, Mail, MapPin, Phone, Plus, Shield, Trash2, User } from "lucide-react"
+import { AlertTriangle, Edit, Eye, Mail, MapPin, Phone, Plus, Shield, Trash2, User } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 
 import { DataTable } from "@/components/ui/data-table"
@@ -15,7 +15,9 @@ import {
   ModalRoot,
   ModalTitle,
 } from "@/components/ui/modal"
-import { useUsersQuery } from "@/hooks/use-users"
+import { toast } from "@/components/ui/toast"
+import { useDeleteUserMutation, useUsersQuery } from "@/hooks/use-users"
+import { ApiError } from "@/lib/api"
 import type { User as UserType } from "@/types/auth"
 
 const roleColors: Record<string, string> = {
@@ -50,7 +52,20 @@ function formatDate(dateStr: string | undefined) {
 export function UtilisateursPage() {
   const navigate = useNavigate()
   const { data: users, isLoading } = useUsersQuery()
+  const deleteUser = useDeleteUserMutation()
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null)
+  const [userToDelete, setUserToDelete] = useState<UserType | null>(null)
+
+  async function handleConfirmDelete() {
+    if (!userToDelete) return
+    try {
+      await deleteUser.mutateAsync(userToDelete.id)
+      toast.success("Utilisateur supprimé avec succès")
+      setUserToDelete(null)
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Une erreur est survenue.")
+    }
+  }
 
   const columns: ColumnDef<UserType>[] = useMemo(
     () => [
@@ -152,7 +167,13 @@ export function UtilisateursPage() {
             <Button variant="ghost" size="icon" className="size-8 text-muted-foreground/60 hover:text-foreground">
               <Edit className="size-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="size-8 text-muted-foreground/60 hover:text-destructive">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setUserToDelete(row)}
+              className="size-8 text-muted-foreground/60 hover:text-destructive"
+              title="Supprimer l'utilisateur"
+            >
               <Trash2 className="size-4" />
             </Button>
           </div>
@@ -271,6 +292,63 @@ export function UtilisateursPage() {
               </div>
             </div>
           </div>
+        </ModalPopup>
+      </ModalRoot>
+
+      <ModalRoot open={!!userToDelete} onOpenChange={(open) => { if (!open) setUserToDelete(null) }}>
+        <ModalPopup>
+          <ModalClose />
+          <ModalHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-destructive/10 text-destructive ring-1 ring-destructive/20">
+                <AlertTriangle className="size-5" />
+              </div>
+              <div>
+                <ModalTitle>Supprimer l'utilisateur</ModalTitle>
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  {userToDelete?.name} · {userToDelete?.email}
+                </p>
+              </div>
+            </div>
+          </ModalHeader>
+          <ModalContent>
+            <p className="text-sm text-foreground/80">
+              Cette action est <span className="font-semibold text-destructive">irréversible</span>. Le compte,
+              le profil et le matricule ({userToDelete?.profile?.employeeCode ?? "—"}) seront définitivement supprimés.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              La suppression sera refusée si l'utilisateur possède des opérations de stock liées
+              (entrées, sorties, inventaires) — dans ce cas, privilégiez la désactivation du compte.
+            </p>
+          </ModalContent>
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={deleteUser.isPending}
+              onClick={() => setUserToDelete(null)}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteUser.isPending}
+              onClick={handleConfirmDelete}
+            >
+              {deleteUser.isPending ? (
+                <span className="flex items-center gap-2">
+                  <span className="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Suppression…
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Trash2 className="size-4" />
+                  Supprimer définitivement
+                </span>
+              )}
+            </Button>
+          </ModalFooter>
         </ModalPopup>
       </ModalRoot>
     </div>

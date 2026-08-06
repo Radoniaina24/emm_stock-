@@ -13,5 +13,9 @@ export declare class UsersController {
     findOne(id: string): Promise<import("./user.mapper.js").AuthUserDto>;
     updateProfile(userId: string, dto: UpdateProfileDto): Promise<import("./user.mapper.js").AuthUserDto>;
     uploadAvatar(userId: string, file: Express.Multer.File): Promise<import("./user.mapper.js").AuthUserDto>;
+    remove(id: string, currentUserId: string): Promise<{
+        success: boolean;
+        id: string;
+    }>;
     deleteAvatar(userId: string): Promise<import("./user.mapper.js").AuthUserDto>;
 }

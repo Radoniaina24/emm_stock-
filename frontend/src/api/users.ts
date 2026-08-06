@@ -41,3 +41,9 @@ export function deleteAvatar() {
     method: "DELETE",
   })
 }
+
+export function deleteUser(id: string) {
+  return api<{ success: boolean; id: string }>(`/users/${id}`, {
+    method: "DELETE",
+  })
+}

@@ -124,9 +124,6 @@ let UsersService = class UsersService {
         });
         return (0, user_mapper_js_1.toAuthUserDto)(user);
     }
-    async nextEmployeeCode() {
-        return { employeeCode: await (0, employee_code_js_1.generateEmployeeCode)(this.prisma) };
-    }
     async findAll() {
         const users = await this.prisma.user.findMany({
             select: user_mapper_js_1.userWithProfileSelect,
@@ -142,6 +139,44 @@ let UsersService = class UsersService {
         if (!user)
             throw new common_1.NotFoundException('Utilisateur introuvable');
         return (0, user_mapper_js_1.toAuthUserDto)(user);
+    }
+    async nextEmployeeCode() {
+        return { employeeCode: await (0, employee_code_js_1.generateEmployeeCode)(this.prisma) };
+    }
+    async remove(id, currentUserId) {
+        if (id === currentUserId) {
+            throw new common_1.BadRequestException('Vous ne pouvez pas supprimer votre propre compte');
+        }
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+            include: {
+                profile: { select: { profilePhoto: true } },
+                role: { select: { code: true, isSystem: true } },
+            },
+        });
+        if (!user)
+            throw new common_1.NotFoundException('Utilisateur introuvable');
+        if (user.role?.code === 'SUPER_ADMIN') {
+            throw new common_1.BadRequestException('Impossible de supprimer un super administrateur');
+        }
+        const [{ _count: entries }, { _count: exits }, { _count: inventories }] = await Promise.all([
+            this.prisma.entry.count({ where: { userId: id } }),
+            this.prisma.exit.count({ where: { userId: id } }),
+            this.prisma.inventory.count({ where: { userId: id } }),
+        ]);
+        if (entries > 0 || exits > 0 || inventories > 0) {
+            const details = [
+                entries > 0 ? `${entries} entrée(s)` : null,
+                exits > 0 ? `${exits} sortie(s)` : null,
+                inventories > 0 ? `${inventories} inventaire(s)` : null,
+            ]
+                .filter(Boolean)
+                .join(', ');
+            throw new common_1.ConflictException(`Impossible de supprimer cet utilisateur : il possède des opérations de stock liées (${details}). Désactivez-le plutôt.`);
+        }
+        this.removeAvatarFile(user.profile?.profilePhoto);
+        await this.prisma.user.delete({ where: { id } });
+        return { success: true, id };
     }
     async getMe(userId) {
         const user = await this.prisma.user.findUnique({

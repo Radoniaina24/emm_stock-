@@ -91,10 +91,6 @@ export class UsersService {
     return toAuthUserDto(user);
   }
 
-  async nextEmployeeCode() {
-    return { employeeCode: await generateEmployeeCode(this.prisma) };
-  }
-
   async findAll() {
     const users = await this.prisma.user.findMany({
       select: userWithProfileSelect,
@@ -110,6 +106,53 @@ export class UsersService {
     });
     if (!user) throw new NotFoundException('Utilisateur introuvable');
     return toAuthUserDto(user);
+  }
+
+  async nextEmployeeCode() {
+    return { employeeCode: await generateEmployeeCode(this.prisma) };
+  }
+
+  async remove(id: string, currentUserId: string) {
+    if (id === currentUserId) {
+      throw new BadRequestException('Vous ne pouvez pas supprimer votre propre compte');
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        profile: { select: { profilePhoto: true } },
+        role: { select: { code: true, isSystem: true } },
+      },
+    });
+    if (!user) throw new NotFoundException('Utilisateur introuvable');
+
+    if (user.role?.code === 'SUPER_ADMIN') {
+      throw new BadRequestException('Impossible de supprimer un super administrateur');
+    }
+
+    const [{ _count: entries }, { _count: exits }, { _count: inventories }] = await Promise.all([
+      this.prisma.entry.count({ where: { userId: id } }),
+      this.prisma.exit.count({ where: { userId: id } }),
+      this.prisma.inventory.count({ where: { userId: id } }),
+    ]);
+
+    if (entries > 0 || exits > 0 || inventories > 0) {
+      const details = [
+        entries > 0 ? `${entries} entrée(s)` : null,
+        exits > 0 ? `${exits} sortie(s)` : null,
+        inventories > 0 ? `${inventories} inventaire(s)` : null,
+      ]
+        .filter(Boolean)
+        .join(', ');
+      throw new ConflictException(
+        `Impossible de supprimer cet utilisateur : il possède des opérations de stock liées (${details}). Désactivez-le plutôt.`,
+      );
+    }
+
+    this.removeAvatarFile(user.profile?.profilePhoto);
+    await this.prisma.user.delete({ where: { id } });
+
+    return { success: true, id };
   }
 
   async getMe(userId: string) {

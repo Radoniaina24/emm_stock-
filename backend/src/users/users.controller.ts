@@ -114,6 +114,14 @@ export class UsersController {
     return this.users.uploadAvatar(userId, file);
   }
 
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Supprimer un utilisateur' })
+  @ApiOkResponse({ description: 'Utilisateur supprimé' })
+  remove(@Param('id') id: string, @CurrentUser('id') currentUserId: string) {
+    return this.users.remove(id, currentUserId);
+  }
+
   @Delete('me/avatar')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Supprimer la photo de profil' })
