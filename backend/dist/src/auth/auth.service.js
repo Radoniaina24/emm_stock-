@@ -47,6 +47,7 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcrypt"));
 const prisma_service_js_1 = require("../prisma/prisma.service.js");
+const employee_code_js_1 = require("../users/employee-code.js");
 const user_mapper_js_1 = require("../users/user.mapper.js");
 let AuthService = class AuthService {
     prisma;
@@ -63,7 +64,7 @@ let AuthService = class AuthService {
             throw new common_1.ConflictException('Email already in use');
         const hashed = await bcrypt.hash(dto.password, 10);
         const names = (0, user_mapper_js_1.splitDisplayName)(dto.name);
-        const employeeCode = `EMP-${Date.now().toString(36).slice(-6).toUpperCase()}`;
+        const employeeCode = await (0, employee_code_js_1.generateEmployeeCode)(this.prisma);
         const username = dto.email.split('@')[0];
         const defaultRole = await this.prisma.role.findFirst({ where: { code: 'VIEWER' } });
         const user = await this.prisma.user.create({

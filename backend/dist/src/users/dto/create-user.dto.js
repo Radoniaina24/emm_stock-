@@ -71,9 +71,9 @@ __decorate([
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "password", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'EMP001' }),
+    (0, swagger_1.ApiProperty)({ example: 'EMP-2026-0001', description: 'Généré automatiquement si non fourni' }),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.MaxLength)(30),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "employeeCode", void 0);

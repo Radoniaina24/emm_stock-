@@ -3,6 +3,14 @@ import * as usersApi from "@/api/users"
 
 export const usersKeys = {
   list: ["users", "list"] as const,
+  nextEmployeeCode: ["users", "next-employee-code"] as const,
+}
+
+export function useNextEmployeeCodeQuery() {
+  return useQuery({
+    queryKey: usersKeys.nextEmployeeCode,
+    queryFn: () => usersApi.getNextEmployeeCode(),
+  })
 }
 
 export function useUsersQuery() {

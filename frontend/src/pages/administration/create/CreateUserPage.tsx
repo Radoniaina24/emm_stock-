@@ -1,4 +1,4 @@
-import { useCallback, useState, type FormEvent } from "react"
+import { useCallback, useEffect, useState, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
 import { ArrowLeft, Loader2, Save, UserPlus } from "lucide-react"
 import { z } from "zod"
@@ -6,7 +6,7 @@ import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/toast"
 import { ApiError } from "@/lib/api"
-import { useCreateUserMutation } from "@/hooks/use-users"
+import { useCreateUserMutation, useNextEmployeeCodeQuery } from "@/hooks/use-users"
 import { PersonalInformationCard } from "./PersonalInformationCard"
 import { AccountInformationCard } from "./AccountInformationCard"
 import { ProfessionalInformationCard } from "./ProfessionalInformationCard"
@@ -58,10 +58,17 @@ const initialForm: UserFormData = {
 export function CreateUserPage() {
   const navigate = useNavigate()
   const createUser = useCreateUserMutation()
+  const { data: nextCode, isFetching: isNextCodeLoading } = useNextEmployeeCodeQuery()
   const [form, setForm] = useState<UserFormData>(initialForm)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [dirty, setDirty] = useState(false)
+
+  useEffect(() => {
+    if (nextCode?.employeeCode && !form.employeeCode) {
+      setForm((prev) => ({ ...prev, employeeCode: nextCode!.employeeCode }))
+    }
+  }, [nextCode, form.employeeCode])
 
   const set = useCallback(<K extends keyof UserFormData>(key: K, value: UserFormData[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -152,6 +159,8 @@ export function CreateUserPage() {
 
         <ProfessionalInformationCard
           employeeCode={form.employeeCode}
+          employeeCodeAuto
+          employeeCodeLoading={isNextCodeLoading}
           roleId={form.roleId}
           departmentId={form.departmentId}
           jobTitleId={form.jobTitleId}

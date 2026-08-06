@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { generateEmployeeCode } from './employee-code.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import {
@@ -34,10 +35,21 @@ export class UsersService {
     });
     if (existingUsername) throw new ConflictException('Ce nom d\'utilisateur est déjà utilisé');
 
-    const existingCode = await this.prisma.userProfile.findUnique({
-      where: { employeeCode: dto.employeeCode },
-    });
-    if (existingCode) throw new ConflictException('Ce matricule est déjà utilisé');
+    let employeeCode = dto.employeeCode?.trim() ?? '';
+    if (employeeCode) {
+      const existingCode = await this.prisma.userProfile.findUnique({
+        where: { employeeCode },
+      });
+      if (existingCode) throw new ConflictException('Ce matricule est déjà utilisé');
+    } else {
+      for (let attempt = 0; attempt < 10; attempt++) {
+        employeeCode = await generateEmployeeCode(this.prisma);
+        const taken = await this.prisma.userProfile.findUnique({
+          where: { employeeCode },
+        });
+        if (!taken) break;
+      }
+    }
 
     const role = await this.prisma.role.findUnique({ where: { id: dto.roleId } });
     if (!role) throw new BadRequestException('Rôle introuvable');
@@ -63,7 +75,7 @@ export class UsersService {
         roleId: dto.roleId,
         profile: {
           create: {
-            employeeCode: dto.employeeCode,
+            employeeCode,
             firstName: dto.firstName,
             lastName: dto.lastName,
             displayName: `${dto.firstName} ${dto.lastName}`,
@@ -77,6 +89,10 @@ export class UsersService {
     });
 
     return toAuthUserDto(user);
+  }
+
+  async nextEmployeeCode() {
+    return { employeeCode: await generateEmployeeCode(this.prisma) };
   }
 
   async findAll() {

@@ -50,11 +50,11 @@ export class CreateUserDto {
   })
   password: string;
 
-  @ApiProperty({ example: 'EMP001' })
+  @ApiProperty({ example: 'EMP-2026-0001', description: 'Généré automatiquement si non fourni' })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MaxLength(30)
-  employeeCode: string;
+  employeeCode?: string;
 
   @ApiProperty({ example: 'role-id' })
   @IsString()
