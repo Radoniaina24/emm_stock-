@@ -1,20 +1,12 @@
 import { useMemo, useState, type FormEvent } from "react"
-import { Edit, Eye, Plus, Shield, Trash2, FilterX } from "lucide-react"
+import { Edit, Eye, Plus, Shield, Trash2 } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { z } from "zod"
 
-import { cn } from "@/lib/utils"
 import { DataTable } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  SelectItem,
-  SelectList,
-  SelectPopup,
-  SelectRoot,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { SearchableSelect } from "@/components/ui/searchable-select"
 import {
   ModalClose,
   ModalContent,
@@ -357,46 +349,26 @@ export function PermissionsPage() {
         data={filteredPermissions}
         filters={
           <div className="flex items-center gap-2">
-            <SelectRoot value={moduleFilter ?? ""} onValueChange={(value) => setModuleFilter(value || null)}>
-              <SelectTrigger className="w-48 bg-background h-9">
-                <SelectValue placeholder="Filtrer par module…" />
-              </SelectTrigger>
-              <SelectPopup searchable searchPlaceholder="Rechercher un module…">
-                <SelectList>
-                  <SelectItem value="">
-                    <span className="flex items-center gap-2 text-muted-foreground">
-                      <FilterX className="size-3.5" />
-                      Tous les modules
-                    </span>
-                  </SelectItem>
-                  {modules.map((module) => (
-                    <SelectItem key={module} value={module}>
-                      {module}
-                    </SelectItem>
-                  ))}
-                </SelectList>
-              </SelectPopup>
-            </SelectRoot>
-            <SelectRoot value={actionFilter ?? ""} onValueChange={(value) => setActionFilter(value || null)}>
-              <SelectTrigger className="w-48 bg-background h-9">
-                <SelectValue placeholder="Filtrer par action…" />
-              </SelectTrigger>
-              <SelectPopup searchable searchPlaceholder="Rechercher une action…">
-                <SelectList>
-                  <SelectItem value="">
-                    <span className="flex items-center gap-2 text-muted-foreground">
-                      <FilterX className="size-3.5" />
-                      Toutes les actions
-                    </span>
-                  </SelectItem>
-                  {actions.map((action) => (
-                    <SelectItem key={action} value={action}>
-                      {action}
-                    </SelectItem>
-                  ))}
-                </SelectList>
-              </SelectPopup>
-            </SelectRoot>
+            <SearchableSelect
+              value={moduleFilter ?? ""}
+              placeholder="Filtrer par module…"
+              options={[
+                { value: "", label: "Tous les modules" },
+                ...modules.map((module) => ({ value: module, label: module })),
+              ]}
+              onSelect={(value) => setModuleFilter(value || null)}
+              triggerClassName="w-48 bg-background"
+            />
+            <SearchableSelect
+              value={actionFilter ?? ""}
+              placeholder="Filtrer par action…"
+              options={[
+                { value: "", label: "Toutes les actions" },
+                ...actions.map((action) => ({ value: action, label: action })),
+              ]}
+              onSelect={(value) => setActionFilter(value || null)}
+              triggerClassName="w-48 bg-background"
+            />
           </div>
         }
         searchKey="code"
