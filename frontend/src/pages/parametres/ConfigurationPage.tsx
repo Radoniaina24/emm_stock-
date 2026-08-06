@@ -455,7 +455,7 @@ export function ConfigurationPage() {
                     label="Sexe"
                     fieldKey="gender"
                     value={profile?.gender}
-                    type="select"
+                    type="combobox"
                     options={GENDER_OPTIONS}
                     placeholder="Sélectionner le sexe"
                     {...fieldProps}
