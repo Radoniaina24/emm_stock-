@@ -164,10 +164,10 @@ export function ProfilePage() {
               <div className="mt-1 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
                 <Badge className="gap-1.5 bg-violet-100 text-violet-700 hover:bg-violet-200 dark:bg-violet-900/30 dark:text-violet-300">
                   <Shield className="size-3" />
-                  {user.role}
+                  {user.role?.name ?? "Aucun rôle"}
                 </Badge>
                 {profile?.jobTitle ? (
-                  <span className="text-sm text-muted-foreground">{profile.jobTitle}</span>
+                  <span className="text-sm text-muted-foreground">{profile.jobTitle.name}</span>
                 ) : null}
                 <span className="text-sm text-muted-foreground">{user.email}</span>
               </div>
@@ -275,14 +275,14 @@ export function ProfilePage() {
               icon={Briefcase}
               label="Poste / Fonction"
               fieldKey="jobTitle"
-              value={profile?.jobTitle}
+              value={profile?.jobTitle?.name ?? null}
               {...fieldProps}
             />
             <EditableInfoRow
               icon={Building2}
               label="Département"
               fieldKey="department"
-              value={profile?.department ?? user.department}
+              value={profile?.department?.name ?? null}
               {...fieldProps}
             />
             <EditableInfoRow
@@ -353,7 +353,7 @@ export function ProfilePage() {
                 icon={Shield}
                 label="Rôle"
                 fieldKey="role"
-                value={user.role}
+                value={user.role?.name ?? null}
                 editable={false}
                 disabledReason="Le rôle est géré par l'administration"
                 {...fieldProps}
