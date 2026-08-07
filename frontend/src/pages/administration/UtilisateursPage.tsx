@@ -22,6 +22,7 @@ import { DataTable } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { UserAvatar } from "@/components/avatar/UserAvatar"
+import { SearchableSelect } from "@/components/ui/searchable-select"
 import {
   ModalClose,
   ModalContent,
@@ -33,6 +34,7 @@ import {
 } from "@/components/ui/modal"
 import { toast } from "@/components/ui/toast"
 import { useDeleteUserMutation, useUsersQuery } from "@/hooks/use-users"
+import { useRolesQuery } from "@/hooks/use-roles"
 import { ApiError } from "@/lib/api"
 import { getUserDisplayName, type User as UserType } from "@/types/auth"
 
@@ -116,9 +118,17 @@ function formatDate(dateStr: string | undefined) {
 export function UtilisateursPage() {
   const navigate = useNavigate()
   const { data: users, isLoading } = useUsersQuery()
+  const { data: roles } = useRolesQuery()
   const deleteUser = useDeleteUserMutation()
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null)
   const [userToDelete, setUserToDelete] = useState<UserType | null>(null)
+  const [roleFilter, setRoleFilter] = useState<string | null>(null)
+
+  const filteredUsers = useMemo(() => {
+    if (!users) return []
+    if (!roleFilter) return users
+    return users.filter((user) => user.role?.id === roleFilter)
+  }, [users, roleFilter])
 
   async function handleConfirmDelete() {
     if (!userToDelete) return
@@ -225,7 +235,7 @@ export function UtilisateursPage() {
 
       <DataTable
         columns={columns}
-        data={users ?? []}
+        data={filteredUsers}
         searchAccessor={(user) =>
           [user.name, user.email, user.profile?.employeeCode, user.role?.name]
             .filter(Boolean)
@@ -235,6 +245,23 @@ export function UtilisateursPage() {
         loading={isLoading}
         exportFilename="utilisateurs.csv"
         emptyMessage="Aucun utilisateur trouvé."
+        filters={
+          <div className="flex items-center gap-2">
+            <SearchableSelect
+              value={roleFilter ?? ""}
+              placeholder="Filtrer par rôle…"
+              options={[
+                { value: "", label: "Tous les rôles" },
+                ...(roles ?? []).map((role) => ({
+                  value: role.id,
+                  label: role.name,
+                })),
+              ]}
+              onSelect={(value) => setRoleFilter(value || null)}
+              triggerClassName="w-48 bg-background"
+            />
+          </div>
+        }
         renderActions={(row) => (
           <div className="flex items-center justify-end gap-0.5">
             <Button
