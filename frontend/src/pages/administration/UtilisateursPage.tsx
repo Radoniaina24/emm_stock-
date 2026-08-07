@@ -1,11 +1,27 @@
 import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { AlertTriangle, Edit, Eye, Mail, MapPin, Phone, Plus, Shield, Trash2, User } from "lucide-react"
+import {
+  AlertTriangle,
+  Briefcase,
+  Building2,
+  CalendarDays,
+  Eye,
+  Fingerprint,
+  Mail,
+  MapPin,
+  Phone,
+  Plus,
+  Shield,
+  Trash2,
+  UserRound,
+  Users,
+} from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 
 import { DataTable } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { UserAvatar } from "@/components/avatar/UserAvatar"
 import {
   ModalClose,
   ModalContent,
@@ -18,15 +34,63 @@ import {
 import { toast } from "@/components/ui/toast"
 import { useDeleteUserMutation, useUsersQuery } from "@/hooks/use-users"
 import { ApiError } from "@/lib/api"
-import type { User as UserType } from "@/types/auth"
+import { getUserDisplayName, type User as UserType } from "@/types/auth"
 
 const roleColors: Record<string, string> = {
-  Admin: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-  Gestionnaire: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  Employé: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  SUPER_ADMIN: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+  ADMIN: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400",
+  STOCK_MANAGER: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
+  STOREKEEPER: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  PURCHASE_MANAGER: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  SALES_MANAGER: "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/30 dark:text-fuchsia-400",
+  SALES_AGENT: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+  ACCOUNTANT: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400",
+  AUDITOR: "bg-muted text-muted-foreground",
+  VIEWER: "bg-muted text-muted-foreground",
 }
 
-function InfoRow({ label, value, icon: Icon }: { label: string; value: string | null | undefined; icon: typeof Shield }) {
+const statusConfig: Record<string, { label: string; dot: string; text: string }> = {
+  ACTIVE: {
+    label: "Actif",
+    dot: "bg-emerald-500",
+    text: "text-emerald-600 dark:text-emerald-400",
+  },
+  INACTIVE: {
+    label: "Inactif",
+    dot: "bg-muted-foreground/40",
+    text: "text-muted-foreground/60",
+  },
+  SUSPENDED: {
+    label: "Suspendu",
+    dot: "bg-amber-500",
+    text: "text-amber-600 dark:text-amber-400",
+  },
+  LOCKED: {
+    label: "Verrouillé",
+    dot: "bg-destructive",
+    text: "text-destructive",
+  },
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const { label, dot, text } = statusConfig[status] ?? statusConfig.ACTIVE
+  return (
+    <div className="flex items-center gap-2">
+      <span className={`inline-block size-2 rounded-full ${dot}`} />
+      <span className={`text-xs font-medium ${text}`}>{label}</span>
+    </div>
+  )
+}
+
+function InfoRow({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string
+  value: string | null | undefined
+  icon: typeof Shield
+}) {
   return (
     <div className="flex items-center gap-2.5 rounded-lg border border-border/20 bg-muted/10 px-3 py-2.5 transition-all hover:border-border/40 hover:bg-muted/20">
       <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-background text-muted-foreground/50 shadow-sm ring-1 ring-border/20">
@@ -34,7 +98,7 @@ function InfoRow({ label, value, icon: Icon }: { label: string; value: string | 
       </div>
       <div className="min-w-0">
         <p className="text-[10px] font-medium text-muted-foreground/50">{label}</p>
-        <p className="mt-px text-sm font-medium text-foreground truncate">{value ?? "—"}</p>
+        <p className="mt-px truncate text-sm font-medium text-foreground">{value ?? "—"}</p>
       </div>
     </div>
   )
@@ -76,14 +140,30 @@ export function UtilisateursPage() {
           const user = row.original
           return (
             <div className="flex items-center gap-3">
-              <div className="flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-[10px] font-semibold text-white ring-1 ring-border/60">
-                {user.name.charAt(0).toUpperCase()}
+              <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-[10px] font-semibold text-white ring-1 ring-border/60">
+                <UserAvatar user={user} textClassName="text-[10px] font-semibold text-white" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-foreground">{user.name}</p>
-                <p className="text-xs text-muted-foreground/70">{user.email}</p>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">
+                  {getUserDisplayName(user)}
+                </p>
+                <p className="truncate text-xs text-muted-foreground/70">{user.email}</p>
               </div>
             </div>
+          )
+        },
+      },
+      {
+        accessorKey: "profile.employeeCode",
+        header: "Matricule",
+        cell: ({ row }) => {
+          const employeeCode = row.original.profile?.employeeCode
+          return employeeCode ? (
+            <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground/70">
+              {employeeCode}
+            </code>
+          ) : (
+            <span className="text-muted-foreground/40">—</span>
           )
         },
       },
@@ -96,7 +176,7 @@ export function UtilisateursPage() {
           return (
             <Badge
               variant="secondary"
-              className={`gap-1.5 text-xs font-medium ${roleColors[name] ?? ""}`}
+              className={`gap-1.5 text-xs font-medium ${role ? (roleColors[role.code] ?? "") : ""}`}
             >
               <Shield className="size-3" />
               {name}
@@ -107,38 +187,36 @@ export function UtilisateursPage() {
       {
         id: "status",
         header: "Statut",
-        cell: () => (
-          <div className="flex items-center gap-2">
-            <span className="inline-block size-2 rounded-full bg-emerald-500" />
-            <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Actif</span>
-          </div>
-        ),
+        cell: ({ row }) => <StatusBadge status={row.original.status} />,
       },
       {
-        accessorKey: "id",
-        header: "ID",
+        accessorKey: "createdAt",
+        header: "Membre depuis",
         cell: ({ row }) => (
-          <code className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-mono text-muted-foreground/70">
-            {row.getValue("id")}
-          </code>
+          <span className="text-xs text-muted-foreground/70">
+            {formatDate(row.original.createdAt as string | undefined)}
+          </span>
         ),
       },
-
     ],
     [],
   )
 
   return (
     <div className="w-full space-y-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">Utilisateurs</h1>
-        <p className="text-sm text-muted-foreground">
-          Gérez les utilisateurs de la plateforme, leurs rôles et leurs accès.
-        </p>
-      </div>
-
-      <div className="flex items-center justify-between gap-4">
-        <div />
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-foreground">
+            Utilisateurs
+            <Badge variant="secondary" className="gap-1 text-xs font-medium">
+              <Users className="size-3" />
+              {users?.length ?? 0}
+            </Badge>
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Gérez les utilisateurs de la plateforme, leurs rôles et leurs accès.
+          </p>
+        </div>
         <Button onClick={() => navigate("/dashboard/administration/utilisateurs/creer")}>
           <Plus className="size-4" />
           Ajouter un utilisateur
@@ -148,12 +226,15 @@ export function UtilisateursPage() {
       <DataTable
         columns={columns}
         data={users ?? []}
-        searchKey="name"
-        searchPlaceholder="Rechercher un utilisateur..."
+        searchAccessor={(user) =>
+          [user.name, user.email, user.profile?.employeeCode, user.role?.name]
+            .filter(Boolean)
+            .join(" ")
+        }
+        searchPlaceholder="Rechercher par nom, email, matricule ou rôle..."
         loading={isLoading}
         exportFilename="utilisateurs.csv"
         emptyMessage="Aucun utilisateur trouvé."
-        enableSelection
         renderActions={(row) => (
           <div className="flex items-center justify-end gap-0.5">
             <Button
@@ -161,11 +242,9 @@ export function UtilisateursPage() {
               size="icon"
               onClick={() => setSelectedUser(row)}
               className="size-8 text-muted-foreground/60 hover:text-foreground"
+              title="Voir le détail"
             >
               <Eye className="size-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="size-8 text-muted-foreground/60 hover:text-foreground">
-              <Edit className="size-4" />
             </Button>
             <Button
               variant="ghost"
@@ -180,8 +259,6 @@ export function UtilisateursPage() {
         )}
       />
 
-
-
       <ModalRoot open={!!selectedUser} onOpenChange={(open) => { if (!open) setSelectedUser(null) }}>
         <ModalPopup size="full" className="overflow-hidden p-0 sm:mx-4 sm:max-w-3xl lg:max-w-4xl">
           <ModalClose className="rounded-full bg-red-500/15 text-red-500 hover:bg-red-500/25 hover:text-red-600" />
@@ -190,14 +267,22 @@ export function UtilisateursPage() {
               <div className="absolute -right-8 -top-8 size-32 rounded-full bg-white/5" />
               <div className="absolute -bottom-10 -left-10 size-40 rounded-full bg-white/5" />
               <div className="flex flex-col items-center gap-3 sm:gap-4">
-                <div className="flex size-14 items-center justify-center rounded-full bg-gradient-to-br from-white/30 to-white/10 p-1 shadow-2xl ring-2 ring-white/20 sm:size-16 md:size-20">
-                  <div className="flex size-full items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-lg font-bold text-white sm:text-xl md:text-2xl">
-                    {selectedUser?.name?.charAt(0).toUpperCase() ?? "?"}
+                <div className="flex size-14 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-white/30 to-white/10 p-1 shadow-2xl ring-2 ring-white/20 sm:size-16 md:size-20">
+                  <div className="relative flex size-full items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-lg font-bold text-white sm:text-xl md:text-2xl">
+                    <UserAvatar
+                      user={selectedUser ?? { name: "?", avatar: null }}
+                      textClassName="text-lg sm:text-xl md:text-2xl font-bold text-white"
+                      className="size-full object-cover"
+                    />
                   </div>
                 </div>
                 <div className="text-center">
-                  <p className="text-base font-bold text-white truncate max-w-36 sm:text-lg sm:max-w-44">{selectedUser?.name ?? "—"}</p>
-                  <p className="mt-0.5 text-xs text-white/70 truncate max-w-36 sm:text-sm sm:mt-1 sm:max-w-44">{selectedUser?.email}</p>
+                  <p className="max-w-36 truncate text-base font-bold text-white sm:max-w-44 sm:text-lg">
+                    {selectedUser ? getUserDisplayName(selectedUser) : "—"}
+                  </p>
+                  <p className="mt-0.5 max-w-36 truncate text-xs text-white/70 sm:mt-1 sm:max-w-44 sm:text-sm">
+                    {selectedUser?.email}
+                  </p>
                 </div>
                 {selectedUser?.role && (
                   <div className="flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-sm ring-1 ring-white/20 sm:px-3.5 sm:py-1.5 sm:text-xs">
@@ -207,8 +292,7 @@ export function UtilisateursPage() {
                 )}
               </div>
               <div className="flex items-center gap-2 text-[11px] text-white/50 sm:text-xs">
-                <span className="inline-block size-1.5 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50 sm:size-2" />
-                Actif
+                <StatusBadge status={selectedUser?.status ?? "ACTIVE"} />
               </div>
             </div>
 
@@ -217,17 +301,17 @@ export function UtilisateursPage() {
                 <div className="rounded-lg bg-muted/20 px-3.5 py-2.5">
                   <div className="flex items-center gap-2.5">
                     <div className="flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary">
-                      <Shield className="size-3.5" />
+                      <UserRound className="size-3.5" />
                     </div>
                     <p className="text-sm font-semibold text-foreground">Général</p>
                   </div>
                   <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
+                    <InfoRow label="Matricule" value={selectedUser?.profile?.employeeCode ?? null} icon={Fingerprint} />
                     <InfoRow label="Rôle" value={selectedUser?.role?.name ?? null} icon={Shield} />
-                    <InfoRow label="Département" value={selectedUser?.department} icon={Shield} />
-                    <InfoRow label="Poste" value={selectedUser?.profile?.jobTitle?.name ?? null} icon={Shield} />
+                    <InfoRow label="Département" value={selectedUser?.profile?.department?.name ?? null} icon={Building2} />
+                    <InfoRow label="Poste" value={selectedUser?.profile?.jobTitle?.name ?? null} icon={Briefcase} />
                     <InfoRow label="Entrepôt" value={selectedUser?.profile?.warehouse?.name ?? null} icon={MapPin} />
-                    <InfoRow label="Téléphone" value={selectedUser?.phone} icon={Phone} />
-                    <InfoRow label="Membre depuis" value={formatDate(selectedUser?.createdAt)} icon={Shield} />
+                    <InfoRow label="Membre depuis" value={formatDate(selectedUser?.createdAt)} icon={CalendarDays} />
                   </div>
                 </div>
 
@@ -236,16 +320,16 @@ export function UtilisateursPage() {
                     <div className="rounded-lg bg-muted/20 px-3.5 py-2.5">
                       <div className="flex items-center gap-2.5">
                         <div className="flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary">
-                          <Shield className="size-3.5" />
+                          <UserRound className="size-3.5" />
                         </div>
                         <p className="text-sm font-semibold text-foreground">Identité & Contact</p>
                       </div>
                       <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
-                        <InfoRow label="Prénom" value={selectedUser.profile.firstName} icon={Shield} />
-                        <InfoRow label="Nom" value={selectedUser.profile.lastName} icon={Shield} />
-                        <InfoRow label="Nom d'affichage" value={selectedUser.profile.displayName} icon={Shield} />
-                        <InfoRow label="Date de naissance" value={formatDate(selectedUser.profile.birthDate ?? undefined)} icon={Shield} />
-                        <InfoRow label="Sexe" value={selectedUser.profile.gender} icon={Shield} />
+                        <InfoRow label="Prénom" value={selectedUser.profile.firstName} icon={UserRound} />
+                        <InfoRow label="Nom" value={selectedUser.profile.lastName} icon={UserRound} />
+                        <InfoRow label="Nom d'affichage" value={selectedUser.profile.displayName} icon={UserRound} />
+                        <InfoRow label="Date de naissance" value={formatDate(selectedUser.profile.birthDate ?? undefined)} icon={CalendarDays} />
+                        <InfoRow label="Sexe" value={selectedUser.profile.gender} icon={UserRound} />
                         <InfoRow label="Email" value={selectedUser.email} icon={Mail} />
                         <InfoRow label="Téléphone" value={selectedUser.profile.phone} icon={Phone} />
                         <InfoRow label="Téléphone secondaire" value={selectedUser.profile.secondaryPhone} icon={Phone} />
@@ -271,14 +355,14 @@ export function UtilisateursPage() {
                     <div className="rounded-lg bg-muted/20 px-3.5 py-2.5">
                       <div className="flex items-center gap-2.5">
                         <div className="flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary">
-                          <Shield className="size-3.5" />
+                          <Briefcase className="size-3.5" />
                         </div>
                         <p className="text-sm font-semibold text-foreground">Professionnel</p>
                       </div>
                       <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
-                        <InfoRow label="Poste" value={selectedUser.profile.jobTitle?.name ?? null} icon={Shield} />
-                        <InfoRow label="Département" value={selectedUser.profile.department?.name ?? null} icon={Shield} />
-                        <InfoRow label="Signature" value={selectedUser.profile.signature} icon={Shield} />
+                        <InfoRow label="Poste" value={selectedUser.profile.jobTitle?.name ?? null} icon={Briefcase} />
+                        <InfoRow label="Département" value={selectedUser.profile.department?.name ?? null} icon={Building2} />
+                        <InfoRow label="Signature" value={selectedUser.profile.signature} icon={Fingerprint} />
                       </div>
                     </div>
                   </>
@@ -306,7 +390,7 @@ export function UtilisateursPage() {
               <div>
                 <ModalTitle>Supprimer l'utilisateur</ModalTitle>
                 <p className="mt-0.5 text-sm text-muted-foreground">
-                  {userToDelete?.name} · {userToDelete?.email}
+                  {userToDelete ? getUserDisplayName(userToDelete) : ""} · {userToDelete?.email}
                 </p>
               </div>
             </div>

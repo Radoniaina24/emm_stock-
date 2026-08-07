@@ -23,7 +23,6 @@ import {
   Columns3,
   Download,
   Search,
-  SlidersHorizontal,
   X,
 } from "lucide-react"
 import { Popover as BasePopover } from "@base-ui/react/popover"
@@ -114,6 +113,7 @@ function SortIndicator({ direction }: { direction: "asc" | "desc" | false }) {
 interface DataTableToolbarProps<TData> {
   table: TableType<TData>
   searchKey?: string
+  searchAccessor?: (row: TData) => string
   searchPlaceholder?: string
   enableColumnVisibility?: boolean
   enableFiltering?: boolean
@@ -123,28 +123,41 @@ interface DataTableToolbarProps<TData> {
 function DataTableToolbar<TData>({
   table,
   searchKey,
+  searchAccessor,
   searchPlaceholder,
   enableColumnVisibility,
   filters,
 }: DataTableToolbarProps<TData>) {
   const [open, setOpen] = React.useState(false)
 
+  const searchColumn = searchKey ? table.getColumn(searchKey) : undefined
+
+  const searchValue = searchAccessor
+    ? (table.getState().globalFilter as string) ?? ""
+    : (searchColumn?.getFilterValue() as string) ?? ""
+
+  function setSearchValue(value: string) {
+    if (searchAccessor) {
+      table.setGlobalFilter(value)
+      return
+    }
+    searchColumn?.setFilterValue(value)
+  }
+
   return (
     <div className="flex flex-wrap items-center gap-3 py-3">
-      {searchKey && (
+      {(searchKey || searchAccessor) && (
         <div className="relative flex-1 min-w-52 max-w-sm">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/60" />
           <input
             placeholder={searchPlaceholder ?? "Rechercher..."}
-            value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-            onChange={(e) =>
-              table.getColumn(searchKey)?.setFilterValue(e.target.value)
-            }
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
             className="h-9 w-full rounded-lg border border-border/60 bg-muted/30 pl-9 pr-8 text-sm outline-none placeholder:text-muted-foreground/50 transition-all hover:border-border focus:border-ring/80 focus:bg-background focus:shadow-[0_0_0_3px_rgba(59,130,246,0.08)]"
           />
-          {table.getColumn(searchKey)?.getFilterValue() && (
+          {searchValue && (
             <button
-              onClick={() => table.getColumn(searchKey)?.setFilterValue("")}
+              onClick={() => setSearchValue("")}
               className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground/60 transition-colors hover:text-foreground"
             >
               <X className="size-4" />
@@ -376,6 +389,8 @@ interface DataTableProps<TData> {
   columns: ColumnDef<TData>[]
   data: TData[]
   searchKey?: string
+  /** Recherche multi-champs : la requête est appliquée sur la chaîne retournée pour chaque ligne. */
+  searchAccessor?: (row: TData) => string
   searchPlaceholder?: string
   pageSize?: number
   pageSizes?: number[]
@@ -395,6 +410,7 @@ function DataTable<TData>({
   columns,
   data,
   searchKey,
+  searchAccessor,
   searchPlaceholder,
   pageSize = 15,
   pageSizes,
@@ -413,6 +429,7 @@ function DataTable<TData>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
+  const [globalFilter, setGlobalFilter] = React.useState("")
 
   const allColumns = React.useMemo(() => {
     const cols: ColumnDef<TData>[] = [...columns]
@@ -459,11 +476,20 @@ function DataTable<TData>({
       columnFilters,
       columnVisibility,
       rowSelection,
+      ...(searchAccessor ? { globalFilter } : {}),
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    onGlobalFilterChange: searchAccessor ? setGlobalFilter : undefined,
+    globalFilterFn: searchAccessor
+      ? (row, _columnId, filterValue) => {
+          const needle = String(filterValue ?? "").toLowerCase().trim()
+          if (!needle) return true
+          return searchAccessor(row.original).toLowerCase().includes(needle)
+        }
+      : undefined,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -508,6 +534,7 @@ function DataTable<TData>({
         <DataTableToolbar
           table={table}
           searchKey={searchKey}
+          searchAccessor={searchAccessor}
           searchPlaceholder={searchPlaceholder}
           enableColumnVisibility={enableColumnVisibility}
           filters={filters}
