@@ -12,9 +12,10 @@ import { JobTitlesModule } from './job-titles/job-titles.module.js';
 import { WarehousesModule } from './warehouses/warehouses.module.js';
 import { CategoriesModule } from './categories/categories.module.js';
 import { BrandsModule } from './brands/brands.module.js';
+import { UnitsOfMeasureModule } from './units-of-measure/units-of-measure.module.js';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, RolesModule, PermissionsModule, RolePermissionsModule, DepartmentsModule, JobTitlesModule, WarehousesModule, CategoriesModule, BrandsModule],
+  imports: [PrismaModule, AuthModule, UsersModule, RolesModule, PermissionsModule, RolePermissionsModule, DepartmentsModule, JobTitlesModule, WarehousesModule, CategoriesModule, BrandsModule, UnitsOfMeasureModule],
   controllers: [AppController],
   providers: [AppService],
 })

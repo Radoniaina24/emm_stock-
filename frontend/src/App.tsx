@@ -26,6 +26,7 @@ import { JobTitlesPage } from "@/pages/parametres/JobTitlesPage"
 import { WarehousesPage } from "@/pages/entrepots/WarehousesPage"
 import { CategoriesPage } from "@/pages/produits/CategoriesPage"
 import { BrandsPage } from "@/pages/produits/BrandsPage"
+import { UnitsOfMeasurePage } from "@/pages/produits/UnitsOfMeasurePage"
 import { UtilisateursPage } from "@/pages/administration/UtilisateursPage"
 import { CreateUserPage } from "@/pages/administration/create/CreateUserPage"
 import { EditUserPage } from "@/pages/administration/edit/EditUserPage"
@@ -55,7 +56,7 @@ function App() {
             <Route path="produits/categories" element={<CategoriesPage />} />
             <Route path="produits/marques" element={<BrandsPage />} />
             <Route path="produits/familles" element={<div className="text-muted-foreground">Familles de produits</div>} />
-            <Route path="produits/unites" element={<div className="text-muted-foreground">Unités de mesure</div>} />
+            <Route path="produits/unites" element={<UnitsOfMeasurePage />} />
             <Route path="produits/variantes" element={<div className="text-muted-foreground">Variantes produits</div>} />
             <Route path="produits/codes-barres" element={<div className="text-muted-foreground">Codes-barres</div>} />
             <Route path="produits/import" element={<div className="text-muted-foreground">Import produits</div>} />
