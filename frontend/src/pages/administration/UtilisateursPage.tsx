@@ -34,7 +34,7 @@ import {
   ModalTitle,
 } from "@/components/ui/modal"
 import { toast } from "@/components/ui/toast"
-import { useDeleteUserMutation, useUsersQuery } from "@/hooks/use-users"
+import { useDeleteUserMutation, useUpdateUserMutation, useUsersQuery } from "@/hooks/use-users"
 import { useRolesQuery } from "@/hooks/use-roles"
 import { ApiError } from "@/lib/api"
 import { getUserDisplayName, type User as UserType } from "@/types/auth"
@@ -75,12 +75,12 @@ const statusConfig: Record<string, { label: string; dot: string; text: string }>
   },
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const { label, dot, text } = statusConfig[status] ?? statusConfig.ACTIVE
+function StatusBadge({ status, label }: { status: string; label?: string }) {
+  const { label: configLabel, dot, text } = statusConfig[status] ?? statusConfig.ACTIVE
   return (
     <div className="flex items-center gap-2">
       <span className={`inline-block size-2 rounded-full ${dot}`} />
-      <span className={`text-xs font-medium ${text}`}>{label}</span>
+      <span className={`text-xs font-medium ${text}`}>{label ?? configLabel}</span>
     </div>
   )
 }
@@ -116,20 +116,87 @@ function formatDate(dateStr: string | undefined) {
   })
 }
 
+type InlineEditCellProps = {
+  value: string
+  options: { value: string; label: string }[]
+  onCommit: (value: string) => Promise<void>
+  renderBadge: (label: string) => React.ReactNode
+  successMessage: string
+}
+
+function InlineEditCell({ value, options, onCommit, renderBadge, successMessage }: InlineEditCellProps) {
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const currentLabel = options.find((o) => o.value === value)?.label ?? "—"
+
+  async function handleSelect(next: string) {
+    setEditing(false)
+    if (next === value) return
+    setSaving(true)
+    try {
+      await onCommit(next)
+      toast.success(successMessage)
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "La mise à jour a échoué.")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (editing) {
+    return (
+      <SearchableSelect
+        value={value}
+        placeholder="Sélectionner…"
+        options={options.filter((o) => o.value !== "")}
+        onSelect={handleSelect}
+        onOpenChange={(open) => {
+          if (!open) setEditing(false)
+        }}
+        triggerClassName="h-8 min-w-40 bg-background"
+      />
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      disabled={saving}
+      onClick={() => setEditing(true)}
+      title="Modifier directement"
+      className="group inline-flex max-w-full items-center gap-1.5 rounded-md px-1.5 py-0.5 -mx-1.5 transition-colors hover:bg-muted/60"
+    >
+      {saving ? (
+        <span className="inline-block size-3.5 animate-spin rounded-full border-2 border-current border-t-transparent opacity-50" />
+      ) : (
+        renderBadge(currentLabel)
+      )}
+      {!saving && (
+        <Pencil className="size-3 shrink-0 text-muted-foreground/0 transition-colors group-hover:text-muted-foreground/60" />
+      )}
+    </button>
+  )
+}
+
 export function UtilisateursPage() {
   const navigate = useNavigate()
   const { data: users, isLoading } = useUsersQuery()
   const { data: roles } = useRolesQuery()
   const deleteUser = useDeleteUserMutation()
+  const updateUser = useUpdateUserMutation()
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null)
   const [userToDelete, setUserToDelete] = useState<UserType | null>(null)
   const [roleFilter, setRoleFilter] = useState<string | null>(null)
+  const [statusFilter, setStatusFilter] = useState<string | null>(null)
 
   const filteredUsers = useMemo(() => {
     if (!users) return []
-    if (!roleFilter) return users
-    return users.filter((user) => user.role?.id === roleFilter)
-  }, [users, roleFilter])
+    return users.filter(
+      (user) =>
+        (!roleFilter || user.role?.id === roleFilter) &&
+        (!statusFilter || user.status === statusFilter),
+    )
+  }, [users, roleFilter, statusFilter])
 
   async function handleConfirmDelete() {
     if (!userToDelete) return
@@ -182,23 +249,49 @@ export function UtilisateursPage() {
         id: "role",
         header: "Rôle",
         cell: ({ row }) => {
-          const role = row.original.role
-          const name = role?.name ?? "—"
+          const user = row.original
+          const role = user.role
           return (
-            <Badge
-              variant="secondary"
-              className={`gap-1.5 text-xs font-medium ${role ? (roleColors[role.code] ?? "") : ""}`}
-            >
-              <Shield className="size-3" />
-              {name}
-            </Badge>
+            <InlineEditCell
+              value={role?.id ?? ""}
+              options={(roles ?? []).map((r) => ({ value: r.id, label: r.name }))}
+              onCommit={async (roleId) => {
+                await updateUser.mutateAsync({ id: user.id, payload: { roleId } })
+              }}
+              successMessage="Rôle mis à jour"
+              renderBadge={(label) => (
+                <Badge
+                  variant="secondary"
+                  className={`gap-1.5 text-xs font-medium ${role ? (roleColors[role.code] ?? "") : ""}`}
+                >
+                  <Shield className="size-3" />
+                  {label}
+                </Badge>
+              )}
+            />
           )
         },
       },
       {
         id: "status",
         header: "Statut",
-        cell: ({ row }) => <StatusBadge status={row.original.status} />,
+        cell: ({ row }) => {
+          const user = row.original
+          return (
+            <InlineEditCell
+              value={user.status}
+              options={Object.entries(statusConfig).map(([value, config]) => ({
+                value,
+                label: config.label,
+              }))}
+              onCommit={async (status) => {
+                await updateUser.mutateAsync({ id: user.id, payload: { status } })
+              }}
+              successMessage="Statut mis à jour"
+              renderBadge={(label) => <StatusBadge status={user.status} label={label} />}
+            />
+          )
+        },
       },
       {
         accessorKey: "createdAt",
@@ -210,7 +303,7 @@ export function UtilisateursPage() {
         ),
       },
     ],
-    [],
+    [roles, updateUser],
   )
 
   return (
@@ -260,6 +353,19 @@ export function UtilisateursPage() {
               ]}
               onSelect={(value) => setRoleFilter(value || null)}
               triggerClassName="w-48 bg-background"
+            />
+            <SearchableSelect
+              value={statusFilter ?? ""}
+              placeholder="Filtrer par statut…"
+              options={[
+                { value: "", label: "Tous les statuts" },
+                ...Object.entries(statusConfig).map(([value, config]) => ({
+                  value,
+                  label: config.label,
+                })),
+              ]}
+              onSelect={(value) => setStatusFilter(value || null)}
+              triggerClassName="w-52 bg-background"
             />
           </div>
         }
