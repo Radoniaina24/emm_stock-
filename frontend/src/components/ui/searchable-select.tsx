@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover"
-import { Check, ChevronDown, Search } from "lucide-react"
+import { Check, ChevronDown, FolderTree, Search } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
 export type SearchableSelectOption = {
   value: string
   label: string
+  /** Niveau d'indentation arborescent (0 = racine) */
+  depth?: number
+  /** Nombre de sous-éléments affiché en badge (hiérarchie) */
+  childrenCount?: number
 }
 
 type SearchableSelectProps = {
@@ -112,30 +116,55 @@ export function SearchableSelect({
             Aucun résultat
           </p>
         ) : (
-          filtered.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => {
-                onSelect(opt.value)
-                setOpen(false)
-              }}
-              className={cn(
-                "flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
-                value === opt.value
-                  ? "bg-accent/50 text-accent-foreground"
-                  : "text-foreground",
-              )}
-            >
-              <Check
+          filtered.map((opt) => {
+            const depth = opt.depth ?? 0
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => {
+                  onSelect(opt.value)
+                  setOpen(false)
+                }}
                 className={cn(
-                  "size-3.5 shrink-0",
-                  value === opt.value ? "opacity-100" : "opacity-0",
+                  "flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+                  value === opt.value
+                    ? "bg-accent/50 text-accent-foreground"
+                    : "text-foreground",
                 )}
-              />
-              {opt.label}
-            </button>
-          ))
+              >
+                <Check
+                  className={cn(
+                    "size-3.5 shrink-0",
+                    value === opt.value ? "opacity-100" : "opacity-0",
+                  )}
+                />
+                <span
+                  aria-hidden
+                  className="flex shrink-0 items-center"
+                  style={{ width: depth * 14 }}
+                >
+                  {Array.from({ length: depth }).map((_, i) => (
+                    <span key={i} className="h-3 w-px bg-border" />
+                  ))}
+                </span>
+                <FolderTree
+                  className={cn(
+                    "size-3.5 shrink-0",
+                    depth === 0
+                      ? "text-blue-500/80"
+                      : "text-muted-foreground/40",
+                  )}
+                />
+                <span className="min-w-0 flex-1 truncate">{opt.label}</span>
+                {typeof opt.childrenCount === "number" && opt.childrenCount > 0 && (
+                  <span className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground/70">
+                    {opt.childrenCount}
+                  </span>
+                )}
+              </button>
+            )
+          })
         )}
       </div>
     </div>

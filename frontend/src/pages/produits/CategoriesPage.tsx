@@ -112,7 +112,9 @@ function FormFields({
         })()
         return {
           value: String(c.id),
-          label: `${"— ".repeat(depth)}${c.name}`,
+          label: c.name,
+          depth,
+          childrenCount: c._count.children,
         }
       })
   }, [categories, editing])
