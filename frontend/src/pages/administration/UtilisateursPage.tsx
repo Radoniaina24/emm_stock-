@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { formatDistanceToNow } from "date-fns"
+import { fr } from "date-fns/locale"
 import {
   AlertTriangle,
   Briefcase,
@@ -7,14 +9,19 @@ import {
   CalendarDays,
   Eye,
   Fingerprint,
+  LockKeyhole,
   Mail,
   MapPin,
   Pencil,
   Phone,
   Plus,
   Shield,
+  // ShieldCheck, ShieldOff, // (réactiver si les cartes statistiques sont réaffichées)
+  Timer,
   Trash2,
+  UserCheck,
   UserRound,
+  UserX,
   Users,
 } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -22,6 +29,7 @@ import type { ColumnDef } from "@tanstack/react-table"
 import { DataTable } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+// import { Card, CardContent } from "@/components/ui/card" // (réactiver si les cartes statistiques sont réaffichées)
 import { UserAvatar } from "@/components/avatar/UserAvatar"
 import { SearchableSelect } from "@/components/ui/searchable-select"
 import {
@@ -50,6 +58,35 @@ const roleColors: Record<string, string> = {
   ACCOUNTANT: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400",
   AUDITOR: "bg-muted text-muted-foreground",
   VIEWER: "bg-muted text-muted-foreground",
+}
+
+const avatarGradients = [
+  "from-violet-500 to-indigo-600",
+  "from-sky-500 to-blue-600",
+  "from-emerald-500 to-teal-600",
+  "from-amber-500 to-orange-600",
+  "from-rose-500 to-pink-600",
+  "from-fuchsia-500 to-purple-600",
+  "from-cyan-500 to-sky-600",
+  "from-orange-500 to-red-600",
+]
+
+function avatarGradient(seed: string) {
+  let hash = 0
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0
+  }
+  return avatarGradients[hash % avatarGradients.length]
+}
+
+function timeAgo(dateStr: string | undefined) {
+  if (!dateStr) return "—"
+  const date = new Date(dateStr)
+  try {
+    return formatDistanceToNow(date, { addSuffix: true, locale: fr })
+  } catch {
+    return "—"
+  }
 }
 
 const statusConfig: Record<string, { label: string; dot: string; text: string }> = {
@@ -150,7 +187,7 @@ function InlineEditCell({ value, options, onCommit, renderBadge, successMessage 
         placeholder="Sélectionner…"
         options={options.filter((o) => o.value !== "")}
         onSelect={handleSelect}
-        onOpenChange={(open) => {
+        onOpenChange={(open: boolean) => {
           if (!open) setEditing(false)
         }}
         triggerClassName="h-8 min-w-40 bg-background"
@@ -216,16 +253,20 @@ export function UtilisateursPage() {
         header: "Utilisateur",
         cell: ({ row }) => {
           const user = row.original
+          const gradient = avatarGradient(getUserDisplayName(user))
           return (
             <div className="flex items-center gap-3">
-              <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-[10px] font-semibold text-white ring-1 ring-border/60">
-                <UserAvatar user={user} textClassName="text-[10px] font-semibold text-white" />
+              <div className={`flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br ${gradient} text-xs font-semibold text-white shadow-sm ring-1 ring-black/5`}>
+                <UserAvatar user={user} textClassName="text-xs font-semibold text-white" />
               </div>
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-foreground">
                   {getUserDisplayName(user)}
                 </p>
-                <p className="truncate text-xs text-muted-foreground/70">{user.email}</p>
+                <p className="flex items-center gap-1 truncate text-xs text-muted-foreground/70">
+                  <Mail className="size-3 shrink-0" />
+                  <span className="truncate">{user.email}</span>
+                </p>
               </div>
             </div>
           )
@@ -296,36 +337,140 @@ export function UtilisateursPage() {
       {
         accessorKey: "createdAt",
         header: "Membre depuis",
-        cell: ({ row }) => (
-          <span className="text-xs text-muted-foreground/70">
-            {formatDate(row.original.createdAt as string | undefined)}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const createdAt = row.original.createdAt as string | undefined
+          return (
+            <div className="flex flex-col">
+              <span className="text-xs font-medium text-foreground/80">
+                {formatDate(createdAt)}
+              </span>
+              <span className="text-[11px] text-muted-foreground/50">{timeAgo(createdAt)}</span>
+            </div>
+          )
+        },
       },
     ],
     [roles, updateUser],
   )
 
+const totalUsers = users?.length ?? 0
+  const activeCount = users?.filter((u) => u.status === "ACTIVE").length ?? 0
+  const suspendedCount = users?.filter((u) => u.status === "SUSPENDED").length ?? 0
+  const lockedCount = users?.filter((u) => u.status === "LOCKED").length ?? 0
+  const inactiveOnlyCount = users?.filter((u) => u.status === "INACTIVE").length ?? 0
+
+  const statusTabs = [
+    { value: null, label: "Tous", count: totalUsers, icon: Users },
+    { value: "ACTIVE", label: "Actifs", count: activeCount, icon: UserCheck },
+    { value: "SUSPENDED", label: "Suspendus", count: suspendedCount, icon: Timer },
+    { value: "LOCKED", label: "Verrouillés", count: lockedCount, icon: LockKeyhole },
+    { value: "INACTIVE", label: "Inactifs", count: inactiveOnlyCount, icon: UserX },
+  ]
+
+// Cartes de statistiques (désactivées pour l'instant)
+/*
+const stats = [
+    {
+      label: "Utilisateurs",
+      value: totalUsers,
+      icon: Users,
+      decorations: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+      progress: 100,
+      progressColor: "bg-gradient-to-r from-blue-500 to-indigo-500",
+    },
+    {
+      label: "Comptes actifs",
+      value: activeCount,
+      icon: ShieldCheck,
+      decorations: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+      progress: totalUsers ? Math.round((activeCount / totalUsers) * 100) : 0,
+      progressColor: "bg-gradient-to-r from-emerald-500 to-teal-500",
+    },
+    {
+      label: "Suspendus",
+      value: suspendedCount,
+      icon: ShieldOff,
+      decorations: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+      progress: totalUsers ? Math.round((suspendedCount / totalUsers) * 100) : 0,
+      progressColor: "bg-gradient-to-r from-amber-500 to-orange-500",
+    },
+    {
+      label: "Verrouillés",
+      value: lockedCount,
+      icon: LockKeyhole,
+      decorations: "bg-destructive/10 text-destructive",
+      progress: totalUsers ? Math.round((lockedCount / totalUsers) * 100) : 0,
+      progressColor: "bg-gradient-to-r from-rose-500 to-red-500",
+    },
+  ]
+*/
+
   return (
     <div className="w-full space-y-6">
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-foreground">
-            Utilisateurs
-            <Badge variant="secondary" className="gap-1 text-xs font-medium">
-              <Users className="size-3" />
-              {users?.length ?? 0}
-            </Badge>
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Gérez les utilisateurs de la plateforme, leurs rôles et leurs accès.
-          </p>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 shadow-xl">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.12),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(59,130,246,0.25),transparent_50%)]" />
+        <div className="relative flex flex-col gap-4 px-6 py-7 sm:flex-row sm:items-end sm:justify-between sm:px-8">
+          <div>
+            <div className="flex items-center gap-2 text-sm font-medium text-blue-200/80">
+              <Building2 className="size-4" />
+              <span>Administration</span>
+            </div>
+            <h1 className="mt-1 flex items-center gap-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+              Utilisateurs
+              <Badge
+                variant="secondary"
+                className="gap-1 bg-white/15 text-white ring-1 ring-white/20 backdrop-blur-sm hover:bg-white/20"
+              >
+                <Users className="size-3" />
+                {totalUsers}
+              </Badge>
+            </h1>
+            <p className="mt-1.5 text-sm text-blue-200/70">
+              Gérez les utilisateurs de la plateforme, leurs rôles et leurs accès en quelques clics.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="hidden items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-white/80 ring-1 ring-white/15 backdrop-blur-sm sm:inline-flex">
+              <span className="inline-block size-2 animate-pulse rounded-full bg-emerald-400" />
+              {activeCount} actifs
+            </span>
+            <Button
+              onClick={() => navigate("/dashboard/administration/utilisateurs/creer")}
+              className="gap-2 bg-white text-blue-700 shadow-lg hover:bg-blue-50"
+            >
+              <Plus className="size-4" />
+              Ajouter un utilisateur
+            </Button>
+          </div>
         </div>
-        <Button onClick={() => navigate("/dashboard/administration/utilisateurs/creer")}>
-          <Plus className="size-4" />
-          Ajouter un utilisateur
-        </Button>
       </div>
+
+      {/*
+        Cartes de statistiques (désactivées pour l'instant) :
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => (
+            <Card key={stat.label} className="group relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-3xl font-bold tracking-tight text-foreground">
+                      {stat.value}
+                    </p>
+                    <p className="mt-1 text-xs font-medium text-muted-foreground">{stat.label}</p>
+                  </div>
+                  <div className={`flex size-10 items-center justify-center rounded-xl ${stat.decorations} transition-transform duration-200 group-hover:scale-110`}>
+                    <stat.icon className="size-5" />
+                  </div>
+                </div>
+                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted/70">
+                  <div className={`h-full rounded-full transition-all ${stat.progressColor}`} style={{ width: `${stat.progress}%` }} />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      */}
 
       <DataTable
         columns={columns}
@@ -340,33 +485,48 @@ export function UtilisateursPage() {
         exportFilename="utilisateurs.csv"
         emptyMessage="Aucun utilisateur trouvé."
         filters={
-          <div className="flex items-center gap-2">
-            <SearchableSelect
-              value={roleFilter ?? ""}
-              placeholder="Filtrer par rôle…"
-              options={[
-                { value: "", label: "Tous les rôles" },
-                ...(roles ?? []).map((role) => ({
-                  value: role.id,
-                  label: role.name,
-                })),
-              ]}
-              onSelect={(value) => setRoleFilter(value || null)}
-              triggerClassName="w-48 bg-background"
-            />
-            <SearchableSelect
-              value={statusFilter ?? ""}
-              placeholder="Filtrer par statut…"
-              options={[
-                { value: "", label: "Tous les statuts" },
-                ...Object.entries(statusConfig).map(([value, config]) => ({
-                  value,
-                  label: config.label,
-                })),
-              ]}
-              onSelect={(value) => setStatusFilter(value || null)}
-              triggerClassName="w-52 bg-background"
-            />
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {statusTabs.map((tab) => (
+                <button
+                  key={tab.value ?? "all"}
+                  type="button"
+                  onClick={() => setStatusFilter(tab.value)}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
+                    (statusFilter ?? null) === tab.value
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "bg-muted/60 text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  <tab.icon className="size-3" />
+                  {tab.label}
+                  <span
+                    className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+                      (statusFilter ?? null) === tab.value
+                        ? "bg-white/20 text-white"
+                        : "bg-background text-muted-foreground/70"
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <SearchableSelect
+                value={roleFilter ?? ""}
+                placeholder="Filtrer par rôle…"
+                options={[
+                  { value: "", label: "Tous les rôles" },
+                  ...(roles ?? []).map((role) => ({
+                    value: role.id,
+                    label: role.name,
+                  })),
+                ]}
+                onSelect={(value) => setRoleFilter(value || null)}
+                triggerClassName="w-48 bg-background"
+              />
+            </div>
           </div>
         }
         renderActions={(row) => (
@@ -406,12 +566,12 @@ export function UtilisateursPage() {
         <ModalPopup size="full" className="overflow-hidden p-0 sm:mx-4 sm:max-w-3xl lg:max-w-4xl">
           <ModalClose className="rounded-full bg-red-500/15 text-red-500 hover:bg-red-500/25 hover:text-red-600" />
           <div className="flex max-h-[70vh] flex-col sm:max-h-[75vh] md:flex-row">
-            <div className="relative flex flex-col items-center gap-3 overflow-hidden bg-gradient-to-b from-violet-600 via-violet-600 to-indigo-700 px-4 py-5 text-white sm:px-6 sm:py-6 md:w-52 md:shrink-0 md:justify-between md:gap-4 lg:w-56">
+            <div className="relative flex flex-col items-center gap-3 overflow-hidden bg-gradient-to-b from-blue-700 via-blue-700 to-slate-800 px-4 py-5 text-white sm:px-6 sm:py-6 md:w-52 md:shrink-0 md:justify-between md:gap-4 lg:w-56">
               <div className="absolute -right-8 -top-8 size-32 rounded-full bg-white/5" />
               <div className="absolute -bottom-10 -left-10 size-40 rounded-full bg-white/5" />
               <div className="flex flex-col items-center gap-3 sm:gap-4">
                 <div className="flex size-14 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-white/30 to-white/10 p-1 shadow-2xl ring-2 ring-white/20 sm:size-16 md:size-20">
-                  <div className="relative flex size-full items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-lg font-bold text-white sm:text-xl md:text-2xl">
+                  <div className="relative flex size-full items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-lg font-bold text-white sm:text-xl md:text-2xl">
                     <UserAvatar
                       user={selectedUser ?? { name: "?", avatar: null }}
                       textClassName="text-lg sm:text-xl md:text-2xl font-bold text-white"

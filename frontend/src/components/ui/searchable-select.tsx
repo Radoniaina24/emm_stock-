@@ -16,6 +16,7 @@ type SearchableSelectProps = {
   onSelect: (value: string) => void
   triggerClassName?: string
   side?: "top" | "bottom"
+  onOpenChange?: (open: boolean) => void
 }
 
 export function SearchableSelect({
@@ -25,6 +26,7 @@ export function SearchableSelect({
   onSelect,
   triggerClassName,
   side = "bottom",
+  onOpenChange,
 }: SearchableSelectProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
@@ -51,7 +53,13 @@ export function SearchableSelect({
   }, [options, query])
 
   return (
-    <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
+    <PopoverPrimitive.Root
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next)
+        onOpenChange?.(next)
+      }}
+    >
       <PopoverPrimitive.Trigger
         className={cn(
           "flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-foreground outline-none transition-all duration-200 select-none hover:bg-muted/50 focus:border-primary/30 focus:shadow-sm focus:ring-2 focus:ring-primary/10 aria-expanded:border-primary/30 aria-expanded:shadow-sm aria-expanded:ring-2 aria-expanded:ring-primary/10",
