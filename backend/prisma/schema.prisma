@@ -183,12 +183,22 @@ model Category {
 }
 
 model Brand {
-  id        String   @id @default(cuid()) @db.VarChar(30)
-  name      String   @unique @db.VarChar(100)
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(150)
+  slug        String   @unique @db.VarChar(180)
+  description String?  @db.Text
+  logoUrl     String?  @map("logo_url") @db.VarChar(500)
+
+  isActive  Boolean @default(true) @map("is_active")
+  sortOrder Int     @default(0) @map("sort_order")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  products  Product[]
 
+  products Product[]
+
+  @@index([name])
+  @@index([isActive])
   @@map("brands")
 }
 
@@ -216,7 +226,7 @@ model Product {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   categoryId Int @map("category_id")
-  brandId    String @map("brand_id") @db.VarChar(30)
+  brandId    Int @map("brand_id") @db.Int
   unitId     String @map("unit_id") @db.VarChar(30)
 
   category    Category      @relation(fields: [categoryId], references: [id])
