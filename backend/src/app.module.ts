@@ -10,9 +10,10 @@ import { RolePermissionsModule } from './role-permissions/role-permissions.modul
 import { DepartmentsModule } from './departments/departments.module.js';
 import { JobTitlesModule } from './job-titles/job-titles.module.js';
 import { WarehousesModule } from './warehouses/warehouses.module.js';
+import { CategoriesModule } from './categories/categories.module.js';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, RolesModule, PermissionsModule, RolePermissionsModule, DepartmentsModule, JobTitlesModule, WarehousesModule],
+  imports: [PrismaModule, AuthModule, UsersModule, RolesModule, PermissionsModule, RolePermissionsModule, DepartmentsModule, JobTitlesModule, WarehousesModule, CategoriesModule],
   controllers: [AppController],
   providers: [AppService],
 })
