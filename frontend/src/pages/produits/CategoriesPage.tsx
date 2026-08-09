@@ -143,12 +143,16 @@ function FormFields({
           Catégorie parente
         </label>
         <SearchableSelect
+          variant="inline"
           value={form.parentId === null ? "" : String(form.parentId)}
           placeholder="Aucune (catégorie racine)…"
           options={[{ value: "", label: "Aucune (catégorie racine)" }, ...parentOptions]}
           onSelect={(value) => setForm((prev) => ({ ...prev, parentId: value === "" ? null : Number(value) }))}
-          triggerClassName="w-full bg-background"
+          triggerClassName="h-10 w-full bg-background"
         />
+        <p className="text-xs text-muted-foreground/60">
+          Astuce : la catégorie et ses descendants sont exclus lors de l'édition (pas de boucle possible).
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
