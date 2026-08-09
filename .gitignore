@@ -1,7 +1,11 @@
 identifiants.txt
+comptes.txt
 backend/.env
 frontend/.env
 backend/node_modules
+backend/dist/
+frontend/dist/
+coverage/
 backend/uploads/avatars/*
 !backend/uploads/avatars/.gitkeep
 backend/uploads/*
