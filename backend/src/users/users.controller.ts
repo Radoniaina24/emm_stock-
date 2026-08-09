@@ -27,6 +27,7 @@ import { memoryStorage } from 'multer';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { UsersService } from './users.service.js';
 
@@ -52,7 +53,9 @@ export class UsersController {
   }
 
   @Get('next-employee-code')
-  @ApiOperation({ summary: 'Prochain matricule disponible (format EMP-YYYY-NNNN)' })
+  @ApiOperation({
+    summary: 'Prochain matricule disponible (format EMP-YYYY-NNNN)',
+  })
   @ApiOkResponse({ description: 'Matricule suggéré' })
   nextEmployeeCode() {
     return this.users.nextEmployeeCode();
@@ -67,10 +70,19 @@ export class UsersController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Détail d\'un utilisateur' })
+  @ApiOperation({ summary: "Détail d'un utilisateur" })
   @ApiOkResponse({ description: 'Utilisateur trouvé' })
   findOne(@Param('id') id: string) {
     return this.users.findOne(id);
+  }
+
+  @Patch(':id')
+  @ApiOperation({
+    summary: 'Modifier un utilisateur (tous les champs sauf le mot de passe)',
+  })
+  @ApiOkResponse({ description: 'Utilisateur modifié' })
+  update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
+    return this.users.update(id, dto);
   }
 
   @Patch('me/profile')

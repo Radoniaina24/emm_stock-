@@ -1,9 +1,16 @@
 import { api } from "@/lib/api"
-import type { CreateUserPayload, UpdateProfilePayload, User } from "@/types/auth"
+import type { CreateUserPayload, UpdateProfilePayload, UpdateUserPayload, User } from "@/types/auth"
 
 export function createUser(payload: CreateUserPayload) {
   return api<User>("/users", {
     method: "POST",
+    body: payload,
+  })
+}
+
+export function updateUser(id: string, payload: UpdateUserPayload) {
+  return api<User>(`/users/${id}`, {
+    method: "PATCH",
     body: payload,
   })
 }
@@ -14,6 +21,10 @@ export function getNextEmployeeCode() {
 
 export function getUsers() {
   return api<User[]>("/users")
+}
+
+export function getUser(id: string) {
+  return api<User>(`/users/${id}`)
 }
 
 export function getMe() {

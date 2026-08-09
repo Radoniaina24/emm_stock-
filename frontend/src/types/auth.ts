@@ -60,6 +60,29 @@ export type CreateUserPayload = {
   warehouseId?: string
 }
 
+export type UpdateUserPayload = Partial<{
+  firstName: string
+  lastName: string
+  displayName: string
+  username: string
+  email: string
+  status: string
+  phone: string
+  secondaryPhone: string
+  birthDate: string
+  gender: string
+  address: string
+  city: string
+  region: string
+  country: string
+  postalCode: string
+  departmentId: string
+  jobTitleId: string
+  warehouseId: string
+  roleId: string
+  signature: string
+}> & { password?: never }
+
 export type UpdateProfilePayload = Partial<
   Omit<UserProfile, "profilePhoto">
 >

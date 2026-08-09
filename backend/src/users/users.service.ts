@@ -10,11 +10,9 @@ import { join } from 'path';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { generateEmployeeCode } from './employee-code.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
-import {
-  toAuthUserDto,
-  userWithProfileSelect,
-} from './user.mapper.js';
+import { toAuthUserDto, userWithProfileSelect } from './user.mapper.js';
 
 const AVATARS_DIR = join(process.cwd(), 'uploads', 'avatars');
 const MAX_SIZE = 2 * 1024 * 1024;
@@ -28,19 +26,22 @@ export class UsersService {
     const existingEmail = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
-    if (existingEmail) throw new ConflictException('Cet email est déjà utilisé');
+    if (existingEmail)
+      throw new ConflictException('Cet email est déjà utilisé');
 
     const existingUsername = await this.prisma.user.findUnique({
       where: { username: dto.username },
     });
-    if (existingUsername) throw new ConflictException('Ce nom d\'utilisateur est déjà utilisé');
+    if (existingUsername)
+      throw new ConflictException("Ce nom d'utilisateur est déjà utilisé");
 
     let employeeCode = dto.employeeCode?.trim() ?? '';
     if (employeeCode) {
       const existingCode = await this.prisma.userProfile.findUnique({
         where: { employeeCode },
       });
-      if (existingCode) throw new ConflictException('Ce matricule est déjà utilisé');
+      if (existingCode)
+        throw new ConflictException('Ce matricule est déjà utilisé');
     } else {
       for (let attempt = 0; attempt < 10; attempt++) {
         employeeCode = await generateEmployeeCode(this.prisma);
@@ -51,17 +52,25 @@ export class UsersService {
       }
     }
 
-    const role = await this.prisma.role.findUnique({ where: { id: dto.roleId } });
+    const role = await this.prisma.role.findUnique({
+      where: { id: dto.roleId },
+    });
     if (!role) throw new BadRequestException('Rôle introuvable');
 
-    const department = await this.prisma.department.findUnique({ where: { id: dto.departmentId } });
+    const department = await this.prisma.department.findUnique({
+      where: { id: dto.departmentId },
+    });
     if (!department) throw new BadRequestException('Département introuvable');
 
-    const jobTitle = await this.prisma.jobTitle.findUnique({ where: { id: dto.jobTitleId } });
+    const jobTitle = await this.prisma.jobTitle.findUnique({
+      where: { id: dto.jobTitleId },
+    });
     if (!jobTitle) throw new BadRequestException('Poste introuvable');
 
     if (dto.warehouseId) {
-      const warehouse = await this.prisma.warehouse.findUnique({ where: { id: dto.warehouseId } });
+      const warehouse = await this.prisma.warehouse.findUnique({
+        where: { id: dto.warehouseId },
+      });
       if (!warehouse) throw new BadRequestException('Entrepôt introuvable');
     }
 
@@ -112,9 +121,167 @@ export class UsersService {
     return { employeeCode: await generateEmployeeCode(this.prisma) };
   }
 
+  async update(id: string, dto: UpdateUserDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        role: { select: { code: true } },
+      },
+    });
+    if (!user) throw new NotFoundException('Utilisateur introuvable');
+
+    if (user.role?.code === 'SUPER_ADMIN' && dto.roleId !== undefined) {
+      const role = await this.prisma.role.findUnique({
+        where: { id: dto.roleId },
+      });
+      if (!role) throw new BadRequestException('Rôle introuvable');
+      if (role.code !== 'SUPER_ADMIN') {
+        throw new BadRequestException(
+          'Il est impossible de retirer le rôle de super administrateur d\u2019un utilisateur ayant ce rôle',
+        );
+      }
+    }
+
+    if (dto.email !== undefined && dto.email !== user.email) {
+      const existing = await this.prisma.user.findUnique({
+        where: { email: dto.email },
+      });
+      if (existing) throw new ConflictException('Cet email est déjà utilisé');
+    }
+
+    if (dto.username !== undefined && dto.username !== user.username) {
+      const existing = await this.prisma.user.findUnique({
+        where: { username: dto.username },
+      });
+      if (existing)
+        throw new ConflictException("Ce nom d'utilisateur est déjà utilisé");
+    }
+
+    if (dto.roleId !== undefined) {
+      const role = await this.prisma.role.findUnique({
+        where: { id: dto.roleId },
+      });
+      if (!role) throw new BadRequestException('Rôle introuvable');
+    }
+
+    if (dto.departmentId !== undefined) {
+      const department = await this.prisma.department.findUnique({
+        where: { id: dto.departmentId },
+      });
+      if (!department) throw new BadRequestException('Département introuvable');
+    }
+
+    if (dto.jobTitleId !== undefined) {
+      const jobTitle = await this.prisma.jobTitle.findUnique({
+        where: { id: dto.jobTitleId },
+      });
+      if (!jobTitle) throw new BadRequestException('Poste introuvable');
+    }
+
+    if (dto.warehouseId !== undefined) {
+      const warehouse = await this.prisma.warehouse.findUnique({
+        where: { id: dto.warehouseId },
+      });
+      if (!warehouse) throw new BadRequestException('Entrepôt introuvable');
+    }
+
+    if (dto.status !== undefined) {
+      if (user.role?.code === 'SUPER_ADMIN' && dto.status !== 'ACTIVE') {
+        throw new BadRequestException(
+          'Il est impossible de désactiver un compte super administrateur',
+        );
+      }
+    }
+
+    const emptyToNull = (value: string | undefined) => {
+      if (value === undefined) return undefined;
+      const trimmed = value.trim();
+      return trimmed.length ? trimmed : null;
+    };
+
+    const required = (value: string | undefined, fallback: string) => {
+      if (value === undefined) return undefined;
+      const trimmed = value.trim();
+      return trimmed.length ? trimmed : fallback;
+    };
+
+    const currentProfile = await this.prisma.userProfile.findUnique({
+      where: { userId: id },
+      select: { firstName: true, lastName: true, displayName: true },
+    });
+
+    const nextFirstName =
+      required(dto.firstName, currentProfile?.firstName ?? '') ??
+      currentProfile?.firstName ??
+      '';
+    const nextLastName =
+      required(dto.lastName, currentProfile?.lastName ?? '') ??
+      currentProfile?.lastName ??
+      '';
+
+    let displayName: string;
+    if (dto.displayName !== undefined) {
+      displayName =
+        required(dto.displayName, currentProfile?.displayName ?? '') ??
+        currentProfile?.displayName ??
+        '';
+    } else if (dto.firstName !== undefined || dto.lastName !== undefined) {
+      displayName = `${nextFirstName} ${nextLastName}`.trim();
+    } else {
+      displayName =
+        currentProfile?.displayName ??
+        `${nextFirstName} ${nextLastName}`.trim();
+    }
+
+    const status = dto.status as
+      'ACTIVE' | 'INACTIVE' | 'SUSPENDED' | 'LOCKED' | undefined;
+
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: { id },
+        data: {
+          ...(dto.email !== undefined ? { email: dto.email } : {}),
+          ...(dto.username !== undefined ? { username: dto.username } : {}),
+          ...(dto.roleId !== undefined ? { roleId: dto.roleId } : {}),
+          ...(status !== undefined ? { status } : {}),
+        },
+      }),
+      this.prisma.userProfile.update({
+        where: { userId: id },
+        data: {
+          ...(dto.firstName !== undefined ? { firstName: dto.firstName } : {}),
+          ...(dto.lastName !== undefined ? { lastName: dto.lastName } : {}),
+          displayName,
+          phone: emptyToNull(dto.phone),
+          secondaryPhone: emptyToNull(dto.secondaryPhone),
+          birthDate:
+            dto.birthDate === undefined
+              ? undefined
+              : dto.birthDate.trim()
+                ? new Date(dto.birthDate)
+                : null,
+          gender: emptyToNull(dto.gender),
+          address: emptyToNull(dto.address),
+          city: emptyToNull(dto.city),
+          region: emptyToNull(dto.region),
+          country: emptyToNull(dto.country),
+          postalCode: emptyToNull(dto.postalCode),
+          departmentId: emptyToNull(dto.departmentId),
+          jobTitleId: emptyToNull(dto.jobTitleId),
+          warehouseId: emptyToNull(dto.warehouseId),
+          signature: emptyToNull(dto.signature),
+        },
+      }),
+    ]);
+
+    return this.findOne(id);
+  }
+
   async remove(id: string, currentUserId: string) {
     if (id === currentUserId) {
-      throw new BadRequestException('Vous ne pouvez pas supprimer votre propre compte');
+      throw new BadRequestException(
+        'Vous ne pouvez pas supprimer votre propre compte',
+      );
     }
 
     const user = await this.prisma.user.findUnique({
@@ -127,14 +294,17 @@ export class UsersService {
     if (!user) throw new NotFoundException('Utilisateur introuvable');
 
     if (user.role?.code === 'SUPER_ADMIN') {
-      throw new BadRequestException('Impossible de supprimer un super administrateur');
+      throw new BadRequestException(
+        'Impossible de supprimer un super administrateur',
+      );
     }
 
-    const [{ _count: entries }, { _count: exits }, { _count: inventories }] = await Promise.all([
-      this.prisma.entry.count({ where: { userId: id } }),
-      this.prisma.exit.count({ where: { userId: id } }),
-      this.prisma.inventory.count({ where: { userId: id } }),
-    ]);
+    const [{ _count: entries }, { _count: exits }, { _count: inventories }] =
+      await Promise.all([
+        this.prisma.entry.count({ where: { userId: id } }),
+        this.prisma.exit.count({ where: { userId: id } }),
+        this.prisma.inventory.count({ where: { userId: id } }),
+      ]);
 
     if (entries > 0 || exits > 0 || inventories > 0) {
       const details = [

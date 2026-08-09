@@ -9,6 +9,7 @@ import {
   Fingerprint,
   Mail,
   MapPin,
+  Pencil,
   Phone,
   Plus,
   Shield,
@@ -264,6 +265,15 @@ export function UtilisateursPage() {
         }
         renderActions={(row) => (
           <div className="flex items-center justify-end gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(`/dashboard/administration/utilisateurs/${row.id}/editer`)}
+              className="size-8 text-muted-foreground/60 hover:text-foreground"
+              title="Modifier l'utilisateur"
+            >
+              <Pencil className="size-4" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"

@@ -1,4 +1,4 @@
-import { Briefcase, Hash, Sparkles } from "lucide-react"
+import { Briefcase, Hash, Lock, Sparkles } from "lucide-react"
 import { RoleSelect } from "./RoleSelect"
 import { DepartmentSelect } from "./DepartmentSelect"
 import { JobTitleSelect } from "./JobTitleSelect"
@@ -7,6 +7,7 @@ import { WarehouseSelect } from "./WarehouseSelect"
 type Props = {
   employeeCode: string
   employeeCodeAuto?: boolean
+  employeeCodeReadOnly?: boolean
   employeeCodeLoading?: boolean
   roleId: string
   departmentId: string
@@ -29,10 +30,11 @@ function inputClass(error?: string) {
 }
 
 export function ProfessionalInformationCard({
-  employeeCode, employeeCodeAuto, employeeCodeLoading, roleId, departmentId, jobTitleId, warehouseId,
+  employeeCode, employeeCodeAuto, employeeCodeReadOnly, employeeCodeLoading, roleId, departmentId, jobTitleId, warehouseId,
   onEmployeeCodeChange, onRoleIdChange, onDepartmentIdChange, onJobTitleIdChange, onWarehouseIdChange,
   errors, warehouseRequired,
 }: Props) {
+  const locked = employeeCodeReadOnly
   return (
     <div className="rounded-xl border border-border/60 bg-card shadow-sm">
       <div className="flex items-center gap-2 border-b border-border/20 px-5 py-3.5">
@@ -42,11 +44,17 @@ export function ProfessionalInformationCard({
       <div className="space-y-4 p-5">
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-foreground/80" htmlFor="create-employeeCode">
-            Matricule <span className="text-destructive">*</span>
+            Matricule {!locked && <span className="text-destructive">*</span>}
             {employeeCodeAuto ? (
               <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
                 <Sparkles className="size-3" />
                 Auto
+              </span>
+            ) : null}
+            {locked ? (
+              <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                <Lock className="size-3" />
+                Lecture seule
               </span>
             ) : null}
           </label>
@@ -57,10 +65,15 @@ export function ProfessionalInformationCard({
               value={employeeCode}
               onChange={(e) => onEmployeeCodeChange(e.target.value)}
               placeholder={employeeCodeLoading ? "Génération…" : "EMP-2026-0001"}
-              readOnly={employeeCodeAuto}
-              className={`${inputClass(errors.employeeCode)}${employeeCodeAuto ? " cursor-not-allowed opacity-80" : ""}`}
+              readOnly={employeeCodeAuto || locked}
+              className={`${inputClass(errors.employeeCode)}${employeeCodeAuto || locked ? " cursor-not-allowed opacity-80" : ""}`}
             />
           </div>
+          {locked ? (
+            <p className="text-xs text-muted-foreground/60">
+              Matricule attribué automatiquement à la création — non modifiable
+            </p>
+          ) : null}
           {employeeCodeAuto ? (
             <p className="text-xs text-muted-foreground/60">Généré automatiquement, format EMP-année-séquence</p>
           ) : null}

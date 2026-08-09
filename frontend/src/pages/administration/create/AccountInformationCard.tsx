@@ -1,4 +1,4 @@
-import { Mail, User as UserIcon } from "lucide-react"
+import { Lock, Mail, User as UserIcon } from "lucide-react"
 import { PasswordField } from "./PasswordField"
 
 type Props = {
@@ -11,6 +11,7 @@ type Props = {
   onPasswordChange: (value: string) => void
   onConfirmPasswordChange: (value: string) => void
   errors: { username?: string; email?: string; password?: string; confirmPassword?: string }
+  hidePassword?: boolean
 }
 
 function inputClass(error?: string) {
@@ -23,7 +24,7 @@ function inputClass(error?: string) {
 export function AccountInformationCard({
   username, email, password, confirmPassword,
   onUsernameChange, onEmailChange, onPasswordChange, onConfirmPasswordChange,
-  errors,
+  errors, hidePassword = false,
 }: Props) {
   return (
     <div className="rounded-xl border border-border/60 bg-card shadow-sm">
@@ -65,24 +66,38 @@ export function AccountInformationCard({
           </div>
           {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <PasswordField
-            id="create-password"
-            label="Mot de passe"
-            value={password}
-            onChange={onPasswordChange}
-            error={errors.password}
-            placeholder="Minimum 8 caractères"
-          />
-          <PasswordField
-            id="create-confirmPassword"
-            label="Confirmation du mot de passe"
-            value={confirmPassword}
-            onChange={onConfirmPasswordChange}
-            error={errors.confirmPassword}
-            placeholder="Répétez le mot de passe"
-          />
-        </div>
+        {hidePassword ? (
+          <div className="flex items-start gap-2.5 rounded-lg border border-border/40 bg-muted/30 px-3.5 py-3">
+            <Lock className="mt-0.5 size-4 shrink-0 text-muted-foreground/60" />
+            <div>
+              <p className="text-xs font-medium text-foreground/80">
+                Mot de passe non modifiable ici
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Le mot de passe du compte ne peut pas être changé depuis cette page.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2">
+            <PasswordField
+              id="create-password"
+              label="Mot de passe"
+              value={password}
+              onChange={onPasswordChange}
+              error={errors.password}
+              placeholder="Minimum 8 caractères"
+            />
+            <PasswordField
+              id="create-confirmPassword"
+              label="Confirmation du mot de passe"
+              value={confirmPassword}
+              onChange={onConfirmPasswordChange}
+              error={errors.confirmPassword}
+              placeholder="Répétez le mot de passe"
+            />
+          </div>
+        )}
       </div>
     </div>
   )
