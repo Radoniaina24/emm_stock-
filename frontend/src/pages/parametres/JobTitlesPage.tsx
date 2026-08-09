@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react"
-import { BadgeCheck, Edit, Eye, Plus, Trash2 } from "lucide-react"
+import { AlertTriangle, BadgeCheck, Edit, Eye, Plus, Trash2 } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { z } from "zod"
 
@@ -132,6 +132,7 @@ export function JobTitlesPage() {
   const deleteJobTitle = useDeleteJobTitleMutation()
 
   const [selectedJobTitle, setSelectedJobTitle] = useState<JobTitle | null>(null)
+  const [jobTitleToDelete, setJobTitleToDelete] = useState<JobTitle | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [editingJobTitle, setEditingJobTitle] = useState<JobTitle | null>(null)
 
@@ -209,10 +210,12 @@ export function JobTitlesPage() {
     }
   }
 
-  async function handleDelete(jobTitle: JobTitle) {
+  async function handleConfirmDelete() {
+    if (!jobTitleToDelete) return
     try {
-      await deleteJobTitle.mutateAsync(jobTitle.id)
+      await deleteJobTitle.mutateAsync(jobTitleToDelete.id)
       toast.success("Titre supprimé avec succès")
+      setJobTitleToDelete(null)
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Une erreur est survenue.")
     }
@@ -322,7 +325,7 @@ export function JobTitlesPage() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleDelete(row)}
+              onClick={() => setJobTitleToDelete(row)}
               className="size-8 text-muted-foreground/60 hover:text-destructive"
             >
               <Trash2 className="size-4" />
@@ -497,6 +500,64 @@ export function JobTitlesPage() {
               </div>
             </div>
           </div>
+        </ModalPopup>
+      </ModalRoot>
+
+      <ModalRoot open={!!jobTitleToDelete} onOpenChange={(open) => { if (!open) setJobTitleToDelete(null) }}>
+        <ModalPopup>
+          <ModalClose />
+          <ModalHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-destructive/10 text-destructive ring-1 ring-destructive/20">
+                <AlertTriangle className="size-5" />
+              </div>
+              <div>
+                <ModalTitle>Supprimer le titre</ModalTitle>
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  {jobTitleToDelete?.name} · {jobTitleToDelete?.code}
+                </p>
+              </div>
+            </div>
+          </ModalHeader>
+          <ModalContent>
+            <p className="text-sm text-foreground/80">
+              Cette action est <span className="font-semibold text-destructive">irréversible</span>. Le
+              titre <span className="font-semibold">{jobTitleToDelete?.name}</span> sera définitivement
+              supprimé.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              La suppression sera refusée si des utilisateurs occupent encore ce poste — dans ce cas,
+              privilégiez la désactivation du titre.
+            </p>
+          </ModalContent>
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={deleteJobTitle.isPending}
+              onClick={() => setJobTitleToDelete(null)}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteJobTitle.isPending}
+              onClick={handleConfirmDelete}
+            >
+              {deleteJobTitle.isPending ? (
+                <span className="flex items-center gap-2">
+                  <span className="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Suppression…
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Trash2 className="size-4" />
+                  Supprimer définitivement
+                </span>
+              )}
+            </Button>
+          </ModalFooter>
         </ModalPopup>
       </ModalRoot>
     </div>

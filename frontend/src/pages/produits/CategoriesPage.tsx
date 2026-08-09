@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react"
-import { Edit, Eye, FolderTree, Layers3, Plus, Tags, Trash2 } from "lucide-react"
+import { AlertTriangle, Edit, Eye, FolderTree, Layers3, Plus, Tags, Trash2 } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { z } from "zod"
 
@@ -267,6 +267,7 @@ export function CategoriesPage() {
 
   const all = useMemo(() => categories ?? [], [categories])
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
 
@@ -354,10 +355,12 @@ export function CategoriesPage() {
     }
   }
 
-  async function handleDelete(category: Category) {
+  async function handleConfirmDelete() {
+    if (!categoryToDelete) return
     try {
-      await deleteCategory.mutateAsync(category.id)
+      await deleteCategory.mutateAsync(categoryToDelete.id)
       toast.success("Catégorie supprimée avec succès")
+      setCategoryToDelete(null)
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Une erreur est survenue.")
     }
@@ -516,7 +519,7 @@ export function CategoriesPage() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleDelete(row)}
+              onClick={() => setCategoryToDelete(row)}
               className="size-8 text-muted-foreground/60 hover:text-destructive"
             >
               <Trash2 className="size-4" />
@@ -722,6 +725,63 @@ export function CategoriesPage() {
               </div>
             </div>
           </div>
+        </ModalPopup>
+      </ModalRoot>
+
+      <ModalRoot open={!!categoryToDelete} onOpenChange={(open) => { if (!open) setCategoryToDelete(null) }}>
+        <ModalPopup>
+          <ModalClose />
+          <ModalHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-destructive/10 text-destructive ring-1 ring-destructive/20">
+                <AlertTriangle className="size-5" />
+              </div>
+              <div>
+                <ModalTitle>Supprimer la catégorie</ModalTitle>
+                <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+                  {categoryToDelete?.name} · {categoryToDelete?.slug}
+                </p>
+              </div>
+            </div>
+          </ModalHeader>
+          <ModalContent>
+            <p className="text-sm text-foreground/80">
+              Cette action est <span className="font-semibold text-destructive">irréversible</span>. La
+              catégorie <span className="font-semibold">{categoryToDelete?.name}</span> et ses
+              sous-catégories seront définitivement supprimées.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              La suppression sera refusée si des produits sont encore associés à cette catégorie.
+            </p>
+          </ModalContent>
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={deleteCategory.isPending}
+              onClick={() => setCategoryToDelete(null)}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteCategory.isPending}
+              onClick={handleConfirmDelete}
+            >
+              {deleteCategory.isPending ? (
+                <span className="flex items-center gap-2">
+                  <span className="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Suppression…
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Trash2 className="size-4" />
+                  Supprimer définitivement
+                </span>
+              )}
+            </Button>
+          </ModalFooter>
         </ModalPopup>
       </ModalRoot>
     </div>

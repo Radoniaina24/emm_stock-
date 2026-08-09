@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react"
-import { Edit, Eye, Image as ImageIcon, Layers3, Plus, Tag, Trash2, Upload, X } from "lucide-react"
+import { AlertTriangle, Edit, Eye, Image as ImageIcon, Layers3, Plus, Tag, Trash2, Upload, X } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { z } from "zod"
 
@@ -238,6 +238,7 @@ export function BrandsPage() {
 
   const all = useMemo(() => brands ?? [], [brands])
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null)
+  const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null)
 
@@ -355,10 +356,12 @@ export function BrandsPage() {
     }
   }
 
-  async function handleDelete(brand: Brand) {
+  async function handleConfirmDelete() {
+    if (!brandToDelete) return
     try {
-      await deleteBrand.mutateAsync(brand.id)
+      await deleteBrand.mutateAsync(brandToDelete.id)
       toast.success("Marque supprimée avec succès")
+      setBrandToDelete(null)
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Une erreur est survenue.")
     }
@@ -503,7 +506,7 @@ export function BrandsPage() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleDelete(row)}
+              onClick={() => setBrandToDelete(row)}
               className="size-8 text-muted-foreground/60 hover:text-destructive"
             >
               <Trash2 className="size-4" />
@@ -688,6 +691,63 @@ export function BrandsPage() {
               </div>
             </div>
           </div>
+        </ModalPopup>
+      </ModalRoot>
+
+      <ModalRoot open={!!brandToDelete} onOpenChange={(open) => { if (!open) setBrandToDelete(null) }}>
+        <ModalPopup>
+          <ModalClose />
+          <ModalHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-destructive/10 text-destructive ring-1 ring-destructive/20">
+                <AlertTriangle className="size-5" />
+              </div>
+              <div>
+                <ModalTitle>Supprimer la marque</ModalTitle>
+                <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+                  {brandToDelete?.name} · {brandToDelete?.slug}
+                </p>
+              </div>
+            </div>
+          </ModalHeader>
+          <ModalContent>
+            <p className="text-sm text-foreground/80">
+              Cette action est <span className="font-semibold text-destructive">irréversible</span>. La
+              marque <span className="font-semibold">{brandToDelete?.name}</span> sera définitivement
+              supprimée.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              La suppression sera refusée si des produits sont encore associés à cette marque.
+            </p>
+          </ModalContent>
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={deleteBrand.isPending}
+              onClick={() => setBrandToDelete(null)}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteBrand.isPending}
+              onClick={handleConfirmDelete}
+            >
+              {deleteBrand.isPending ? (
+                <span className="flex items-center gap-2">
+                  <span className="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Suppression…
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Trash2 className="size-4" />
+                  Supprimer définitivement
+                </span>
+              )}
+            </Button>
+          </ModalFooter>
         </ModalPopup>
       </ModalRoot>
     </div>

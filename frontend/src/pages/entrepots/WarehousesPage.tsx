@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react"
-import { Building2, Edit, Eye, MapPin, Plus, Trash2 } from "lucide-react"
+import { AlertTriangle, Building2, Edit, Eye, MapPin, Plus, Trash2 } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { z } from "zod"
 
@@ -106,6 +106,7 @@ export function WarehousesPage() {
   const deleteWarehouse = useDeleteWarehouseMutation()
 
   const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null)
+  const [warehouseToDelete, setWarehouseToDelete] = useState<Warehouse | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(null)
 
@@ -182,10 +183,12 @@ export function WarehousesPage() {
     }
   }
 
-  async function handleDelete(warehouse: Warehouse) {
+  async function handleConfirmDelete() {
+    if (!warehouseToDelete) return
     try {
-      await deleteWarehouse.mutateAsync(warehouse.id)
+      await deleteWarehouse.mutateAsync(warehouseToDelete.id)
       toast.success("Entrepôt supprimé avec succès")
+      setWarehouseToDelete(null)
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Une erreur est survenue.")
     }
@@ -291,7 +294,7 @@ export function WarehousesPage() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleDelete(row)}
+              onClick={() => setWarehouseToDelete(row)}
               className="size-8 text-muted-foreground/60 hover:text-destructive"
             >
               <Trash2 className="size-4" />
@@ -441,6 +444,65 @@ export function WarehousesPage() {
               </div>
             </div>
           </div>
+        </ModalPopup>
+      </ModalRoot>
+
+      <ModalRoot open={!!warehouseToDelete} onOpenChange={(open) => { if (!open) setWarehouseToDelete(null) }}>
+        <ModalPopup>
+          <ModalClose />
+          <ModalHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-destructive/10 text-destructive ring-1 ring-destructive/20">
+                <AlertTriangle className="size-5" />
+              </div>
+              <div>
+                <ModalTitle>Supprimer l'entrepôt</ModalTitle>
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  {warehouseToDelete?.name}
+                  {warehouseToDelete?.location ? ` · ${warehouseToDelete.location}` : ""}
+                </p>
+              </div>
+            </div>
+          </ModalHeader>
+          <ModalContent>
+            <p className="text-sm text-foreground/80">
+              Cette action est <span className="font-semibold text-destructive">irréversible</span>.
+              L'entrepôt <span className="font-semibold">{warehouseToDelete?.name}</span> sera
+              définitivement supprimé.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              La suppression sera refusée si des utilisateurs ou des opérations de stock sont encore
+              rattachés à cet entrepôt — dans ce cas, privilégiez la désactivation de l'entrepôt.
+            </p>
+          </ModalContent>
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={deleteWarehouse.isPending}
+              onClick={() => setWarehouseToDelete(null)}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteWarehouse.isPending}
+              onClick={handleConfirmDelete}
+            >
+              {deleteWarehouse.isPending ? (
+                <span className="flex items-center gap-2">
+                  <span className="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Suppression…
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Trash2 className="size-4" />
+                  Supprimer définitivement
+                </span>
+              )}
+            </Button>
+          </ModalFooter>
         </ModalPopup>
       </ModalRoot>
     </div>

@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react"
-import { Building2, Edit, Eye, Plus, Trash2 } from "lucide-react"
+import { AlertTriangle, Building2, Edit, Eye, Plus, Trash2 } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { z } from "zod"
 
@@ -132,6 +132,7 @@ export function DepartementsPage() {
   const deleteDepartment = useDeleteDepartmentMutation()
 
   const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null)
+  const [departmentToDelete, setDepartmentToDelete] = useState<Department | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null)
 
@@ -209,10 +210,12 @@ export function DepartementsPage() {
     }
   }
 
-  async function handleDelete(department: Department) {
+  async function handleConfirmDelete() {
+    if (!departmentToDelete) return
     try {
-      await deleteDepartment.mutateAsync(department.id)
+      await deleteDepartment.mutateAsync(departmentToDelete.id)
       toast.success("Département supprimé avec succès")
+      setDepartmentToDelete(null)
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Une erreur est survenue.")
     }
@@ -322,7 +325,7 @@ export function DepartementsPage() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleDelete(row)}
+              onClick={() => setDepartmentToDelete(row)}
               className="size-8 text-muted-foreground/60 hover:text-destructive"
             >
               <Trash2 className="size-4" />
@@ -497,6 +500,64 @@ export function DepartementsPage() {
               </div>
             </div>
           </div>
+        </ModalPopup>
+      </ModalRoot>
+
+      <ModalRoot open={!!departmentToDelete} onOpenChange={(open) => { if (!open) setDepartmentToDelete(null) }}>
+        <ModalPopup>
+          <ModalClose />
+          <ModalHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-destructive/10 text-destructive ring-1 ring-destructive/20">
+                <AlertTriangle className="size-5" />
+              </div>
+              <div>
+                <ModalTitle>Supprimer le département</ModalTitle>
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  {departmentToDelete?.name} · {departmentToDelete?.code}
+                </p>
+              </div>
+            </div>
+          </ModalHeader>
+          <ModalContent>
+            <p className="text-sm text-foreground/80">
+              Cette action est <span className="font-semibold text-destructive">irréversible</span>. Le
+              département <span className="font-semibold">{departmentToDelete?.name}</span> sera
+              définitivement supprimé.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              La suppression sera refusée si des utilisateurs sont encore rattachés à ce département —
+              dans ce cas, privilégiez la désactivation du département.
+            </p>
+          </ModalContent>
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={deleteDepartment.isPending}
+              onClick={() => setDepartmentToDelete(null)}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteDepartment.isPending}
+              onClick={handleConfirmDelete}
+            >
+              {deleteDepartment.isPending ? (
+                <span className="flex items-center gap-2">
+                  <span className="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Suppression…
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Trash2 className="size-4" />
+                  Supprimer définitivement
+                </span>
+              )}
+            </Button>
+          </ModalFooter>
         </ModalPopup>
       </ModalRoot>
     </div>

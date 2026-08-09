@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react"
-import { Edit, Eye, Plus, Shield, Trash2 } from "lucide-react"
+import { AlertTriangle, Edit, Eye, Plus, Shield, Trash2 } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { z } from "zod"
 
@@ -178,6 +178,7 @@ export function PermissionsPage() {
   const [moduleFilter, setModuleFilter] = useState<string | null>(null)
   const [actionFilter, setActionFilter] = useState<string | null>(null)
   const [selectedPermission, setSelectedPermission] = useState<Permission | null>(null)
+  const [permissionToDelete, setPermissionToDelete] = useState<Permission | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [editingPermission, setEditingPermission] = useState<Permission | null>(null)
 
@@ -252,10 +253,12 @@ export function PermissionsPage() {
     }
   }
 
-  async function handleDelete(permission: Permission) {
+  async function handleConfirmDelete() {
+    if (!permissionToDelete) return
     try {
-      await deletePermission.mutateAsync(permission.id)
+      await deletePermission.mutateAsync(permissionToDelete.id)
       toast.success("Permission supprimée avec succès")
+      setPermissionToDelete(null)
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Une erreur est survenue.")
     }
@@ -398,7 +401,7 @@ export function PermissionsPage() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleDelete(row)}
+              onClick={() => setPermissionToDelete(row)}
               className="size-8 text-muted-foreground/60 hover:text-destructive"
             >
               <Trash2 className="size-4" />
@@ -521,6 +524,63 @@ export function PermissionsPage() {
               </Button>
             </div>
           </div>
+        </ModalPopup>
+      </ModalRoot>
+
+      <ModalRoot open={!!permissionToDelete} onOpenChange={(open) => { if (!open) setPermissionToDelete(null) }}>
+        <ModalPopup>
+          <ModalClose />
+          <ModalHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-destructive/10 text-destructive ring-1 ring-destructive/20">
+                <AlertTriangle className="size-5" />
+              </div>
+              <div>
+                <ModalTitle>Supprimer la permission</ModalTitle>
+                <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+                  {permissionToDelete?.code}
+                </p>
+              </div>
+            </div>
+          </ModalHeader>
+          <ModalContent>
+            <p className="text-sm text-foreground/80">
+              Cette action est <span className="font-semibold text-destructive">irréversible</span>. La
+              permission <span className="font-semibold">{permissionToDelete?.code}</span> sera
+              définitivement supprimée.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              La suppression sera refusée si la permission est encore assignée à des rôles.
+            </p>
+          </ModalContent>
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={deletePermission.isPending}
+              onClick={() => setPermissionToDelete(null)}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deletePermission.isPending}
+              onClick={handleConfirmDelete}
+            >
+              {deletePermission.isPending ? (
+                <span className="flex items-center gap-2">
+                  <span className="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Suppression…
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Trash2 className="size-4" />
+                  Supprimer définitivement
+                </span>
+              )}
+            </Button>
+          </ModalFooter>
         </ModalPopup>
       </ModalRoot>
     </div>

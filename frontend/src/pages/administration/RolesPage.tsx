@@ -1,6 +1,6 @@
 import { useMemo, useState, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
-import { Edit, Eye, Plus, Shield, ShieldCheck, ShieldOff, Trash2, Users } from "lucide-react"
+import { AlertTriangle, Edit, Eye, Plus, Shield, ShieldCheck, ShieldOff, Trash2, Users } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { z } from "zod"
 
@@ -134,6 +134,7 @@ export function RolesPage() {
   const deleteRole = useDeleteRoleMutation()
 
   const [selectedRole, setSelectedRole] = useState<Role | null>(null)
+  const [roleToDelete, setRoleToDelete] = useState<Role | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [editingRole, setEditingRole] = useState<Role | null>(null)
 
@@ -211,14 +212,12 @@ export function RolesPage() {
     }
   }
 
-  async function handleDelete(role: Role) {
-    if (role.isSystem) {
-      toast.error("Impossible de supprimer un rôle système")
-      return
-    }
+  async function handleConfirmDelete() {
+    if (!roleToDelete) return
     try {
-      await deleteRole.mutateAsync(role.id)
+      await deleteRole.mutateAsync(roleToDelete.id)
       toast.success("Rôle supprimé avec succès")
+      setRoleToDelete(null)
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Une erreur est survenue.")
     }
@@ -370,7 +369,13 @@ export function RolesPage() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleDelete(row)}
+              onClick={() => {
+                if (row.isSystem) {
+                  toast.error("Impossible de supprimer un rôle système")
+                  return
+                }
+                setRoleToDelete(row)
+              }}
               className="size-8 text-muted-foreground/60 hover:text-destructive"
             >
               <Trash2 className="size-4" />
@@ -629,6 +634,63 @@ export function RolesPage() {
               </div>
             </div>
           </div>
+        </ModalPopup>
+      </ModalRoot>
+
+      <ModalRoot open={!!roleToDelete} onOpenChange={(open) => { if (!open) setRoleToDelete(null) }}>
+        <ModalPopup>
+          <ModalClose />
+          <ModalHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-destructive/10 text-destructive ring-1 ring-destructive/20">
+                <AlertTriangle className="size-5" />
+              </div>
+              <div>
+                <ModalTitle>Supprimer le rôle</ModalTitle>
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  {roleToDelete?.name} · {roleToDelete?.code}
+                </p>
+              </div>
+            </div>
+          </ModalHeader>
+          <ModalContent>
+            <p className="text-sm text-foreground/80">
+              Cette action est <span className="font-semibold text-destructive">irréversible</span>. Le rôle{" "}
+              <span className="font-semibold">{roleToDelete?.name}</span> sera définitivement supprimé.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              La suppression sera refusée si des utilisateurs sont encore rattachés à ce rôle — dans ce cas,
+              privilégiez la désactivation du rôle.
+            </p>
+          </ModalContent>
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={deleteRole.isPending}
+              onClick={() => setRoleToDelete(null)}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteRole.isPending}
+              onClick={handleConfirmDelete}
+            >
+              {deleteRole.isPending ? (
+                <span className="flex items-center gap-2">
+                  <span className="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Suppression…
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Trash2 className="size-4" />
+                  Supprimer définitivement
+                </span>
+              )}
+            </Button>
+          </ModalFooter>
         </ModalPopup>
       </ModalRoot>
     </div>
