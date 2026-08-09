@@ -27,6 +27,7 @@ import { WarehousesPage } from "@/pages/entrepots/WarehousesPage"
 import { CategoriesPage } from "@/pages/produits/CategoriesPage"
 import { BrandsPage } from "@/pages/produits/BrandsPage"
 import { UnitsOfMeasurePage } from "@/pages/produits/UnitsOfMeasurePage"
+import { ProductBarcodesPage } from "@/pages/produits/ProductBarcodesPage"
 import { UtilisateursPage } from "@/pages/administration/UtilisateursPage"
 import { CreateUserPage } from "@/pages/administration/create/CreateUserPage"
 import { EditUserPage } from "@/pages/administration/edit/EditUserPage"
@@ -58,7 +59,7 @@ function App() {
             <Route path="produits/familles" element={<div className="text-muted-foreground">Familles de produits</div>} />
             <Route path="produits/unites" element={<UnitsOfMeasurePage />} />
             <Route path="produits/variantes" element={<div className="text-muted-foreground">Variantes produits</div>} />
-            <Route path="produits/codes-barres" element={<div className="text-muted-foreground">Codes-barres</div>} />
+            <Route path="produits/codes-barres" element={<ProductBarcodesPage />} />
             <Route path="produits/import" element={<div className="text-muted-foreground">Import produits</div>} />
             <Route path="produits/export" element={<div className="text-muted-foreground">Export produits</div>} />
             <Route path="stock" element={<div className="text-muted-foreground">Vue globale du stock</div>} />
