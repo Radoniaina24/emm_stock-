@@ -118,18 +118,14 @@ function FormFields({
           <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-type`}>
             Type
           </label>
-          <select
-            id={`${prefix}-type`}
-            value={form.type}
-            onChange={(e) => setForm((prev) => ({ ...prev, type: e.target.value as BarcodeType }))}
-            className={inputClass("type")}
-          >
-            {BARCODE_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
+        <SearchableSelect
+          variant="inline"
+          value={form.type}
+          placeholder="Choisir un type…"
+          options={BARCODE_TYPES.map((t) => ({ value: t, label: t }))}
+          onSelect={(value) => setForm((prev) => ({ ...prev, type: value as BarcodeType }))}
+          triggerClassName={`h-10 w-full bg-background${fieldErrors.type ? " border-destructive/60" : ""}`}
+        />
           {fieldErrors.type && <p className="text-xs text-destructive">{fieldErrors.type}</p>}
         </div>
       </div>

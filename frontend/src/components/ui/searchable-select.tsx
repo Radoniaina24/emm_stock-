@@ -80,6 +80,11 @@ export function SearchableSelect({
     return options.filter((o) => o.label.toLowerCase().includes(term))
   }, [options, query])
 
+  const isTree = useMemo(
+    () => options.some((o) => o.depth !== undefined || o.childrenCount !== undefined),
+    [options],
+  )
+
   const triggerContent = (
     <>
       <span className="flex-1 truncate text-left">
@@ -139,23 +144,27 @@ export function SearchableSelect({
                     value === opt.value ? "opacity-100" : "opacity-0",
                   )}
                 />
-                <span
-                  aria-hidden
-                  className="flex shrink-0 items-center"
-                  style={{ width: depth * 14 }}
-                >
-                  {Array.from({ length: depth }).map((_, i) => (
-                    <span key={i} className="h-3 w-px bg-border" />
-                  ))}
-                </span>
-                <FolderTree
-                  className={cn(
-                    "size-3.5 shrink-0",
-                    depth === 0
-                      ? "text-blue-500/80"
-                      : "text-muted-foreground/40",
-                  )}
-                />
+                {isTree && (
+                  <>
+                    <span
+                      aria-hidden
+                      className="flex shrink-0 items-center"
+                      style={{ width: depth * 14 }}
+                    >
+                      {Array.from({ length: depth }).map((_, i) => (
+                        <span key={i} className="h-3 w-px bg-border" />
+                      ))}
+                    </span>
+                    <FolderTree
+                      className={cn(
+                        "size-3.5 shrink-0",
+                        depth === 0
+                          ? "text-blue-500/80"
+                          : "text-muted-foreground/40",
+                      )}
+                    />
+                  </>
+                )}
                 <span className="min-w-0 flex-1 truncate">{opt.label}</span>
                 {typeof opt.childrenCount === "number" && opt.childrenCount > 0 && (
                   <span className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground/70">
