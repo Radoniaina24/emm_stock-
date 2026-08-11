@@ -123,7 +123,7 @@ function FormFields({
     <div className="space-y-3">
       <div className="space-y-1.5">
         <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-name`}>
-          Nom de la catégorie
+          Nom de la catégorie <span className="text-destructive">*</span>
         </label>
         <input
           id={`${prefix}-name`}
@@ -160,7 +160,7 @@ function FormFields({
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-sort`}>
-            Ordre d'affichage
+            Ordre d'affichage <span className="text-destructive">*</span>
           </label>
           <input
             id={`${prefix}-sort`}

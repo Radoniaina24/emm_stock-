@@ -87,7 +87,7 @@ function FormFields({
     <div className="space-y-3">
       <div className="space-y-1.5">
         <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-product`}>
-          Produit
+          Produit <span className="text-destructive">*</span>
         </label>
         <SearchableSelect
           variant="inline"
@@ -103,7 +103,7 @@ function FormFields({
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-code`}>
-            Code
+            Code <span className="text-destructive">*</span>
           </label>
           <input
             id={`${prefix}-code`}

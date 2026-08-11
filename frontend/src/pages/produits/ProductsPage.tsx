@@ -158,7 +158,7 @@ function FormFields({
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-sku`}>
-              SKU
+              SKU <span className="text-destructive">*</span>
             </label>
             <input
               id={`${prefix}-sku`}
@@ -171,7 +171,7 @@ function FormFields({
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-name`}>
-              Nom du produit
+              Nom du produit <span className="text-destructive">*</span>
             </label>
             <input
               id={`${prefix}-name`}
@@ -193,7 +193,7 @@ function FormFields({
 
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-slug`}>
-            Slug
+            Slug <span className="text-destructive">*</span>
           </label>
           <input
             id={`${prefix}-slug`}
@@ -251,7 +251,7 @@ function FormFields({
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-unit`}>
-                Unité de mesure
+                Unité de mesure <span className="text-destructive">*</span>
               </label>
               <SearchableSelect
                 variant="inline"

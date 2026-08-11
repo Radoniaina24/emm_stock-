@@ -36,6 +36,7 @@ export function SearchableSelect({
 }: SearchableSelectProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
+  const [placement, setPlacement] = useState({ up: false, maxHeight: 240 })
   const inputRef = useRef<HTMLInputElement>(null)
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -47,6 +48,31 @@ export function SearchableSelect({
       setQuery("")
     }
   }, [open])
+
+  useEffect(() => {
+    if (variant !== "inline" || !open) return
+
+    function measure() {
+      const trigger = rootRef.current?.querySelector(":scope > button")
+      if (!trigger) return
+      const rect = trigger.getBoundingClientRect()
+      const gap = 16
+      const spaceBelow = window.innerHeight - rect.bottom - gap
+      const spaceAbove = rect.top - gap
+      setPlacement({
+        up: spaceBelow < 200 && spaceAbove > spaceBelow,
+        maxHeight: Math.max(96, Math.min(240, Math.floor(Math.max(spaceBelow, spaceAbove)))),
+      })
+    }
+
+    measure()
+    window.addEventListener("resize", measure)
+    window.addEventListener("scroll", measure, true)
+    return () => {
+      window.removeEventListener("resize", measure)
+      window.removeEventListener("scroll", measure, true)
+    }
+  }, [variant, open])
 
   useEffect(() => {
     if (variant !== "inline" || !open) return
@@ -102,8 +128,13 @@ export function SearchableSelect({
       triggerClassName,
     )
 
+  const listMaxHeight = variant === "inline" ? Math.max(80, placement.maxHeight - 44) : 240
+
   const panel = (
-    <div className="overflow-hidden rounded-lg border border-border/60 bg-popover p-1 text-sm text-popover-foreground shadow-lg">
+    <div
+      className="overflow-hidden rounded-lg border border-border/60 bg-popover p-1 text-sm text-popover-foreground shadow-lg"
+      style={variant === "inline" ? { maxHeight: listMaxHeight + 44 } : undefined}
+    >
       <div className="relative mb-1">
         <Search className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground/50" />
         <input
@@ -115,7 +146,7 @@ export function SearchableSelect({
           className="h-8 w-full rounded-md border border-border/60 bg-background pl-7 pr-2.5 text-sm outline-none placeholder:text-muted-foreground/40 focus:border-primary/30"
         />
       </div>
-      <div className="max-h-60 overflow-y-auto overscroll-contain">
+      <div className="overflow-y-auto overscroll-contain" style={{ maxHeight: listMaxHeight }}>
         {filtered.length === 0 ? (
           <p className="py-4 text-center text-xs text-muted-foreground">
             Aucun résultat
@@ -190,7 +221,9 @@ export function SearchableSelect({
           {triggerContent}
         </button>
         {open && (
-          <div className="absolute top-full left-0 right-0 z-50 mt-1.5">
+          <div
+            className={`absolute left-0 right-0 z-50 ${placement.up ? "bottom-full mb-1.5" : "top-full mt-1.5"}`}
+          >
             {panel}
           </div>
         )}
