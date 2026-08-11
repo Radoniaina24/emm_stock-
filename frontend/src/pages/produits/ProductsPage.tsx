@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import {
   AlertTriangle,
   Building2,
+  Coins,
   Edit,
   Eye,
   Image as ImageIcon,
@@ -10,6 +11,7 @@ import {
   Layers3,
   Package,
   Plus,
+  Ruler,
   ScanLine,
   Settings2,
   Star,
@@ -41,6 +43,7 @@ import {
   slugify,
   generateSku,
   initialProductForm,
+  toNumber,
   type ProductFormData,
   type ProductFieldErrors,
   type ProductOption,
@@ -260,6 +263,228 @@ function FormFields({
               />
               {fieldErrors.unitId && <p className="text-xs text-destructive">{fieldErrors.unitId}</p>}
             </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-type`}>
+                Type
+              </label>
+              <SearchableSelect
+                variant="inline"
+                value={form.type}
+                placeholder="Choisir…"
+                options={[
+                  { value: "STORABLE", label: "Stockable" },
+                  { value: "CONSUMABLE", label: "Consommable" },
+                  { value: "SERVICE", label: "Service" },
+                ]}
+                onSelect={(v) => setForm((prev) => ({ ...prev, type: v as ProductFormData["type"] }))}
+                triggerClassName={`h-10 w-full bg-background${fieldErrors.type ? " border-destructive/60" : ""}`}
+              />
+              {fieldErrors.type && <p className="text-xs text-destructive">{fieldErrors.type}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-shelf-life`}>
+                Durée de conservation (jours)
+              </label>
+              <input
+                id={`${prefix}-shelf-life`}
+                type="number"
+                min="1"
+                value={form.shelfLifeDays}
+                onChange={(e) => setForm((prev) => ({ ...prev, shelfLifeDays: e.target.value }))}
+                className={`${inputClass("shelfLifeDays")} font-mono`}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-purchase-unit`}>
+                Unité d'achat
+              </label>
+              <SearchableSelect
+                variant="inline"
+                value={form.purchaseUnitId}
+                placeholder="Identique…"
+                options={slugs.unitOptions}
+                onSelect={(value) => setForm((prev) => ({ ...prev, purchaseUnitId: value }))}
+                triggerClassName="h-10 w-full bg-background"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-sale-unit`}>
+                Unité de vente
+              </label>
+              <SearchableSelect
+                variant="inline"
+                value={form.saleUnitId}
+                placeholder="Identique…"
+                options={slugs.unitOptions}
+                onSelect={(value) => setForm((prev) => ({ ...prev, saleUnitId: value }))}
+                triggerClassName="h-10 w-full bg-background"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="flex size-6 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <Coins className="size-3" />
+          </div>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+            Prix & traçabilité
+          </span>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-cost-price`}>
+              Coût d'achat
+            </label>
+            <input
+              id={`${prefix}-cost-price`}
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.costPrice}
+              onChange={(e) => setForm((prev) => ({ ...prev, costPrice: e.target.value }))}
+              className={`${inputClass("costPrice")} font-mono`}
+            />
+            {fieldErrors.costPrice && <p className="text-xs text-destructive">{fieldErrors.costPrice}</p>}
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-sale-price`}>
+              Prix de vente
+            </label>
+            <input
+              id={`${prefix}-sale-price`}
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.salePrice}
+              onChange={(e) => setForm((prev) => ({ ...prev, salePrice: e.target.value }))}
+              className={`${inputClass("salePrice")} font-mono`}
+            />
+            {fieldErrors.salePrice && <p className="text-xs text-destructive">{fieldErrors.salePrice}</p>}
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-tax-rate`}>
+              TVA (%)
+            </label>
+            <input
+              id={`${prefix}-tax-rate`}
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.taxRate}
+              onChange={(e) => setForm((prev) => ({ ...prev, taxRate: e.target.value }))}
+              className={`${inputClass("taxRate")} font-mono`}
+            />
+            {fieldErrors.taxRate && <p className="text-xs text-destructive">{fieldErrors.taxRate}</p>}
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-tracking`}>
+              Traçabilité
+            </label>
+              <SearchableSelect
+                variant="inline"
+                value={form.tracking}
+                placeholder="Choisir…"
+                options={[
+                  { value: "NONE", label: "Aucune" },
+                  { value: "LOT", label: "Par lot" },
+                  { value: "SERIAL", label: "Par série" },
+                ]}
+                onSelect={(v) => setForm((prev) => ({ ...prev, tracking: v as ProductFormData["tracking"] }))}
+                triggerClassName={`h-10 w-full bg-background${fieldErrors.tracking ? " border-destructive/60" : ""}`}
+              />
+          </div>
+        </div>
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-border/20 bg-muted/10 px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-foreground/80">Produit à péremption</p>
+            <p className="text-xs text-muted-foreground/60">Suivi d'une date d'expiration</p>
+          </div>
+          <label className="relative inline-flex shrink-0 cursor-pointer items-center">
+            <input
+              type="checkbox"
+              checked={form.hasExpiry}
+              onChange={(e) => setForm((prev) => ({ ...prev, hasExpiry: e.target.checked }))}
+              className="peer sr-only"
+            />
+            <div className="h-5 w-9 rounded-full bg-muted-foreground/30 after:absolute after:left-0.5 after:top-0.5 after:size-4 after:rounded-full after:bg-white after:shadow-sm after:transition-all peer-checked:bg-emerald-500 peer-checked:after:translate-x-full" />
+          </label>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="flex size-6 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+            <Ruler className="size-3" />
+          </div>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+            Dimensions (cm)
+          </span>
+        </div>
+        <div className="grid grid-cols-4 gap-3">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-weight`}>
+              Poids (kg)
+            </label>
+            <input
+              id={`${prefix}-weight`}
+              type="number"
+              step="0.001"
+              min="0"
+              value={form.weight}
+              onChange={(e) => setForm((prev) => ({ ...prev, weight: e.target.value }))}
+              className={`${inputClass("weight")} font-mono`}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-length`}>
+              Longueur
+            </label>
+            <input
+              id={`${prefix}-length`}
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.length}
+              onChange={(e) => setForm((prev) => ({ ...prev, length: e.target.value }))}
+              className={`${inputClass("length")} font-mono`}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-width`}>
+              Largeur
+            </label>
+            <input
+              id={`${prefix}-width`}
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.width}
+              onChange={(e) => setForm((prev) => ({ ...prev, width: e.target.value }))}
+              className={`${inputClass("width")} font-mono`}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-height`}>
+              Hauteur
+            </label>
+            <input
+              id={`${prefix}-height`}
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.height}
+              onChange={(e) => setForm((prev) => ({ ...prev, height: e.target.value }))}
+              className={`${inputClass("height")} font-mono`}
+            />
           </div>
         </div>
       </div>
@@ -536,9 +761,25 @@ export function ProductsPage() {
       name: product.name,
       slug: product.slug,
       description: product.description ?? "",
+      descriptionPurchase: product.descriptionPurchase ?? "",
+      descriptionSale: product.descriptionSale ?? "",
+      internalNotes: product.internalNotes ?? "",
+      type: product.type,
       brandId: product.brandId != null ? String(product.brandId) : "",
       categoryId: product.categoryId != null ? String(product.categoryId) : "",
       unitId: String(product.unitId),
+      purchaseUnitId: product.purchaseUnitId != null ? String(product.purchaseUnitId) : "",
+      saleUnitId: product.saleUnitId != null ? String(product.saleUnitId) : "",
+      costPrice: product.costPrice != null ? String(product.costPrice) : "",
+      salePrice: product.salePrice != null ? String(product.salePrice) : "",
+      taxRate: product.taxRate != null ? String(product.taxRate) : "",
+      tracking: product.tracking,
+      hasExpiry: product.hasExpiry,
+      shelfLifeDays: product.shelfLifeDays != null ? String(product.shelfLifeDays) : "",
+      weight: product.weight != null ? String(product.weight) : "",
+      length: product.length != null ? String(product.length) : "",
+      width: product.width != null ? String(product.width) : "",
+      height: product.height != null ? String(product.height) : "",
       isActive: product.isActive,
     })
     autoSlug.current = false
@@ -576,9 +817,25 @@ export function ProductsPage() {
           name: data.name,
           slug: data.slug || undefined,
           description: data.description || undefined,
+          descriptionPurchase: data.descriptionPurchase || undefined,
+          descriptionSale: data.descriptionSale || undefined,
+          internalNotes: data.internalNotes || undefined,
+          type: data.type,
           brandId: data.brandId ? Number(data.brandId) : undefined,
           categoryId: data.categoryId ? Number(data.categoryId) : undefined,
           unitId: Number(data.unitId),
+          purchaseUnitId: toNumber(data.purchaseUnitId),
+          saleUnitId: toNumber(data.saleUnitId),
+          costPrice: toNumber(data.costPrice, 0),
+          salePrice: toNumber(data.salePrice, 0),
+          taxRate: toNumber(data.taxRate, 0),
+          tracking: data.tracking,
+          hasExpiry: data.hasExpiry,
+          shelfLifeDays: data.hasExpiry ? toNumber(data.shelfLifeDays) : undefined,
+          weight: toNumber(data.weight),
+          length: toNumber(data.length),
+          width: toNumber(data.width),
+          height: toNumber(data.height),
           isActive: data.isActive,
         },
       })
@@ -953,6 +1210,77 @@ export function ProductsPage() {
                         <span className="italic text-muted-foreground/40">Aucune description</span>
                       )}
                     </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex size-6 items-center justify-center rounded-lg bg-muted/60">
+                        <Coins className="size-3 text-muted-foreground/60" />
+                      </div>
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Prix & traçabilité</span>
+                    </div>
+                    <div className="grid grid-cols-4 gap-3">
+                      <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Coût d'achat</p>
+                        <p className="mt-1 text-lg font-semibold text-foreground">
+                          {selectedProduct?.costPrice != null ? `${Number(selectedProduct.costPrice).toLocaleString("fr-FR")} Ar` : "—"}
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Prix de vente</p>
+                        <p className="mt-1 text-lg font-semibold text-foreground">
+                          {selectedProduct?.salePrice != null ? `${Number(selectedProduct.salePrice).toLocaleString("fr-FR")} Ar` : "—"}
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">TVA</p>
+                        <p className="mt-1 text-lg font-semibold text-foreground">
+                          {selectedProduct?.taxRate != null ? `${Number(selectedProduct.taxRate).toLocaleString("fr-FR")} %` : "—"}
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Traçabilité</p>
+                        <p className="mt-1 text-lg font-semibold text-foreground">
+                          {selectedProduct ? ({ NONE: "Aucune", LOT: "Par lot", SERIAL: "Par série" } as const)[selectedProduct.tracking] : "—"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2 pl-8">
+                      <Badge variant="outline" className="text-[11px]">
+                        Type : {({ STORABLE: "Stockable", CONSUMABLE: "Consommable", SERVICE: "Service" } as const)[selectedProduct?.type ?? "STORABLE"]}
+                      </Badge>
+                      {selectedProduct?.hasExpiry && (
+                        <Badge variant="outline" className="text-[11px]">
+                          Péremption : {selectedProduct.shelfLifeDays ?? "—"} jours
+                        </Badge>
+                      )}
+                      {selectedProduct?.purchaseUnit && (
+                        <Badge variant="outline" className="text-[11px]">
+                          Achat : {selectedProduct.purchaseUnit.symbol ?? selectedProduct.purchaseUnit.code}
+                        </Badge>
+                      )}
+                      {selectedProduct?.saleUnit && (
+                        <Badge variant="outline" className="text-[11px]">
+                          Vente : {selectedProduct.saleUnit.symbol ?? selectedProduct.saleUnit.code}
+                        </Badge>
+                      )}
+                      {(selectedProduct?.weight != null ||
+                        selectedProduct?.length != null ||
+                        selectedProduct?.width != null ||
+                        selectedProduct?.height != null) && (
+                        <Badge variant="outline" className="text-[11px]">
+                          {[
+                            selectedProduct.weight != null ? `${Number(selectedProduct.weight).toLocaleString("fr-FR")} kg` : null,
+                            selectedProduct.length != null ? `L ${Number(selectedProduct.length).toLocaleString("fr-FR")}` : null,
+                            selectedProduct.width != null ? `l ${Number(selectedProduct.width).toLocaleString("fr-FR")}` : null,
+                            selectedProduct.height != null ? `h ${Number(selectedProduct.height).toLocaleString("fr-FR")}` : null,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}{" "}
+                          cm
+                        </Badge>
+                      )}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-3 gap-3">

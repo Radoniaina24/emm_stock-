@@ -5,16 +5,28 @@ import { inputClass, type ProductFieldErrors } from "@/lib/product-form"
 type Props = {
   isActive: boolean
   description: string
+  descriptionPurchase: string
+  descriptionSale: string
+  internalNotes: string
   onActiveChange: (value: boolean) => void
   onDescriptionChange: (value: string) => void
+  onDescriptionPurchaseChange: (value: string) => void
+  onDescriptionSaleChange: (value: string) => void
+  onInternalNotesChange: (value: string) => void
   errors: ProductFieldErrors
 }
 
 export function SettingsCard({
   isActive,
   description,
+  descriptionPurchase,
+  descriptionSale,
+  internalNotes,
   onActiveChange,
   onDescriptionChange,
+  onDescriptionPurchaseChange,
+  onDescriptionSaleChange,
+  onInternalNotesChange,
   errors,
 }: Props) {
   return (
@@ -55,6 +67,53 @@ export function SettingsCard({
             className={`${inputClass(errors.description)} h-auto resize-none py-2.5`}
           />
           {errors.description && <p className="text-xs text-destructive">{errors.description}</p>}
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-foreground/80" htmlFor="create-description-purchase">
+            Description d'achat
+          </label>
+          <textarea
+            id="create-description-purchase"
+            value={descriptionPurchase}
+            onChange={(e) => onDescriptionPurchaseChange(e.target.value)}
+            placeholder="Informations destinées aux achats…"
+            rows={2}
+            className={`${inputClass(errors.descriptionPurchase)} h-auto resize-none py-2.5`}
+          />
+          {errors.descriptionPurchase && (
+            <p className="text-xs text-destructive">{errors.descriptionPurchase}</p>
+          )}
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-foreground/80" htmlFor="create-description-sale">
+            Description de vente
+          </label>
+          <textarea
+            id="create-description-sale"
+            value={descriptionSale}
+            onChange={(e) => onDescriptionSaleChange(e.target.value)}
+            placeholder="Arguments commerciaux…"
+            rows={2}
+            className={`${inputClass(errors.descriptionSale)} h-auto resize-none py-2.5`}
+          />
+          {errors.descriptionSale && <p className="text-xs text-destructive">{errors.descriptionSale}</p>}
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-foreground/80" htmlFor="create-internal-notes">
+            Notes internes
+          </label>
+          <textarea
+            id="create-internal-notes"
+            value={internalNotes}
+            onChange={(e) => onInternalNotesChange(e.target.value)}
+            placeholder="Réservé au personnel…"
+            rows={2}
+            className={`${inputClass(errors.internalNotes)} h-auto resize-none py-2.5`}
+          />
+          {errors.internalNotes && <p className="text-xs text-destructive">{errors.internalNotes}</p>}
         </div>
       </div>
     </div>

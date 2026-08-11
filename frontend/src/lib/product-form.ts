@@ -7,6 +7,9 @@ export type PendingImage = { file: File; url: string }
 export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"] as const
 export const MAX_IMAGE_SIZE = 2 * 1024 * 1024
 
+export const PRODUCT_TYPES = ["STORABLE", "CONSUMABLE", "SERVICE"] as const
+export const TRACKING_TYPES = ["NONE", "LOT", "SERIAL"] as const
+
 export const productSchema = z.object({
   sku: z
     .string()
@@ -20,9 +23,25 @@ export const productSchema = z.object({
     .max(220, "Le slug est trop long")
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug invalide (minuscules, chiffres et tirets)"),
   description: z.string().max(5000, "La description est trop longue"),
+  descriptionPurchase: z.string().max(5000, "La description d'achat est trop longue"),
+  descriptionSale: z.string().max(5000, "La description de vente est trop longue"),
+  internalNotes: z.string().max(5000, "Les notes internes sont trop longues"),
+  type: z.enum(PRODUCT_TYPES),
   brandId: z.string(),
   categoryId: z.string(),
   unitId: z.string().min(1, "L'unité de mesure est obligatoire"),
+  purchaseUnitId: z.string(),
+  saleUnitId: z.string(),
+  costPrice: z.string().regex(/^\d*\.?\d*$/, "Prix invalide"),
+  salePrice: z.string().regex(/^\d*\.?\d*$/, "Prix invalide"),
+  taxRate: z.string().regex(/^\d*\.?\d*$/, "Taux invalide"),
+  tracking: z.enum(TRACKING_TYPES),
+  hasExpiry: z.boolean(),
+  shelfLifeDays: z.string().regex(/^\d*$/, "Durée invalide"),
+  weight: z.string().regex(/^\d*\.?\d*$/, "Poids invalide"),
+  length: z.string().regex(/^\d*\.?\d*$/, "Longueur invalide"),
+  width: z.string().regex(/^\d*\.?\d*$/, "Largeur invalide"),
+  height: z.string().regex(/^\d*\.?\d*$/, "Hauteur invalide"),
   isActive: z.boolean(),
 })
 
@@ -35,10 +54,33 @@ export const initialProductForm: ProductFormData = {
   name: "",
   slug: "",
   description: "",
+  descriptionPurchase: "",
+  descriptionSale: "",
+  internalNotes: "",
+  type: "STORABLE",
   brandId: "",
   categoryId: "",
   unitId: "",
+  purchaseUnitId: "",
+  saleUnitId: "",
+  costPrice: "",
+  salePrice: "",
+  taxRate: "",
+  tracking: "NONE",
+  hasExpiry: false,
+  shelfLifeDays: "",
+  weight: "",
+  length: "",
+  width: "",
+  height: "",
   isActive: true,
+}
+
+export function toNumber(value: string, fallback?: number): number | undefined {
+  const trimmed = value.trim()
+  if (!trimmed) return fallback
+  const parsed = Number(trimmed)
+  return Number.isFinite(parsed) ? parsed : fallback
 }
 
 export function slugify(value: string): string {

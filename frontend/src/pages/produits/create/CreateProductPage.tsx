@@ -17,6 +17,7 @@ import {
   slugify,
   generateSku,
   initialProductForm,
+  toNumber,
   type ProductFormData,
   type ProductFieldErrors,
   type ProductOption,
@@ -25,6 +26,8 @@ import {
 import { IdentityInformationCard } from "./IdentityInformationCard"
 import { ClassificationCard } from "./ClassificationCard"
 import { ImagesCard } from "./ImagesCard"
+import { PricingCard } from "./PricingCard"
+import { LogisticsCard } from "./LogisticsCard"
 import { SettingsCard } from "./SettingsCard"
 import { ProductPreviewCard } from "./ProductPreviewCard"
 
@@ -145,9 +148,25 @@ export function CreateProductPage() {
         name: data.name,
         slug: data.slug || undefined,
         description: data.description || undefined,
+        descriptionPurchase: data.descriptionPurchase || undefined,
+        descriptionSale: data.descriptionSale || undefined,
+        internalNotes: data.internalNotes || undefined,
+        type: data.type,
         brandId: data.brandId ? Number(data.brandId) : undefined,
         categoryId: data.categoryId ? Number(data.categoryId) : undefined,
         unitId: Number(data.unitId),
+        purchaseUnitId: toNumber(data.purchaseUnitId),
+        saleUnitId: toNumber(data.saleUnitId),
+        costPrice: toNumber(data.costPrice, 0),
+        salePrice: toNumber(data.salePrice, 0),
+        taxRate: toNumber(data.taxRate, 0),
+        tracking: data.tracking,
+        hasExpiry: data.hasExpiry,
+        shelfLifeDays: data.hasExpiry ? toNumber(data.shelfLifeDays) : undefined,
+        weight: toNumber(data.weight),
+        length: toNumber(data.length),
+        width: toNumber(data.width),
+        height: toNumber(data.height),
         isActive: data.isActive,
       })
       await uploadPendingImages(created.id)
@@ -217,9 +236,43 @@ export function CreateProductPage() {
               categoryId={form.categoryId}
               brandId={form.brandId}
               unitId={form.unitId}
+              purchaseUnitId={form.purchaseUnitId}
+              saleUnitId={form.saleUnitId}
               onCategoryChange={(v) => set("categoryId", v)}
               onBrandChange={handleBrandChange}
               onUnitChange={(v) => set("unitId", v)}
+              onPurchaseUnitChange={(v) => set("purchaseUnitId", v)}
+              onSaleUnitChange={(v) => set("saleUnitId", v)}
+              errors={fieldErrors}
+            />
+
+            <PricingCard
+              costPrice={form.costPrice}
+              salePrice={form.salePrice}
+              taxRate={form.taxRate}
+              tracking={form.tracking}
+              hasExpiry={form.hasExpiry}
+              shelfLifeDays={form.shelfLifeDays}
+              onCostPriceChange={(v) => set("costPrice", v)}
+              onSalePriceChange={(v) => set("salePrice", v)}
+              onTaxRateChange={(v) => set("taxRate", v)}
+              onTrackingChange={(v) => set("tracking", v as ProductFormData["tracking"])}
+              onHasExpiryChange={(v) => set("hasExpiry", v)}
+              onShelfLifeDaysChange={(v) => set("shelfLifeDays", v)}
+              errors={fieldErrors}
+            />
+
+            <LogisticsCard
+              type={form.type}
+              weight={form.weight}
+              length={form.length}
+              width={form.width}
+              height={form.height}
+              onTypeChange={(v) => set("type", v as ProductFormData["type"])}
+              onWeightChange={(v) => set("weight", v)}
+              onLengthChange={(v) => set("length", v)}
+              onWidthChange={(v) => set("width", v)}
+              onHeightChange={(v) => set("height", v)}
               errors={fieldErrors}
             />
 
@@ -244,8 +297,14 @@ export function CreateProductPage() {
             <SettingsCard
               isActive={form.isActive}
               description={form.description}
+              descriptionPurchase={form.descriptionPurchase}
+              descriptionSale={form.descriptionSale}
+              internalNotes={form.internalNotes}
               onActiveChange={(v) => set("isActive", v)}
               onDescriptionChange={(v) => set("description", v)}
+              onDescriptionPurchaseChange={(v) => set("descriptionPurchase", v)}
+              onDescriptionSaleChange={(v) => set("descriptionSale", v)}
+              onInternalNotesChange={(v) => set("internalNotes", v)}
               errors={fieldErrors}
             />
           </div>
@@ -255,6 +314,8 @@ export function CreateProductPage() {
             sku={form.sku}
             slug={form.slug}
             isActive={form.isActive}
+            type={form.type}
+            salePrice={form.salePrice}
             brandId={form.brandId}
             categoryId={form.categoryId}
             unitId={form.unitId}

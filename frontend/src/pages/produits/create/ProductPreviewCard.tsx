@@ -1,6 +1,8 @@
 import {
+  Boxes,
   Building2,
   CheckCircle2,
+  Coins,
   Eye,
   Image as ImageIcon,
   Layers3,
@@ -19,6 +21,8 @@ type Props = {
   sku: string
   slug: string
   isActive: boolean
+  type: string
+  salePrice: string
   brandId: string
   categoryId: string
   unitId: string
@@ -30,11 +34,19 @@ type Props = {
   autoSku: boolean
 }
 
+const TYPE_LABELS: Record<string, string> = {
+  STORABLE: "Stockable",
+  CONSUMABLE: "Consommable",
+  SERVICE: "Service",
+}
+
 export function ProductPreviewCard({
   name,
   sku,
   slug,
   isActive,
+  type,
+  salePrice,
   brandId,
   categoryId,
   unitId,
@@ -118,6 +130,20 @@ export function ProductPreviewCard({
                 <Ruler className="size-3" /> {unitName}
               </Badge>
             )}
+            {type && (
+              <Badge variant="outline" className="gap-1 text-[11px]">
+                <Boxes className="size-3" /> {TYPE_LABELS[type] ?? type}
+              </Badge>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between rounded-lg border border-border/20 bg-muted/10 px-3 py-2">
+            <span className="flex items-center gap-1.5 text-xs text-muted-foreground/60">
+              <Coins className="size-3.5" /> Prix de vente
+            </span>
+            <span className="font-mono text-xs font-semibold text-foreground">
+              {salePrice ? `${salePrice} Ar` : "—"}
+            </span>
           </div>
 
           <div className="flex items-center justify-between rounded-lg border border-border/20 bg-muted/10 px-3 py-2">
