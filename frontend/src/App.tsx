@@ -30,6 +30,7 @@ import { UnitsOfMeasurePage } from "@/pages/produits/UnitsOfMeasurePage"
 import { ProductBarcodesPage } from "@/pages/produits/ProductBarcodesPage"
 import { ProductsPage } from "@/pages/produits/ProductsPage"
 import { CreateProductPage } from "@/pages/produits/create/CreateProductPage"
+import { EditProductPage } from "@/pages/produits/edit/EditProductPage"
 import { UtilisateursPage } from "@/pages/administration/UtilisateursPage"
 import { CreateUserPage } from "@/pages/administration/create/CreateUserPage"
 import { EditUserPage } from "@/pages/administration/edit/EditUserPage"
@@ -56,6 +57,7 @@ function App() {
             <Route path="profil" element={<ProfilePage />} />
             <Route path="produits" element={<ProductsPage />} />
             <Route path="produits/ajouter" element={<CreateProductPage />} />
+            <Route path="produits/modifier/:productId" element={<EditProductPage />} />
             <Route path="produits/categories" element={<CategoriesPage />} />
             <Route path="produits/marques" element={<BrandsPage />} />
             <Route path="produits/familles" element={<div className="text-muted-foreground">Familles de produits</div>} />

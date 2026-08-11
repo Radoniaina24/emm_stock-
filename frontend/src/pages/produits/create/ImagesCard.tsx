@@ -1,21 +1,40 @@
 import { useRef } from "react"
-import { ImagePlus, Image as ImageIcon, Trash2 } from "lucide-react"
+import { ImagePlus, Image as ImageIcon, Star, Trash2 } from "lucide-react"
 
 import { toast } from "@/components/ui/toast"
+import { resolveImageUrl } from "@/api/products"
 import {
   ACCEPTED_IMAGE_TYPES,
   MAX_IMAGE_SIZE,
   type PendingImage,
 } from "@/lib/product-form"
 
+type ExistingImage = {
+  id: number
+  url: string
+  alt: string | null
+  isPrimary: boolean
+}
+
 type Props = {
   pendingImages: PendingImage[]
   onAddFiles: (files: File[]) => void
   onRemovePending: (index: number) => void
+  existingImages?: ExistingImage[]
+  onDeleteImage?: (id: number) => void
+  onMakePrimary?: (id: number) => void
 }
 
-export function ImagesCard({ pendingImages, onAddFiles, onRemovePending }: Props) {
+export function ImagesCard({
+  pendingImages,
+  onAddFiles,
+  onRemovePending,
+  existingImages = [],
+  onDeleteImage,
+  onMakePrimary,
+}: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const totalCount = existingImages.length + pendingImages.length
 
   function handleFilesChange(files: FileList | null) {
     if (!files || files.length === 0) return
@@ -46,14 +65,51 @@ export function ImagesCard({ pendingImages, onAddFiles, onRemovePending }: Props
           </div>
           <h3 className="text-sm font-semibold text-foreground">Images</h3>
         </div>
-        {pendingImages.length > 0 && (
+        {totalCount > 0 && (
           <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-600 ring-1 ring-emerald-500/20 dark:text-emerald-400">
-            {pendingImages.length} {pendingImages.length > 1 ? "images" : "image"}
+            {totalCount} {totalCount > 1 ? "images" : "image"}
           </span>
         )}
       </div>
       <div className="space-y-4 p-5">
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+          {existingImages.map((image) => (
+            <div key={image.id} className={`group relative aspect-square overflow-hidden rounded-xl bg-muted/20 ${image.isPrimary ? "border border-primary/40 ring-1 ring-primary/30" : "border border-border/40"}`}>
+              <img
+                src={resolveImageUrl(image) ?? ""}
+                alt={image.alt ?? "Image du produit"}
+                className="size-full object-cover"
+              />
+              {image.isPrimary ? (
+                <span className="absolute top-1.5 left-1.5 flex items-center gap-1 rounded-full bg-primary/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm">
+                  <Star className="size-2.5" /> Principale
+                </span>
+              ) : null}
+              <div className="absolute inset-0 flex items-center justify-center gap-1.5 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                {!image.isPrimary && onMakePrimary ? (
+                  <button
+                    type="button"
+                    onClick={() => onMakePrimary(image.id)}
+                    title="Définir principale"
+                    className="flex size-8 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur-sm transition-colors hover:bg-amber-500/80"
+                  >
+                    <Star className="size-4" />
+                  </button>
+                ) : null}
+                {onDeleteImage ? (
+                  <button
+                    type="button"
+                    onClick={() => onDeleteImage(image.id)}
+                    title="Supprimer"
+                    className="flex size-8 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur-sm transition-colors hover:bg-destructive/80"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                ) : null}
+              </div>
+            </div>
+          ))}
+
           {pendingImages.map((pending, index) => (
             <div key={pending.url} className="group relative aspect-square overflow-hidden rounded-xl border border-primary/30 bg-muted/20 ring-1 ring-primary/20">
               <img src={pending.url} alt={pending.file.name} className="size-full object-cover" />
