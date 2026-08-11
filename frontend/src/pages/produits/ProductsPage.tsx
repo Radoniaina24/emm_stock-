@@ -9,6 +9,7 @@ import {
   Package,
   Plus,
   ScanLine,
+  Settings2,
   Trash2,
 } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -144,127 +145,167 @@ function FormFields({
   }
 
   return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-sku`}>
-            SKU
-          </label>
-          <input
-            id={`${prefix}-sku`}
-            value={form.sku}
-            onChange={(e) => setForm((prev) => ({ ...prev, sku: e.target.value.toUpperCase() }))}
-            placeholder="SKU-ELEC-021"
-            className={`${inputClass("sku")} font-mono`}
-          />
-          {fieldErrors.sku && <p className="text-xs text-destructive">{fieldErrors.sku}</p>}
+    <div className="space-y-6">
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="flex size-6 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+            <Package className="size-3" />
+          </div>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+            Identité du produit
+          </span>
         </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-sku`}>
+              SKU
+            </label>
+            <input
+              id={`${prefix}-sku`}
+              value={form.sku}
+              onChange={(e) => setForm((prev) => ({ ...prev, sku: e.target.value.toUpperCase() }))}
+              placeholder="SKU-ELEC-021"
+              className={`${inputClass("sku")} font-mono`}
+            />
+            {fieldErrors.sku && <p className="text-xs text-destructive">{fieldErrors.sku}</p>}
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-name`}>
+              Nom du produit
+            </label>
+            <input
+              id={`${prefix}-name`}
+              value={form.name}
+              onChange={(e) => {
+                const name = e.target.value
+                setForm((prev) => ({
+                  ...prev,
+                  name,
+                  slug: slugs.autoSlug.current ? slugify(name) : prev.slug,
+                }))
+              }}
+              placeholder="Tablette graphique"
+              className={inputClass("name")}
+            />
+            {fieldErrors.name && <p className="text-xs text-destructive">{fieldErrors.name}</p>}
+          </div>
+        </div>
+
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-name`}>
-            Nom du produit
+          <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-slug`}>
+            Slug
           </label>
           <input
-            id={`${prefix}-name`}
-            value={form.name}
+            id={`${prefix}-slug`}
+            value={form.slug}
             onChange={(e) => {
-              const name = e.target.value
-              setForm((prev) => ({
-                ...prev,
-                name,
-                slug: slugs.autoSlug.current ? slugify(name) : prev.slug,
-              }))
+              slugs.autoSlug.current = false
+              setForm((prev) => ({ ...prev, slug: e.target.value }))
             }}
-            placeholder="Tablette graphique"
-            className={inputClass("name")}
+            placeholder="tablette-graphique"
+            className={`${inputClass("slug")} font-mono`}
           />
-          {fieldErrors.name && <p className="text-xs text-destructive">{fieldErrors.name}</p>}
+          <p className="text-xs text-muted-foreground/50">
+            Généré automatiquement depuis le nom — modifiable en le touchant.
+          </p>
+          {fieldErrors.slug && <p className="text-xs text-destructive">{fieldErrors.slug}</p>}
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-slug`}>
-          Slug
-        </label>
-        <input
-          id={`${prefix}-slug`}
-          value={form.slug}
-          onChange={(e) => {
-            slugs.autoSlug.current = false
-            setForm((prev) => ({ ...prev, slug: e.target.value }))
-          }}
-          placeholder="tablette-graphique"
-          className={`${inputClass("slug")} font-mono`}
-        />
-        <p className="text-xs text-muted-foreground/50">
-          Généré automatiquement depuis le nom — modifiable en le touchant.
-        </p>
-        {fieldErrors.slug && <p className="text-xs text-destructive">{fieldErrors.slug}</p>}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="flex size-6 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+            <Layers3 className="size-3" />
+          </div>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+            Classement
+          </span>
+        </div>
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-category`}>
+              Catégorie
+            </label>
+            <SearchableSelect
+              variant="inline"
+              value={form.categoryId}
+              placeholder="Toutes…"
+              options={slugs.categoryOptions}
+              onSelect={(value) => setForm((prev) => ({ ...prev, categoryId: value }))}
+              triggerClassName="h-10 w-full bg-background"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-brand`}>
+                Marque
+              </label>
+              <SearchableSelect
+                variant="inline"
+                value={form.brandId}
+                placeholder="Aucune…"
+                options={slugs.brandOptions}
+                onSelect={(value) => setForm((prev) => ({ ...prev, brandId: value }))}
+                triggerClassName="h-10 w-full bg-background"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-unit`}>
+                Unité de mesure
+              </label>
+              <SearchableSelect
+                variant="inline"
+                value={form.unitId}
+                placeholder="Choisir…"
+                options={slugs.unitOptions}
+                onSelect={(value) => setForm((prev) => ({ ...prev, unitId: value }))}
+                triggerClassName={`h-10 w-full bg-background${fieldErrors.unitId ? " border-destructive/60" : ""}`}
+              />
+              {fieldErrors.unitId && <p className="text-xs text-destructive">{fieldErrors.unitId}</p>}
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-category`}>
-            Catégorie
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="flex size-6 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <Settings2 className="size-3" />
+          </div>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+            Paramètres
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-border/20 bg-muted/10 px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-foreground/80">Produit actif</p>
+            <p className="text-xs text-muted-foreground/60">Visible et disponible dans le catalogue</p>
+          </div>
+          <label className="relative inline-flex shrink-0 cursor-pointer items-center">
+            <input
+              type="checkbox"
+              checked={form.isActive}
+              onChange={(e) => setForm((prev) => ({ ...prev, isActive: e.target.checked }))}
+              className="peer sr-only"
+            />
+            <div className="h-5 w-9 rounded-full bg-muted-foreground/30 after:absolute after:left-0.5 after:top-0.5 after:size-4 after:rounded-full after:bg-white after:shadow-sm after:transition-all peer-checked:bg-emerald-500 peer-checked:after:translate-x-full" />
           </label>
-          <SearchableSelect
-            value={form.categoryId}
-            placeholder="Toutes…"
-            options={slugs.categoryOptions}
-            onSelect={(value) => setForm((prev) => ({ ...prev, categoryId: value }))}
-          />
         </div>
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-brand`}>
-            Marque
-          </label>
-          <SearchableSelect
-            value={form.brandId}
-            placeholder="Aucune…"
-            options={slugs.brandOptions}
-            onSelect={(value) => setForm((prev) => ({ ...prev, brandId: value }))}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-unit`}>
-            Unité de mesure
-          </label>
-          <SearchableSelect
-            value={form.unitId}
-            placeholder="Choisir…"
-            options={slugs.unitOptions}
-            onSelect={(value) => setForm((prev) => ({ ...prev, unitId: value }))}
-            triggerClassName={fieldErrors.unitId ? "border-destructive/60" : undefined}
-          />
-          {fieldErrors.unitId && <p className="text-xs text-destructive">{fieldErrors.unitId}</p>}
-        </div>
-      </div>
 
-      <div className="flex items-center gap-3">
-        <label className="relative inline-flex cursor-pointer items-center">
-          <input
-            type="checkbox"
-            checked={form.isActive}
-            onChange={(e) => setForm((prev) => ({ ...prev, isActive: e.target.checked }))}
-            className="peer sr-only"
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-description`}>
+            Description
+          </label>
+          <textarea
+            id={`${prefix}-description`}
+            value={form.description}
+            onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
+            placeholder="Description complète du produit…"
+            rows={3}
+            className={textareaClass("description")}
           />
-          <div className="h-5 w-9 rounded-full bg-muted-foreground/30 after:absolute after:left-0.5 after:top-0.5 after:size-4 after:rounded-full after:bg-white after:shadow-sm after:transition-all peer-checked:bg-emerald-500 peer-checked:after:translate-x-full" />
-        </label>
-        <span className="text-sm text-foreground/80">Produit actif</span>
-      </div>
-
-      <div className="space-y-1.5">
-        <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-description`}>
-          Description
-        </label>
-        <textarea
-          id={`${prefix}-description`}
-          value={form.description}
-          onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-          placeholder="Description complète du produit…"
-          rows={3}
-          className={textareaClass("description")}
-        />
-        {fieldErrors.description && <p className="text-xs text-destructive">{fieldErrors.description}</p>}
+          {fieldErrors.description && <p className="text-xs text-destructive">{fieldErrors.description}</p>}
+        </div>
       </div>
     </div>
   )
@@ -430,6 +471,9 @@ export function ProductsPage() {
   }
 
   const activeCount = all.filter((p) => p.isActive).length
+
+  const detailImage = selectedProduct?.images?.[detailImageIndex] ?? selectedProduct?.images?.[0]
+  const detailImageSrc = resolveImageUrl(detailImage)
 
   const columns: ColumnDef<Product>[] = useMemo(
     () => [
@@ -612,7 +656,7 @@ export function ProductsPage() {
       />
 
       <ModalRoot open={showCreate} onOpenChange={(open) => { if (!open) { setShowCreate(false); resetForm() } }}>
-        <ModalPopup>
+        <ModalPopup size="lg">
           <ModalClose />
           <ModalHeader>
             <div className="flex items-center gap-3">
@@ -628,7 +672,7 @@ export function ProductsPage() {
             </div>
           </ModalHeader>
           <form onSubmit={handleCreate}>
-            <ModalContent>
+            <ModalContent className="max-h-[70vh] overflow-y-auto">
               <div className="space-y-5">
                 <FormFields
                   form={form}
@@ -661,7 +705,7 @@ export function ProductsPage() {
       </ModalRoot>
 
       <ModalRoot open={!!editingProduct} onOpenChange={(open) => { if (!open) { setEditingProduct(null); resetForm() } }}>
-        <ModalPopup>
+        <ModalPopup size="lg">
           <ModalClose />
           <ModalHeader>
             <div className="flex items-center gap-3">
@@ -675,7 +719,7 @@ export function ProductsPage() {
             </div>
           </ModalHeader>
           <form onSubmit={handleUpdate}>
-            <ModalContent>
+            <ModalContent className="max-h-[70vh] overflow-y-auto">
               <div className="space-y-5">
                 <FormFields
                   form={form}
@@ -708,9 +752,9 @@ export function ProductsPage() {
       </ModalRoot>
 
       <ModalRoot open={selectedProductId != null} onOpenChange={(open) => { if (!open) setSelectedProductId(null) }}>
-        <ModalPopup size="full" className="overflow-hidden p-0 sm:mx-4 sm:max-w-2xl">
+        <ModalPopup size="full" className="overflow-hidden p-0 sm:mx-4 sm:max-w-4xl">
           <ModalClose />
-          <div className="flex max-h-[80vh] flex-col">
+          <div className="flex max-h-[85vh] flex-col">
             <div className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-800 to-slate-900 px-6 py-6 text-white">
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.12),transparent_60%)]" />
               <div className="relative flex items-start justify-between">
@@ -751,20 +795,27 @@ export function ProductsPage() {
               </div>
             </div>
 
-            <div className="flex-1 space-y-5 overflow-y-auto p-6">
-              {selectedProduct?.images?.length ? (
-                <div className="space-y-3">
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="grid gap-6 lg:grid-cols-5">
+                <div className="space-y-4 lg:col-span-2">
                   <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border/20 bg-muted/20">
-                    <img
-                      src={resolveImageUrl(selectedProduct.images[detailImageIndex] ?? selectedProduct.images[0]) ?? ""}
-                      alt={selectedProduct.images[detailImageIndex]?.alt ?? selectedProduct.name}
-                      className="size-full object-cover"
-                      onError={(e) => {
-                        ;(e.target as HTMLImageElement).style.display = "none"
-                      }}
-                    />
+                    {detailImageSrc ? (
+                      <img
+                        src={detailImageSrc}
+                        alt={detailImage?.alt ?? selectedProduct?.name ?? "Produit"}
+                        className="size-full object-cover"
+                        onError={(e) => {
+                          ;(e.target as HTMLImageElement).style.display = "none"
+                        }}
+                      />
+                    ) : (
+                      <div className="flex size-full flex-col items-center justify-center gap-2 text-muted-foreground/30">
+                        <Package className="size-12" />
+                        <span className="text-xs font-medium">Aucune image</span>
+                      </div>
+                    )}
                   </div>
-                  {selectedProduct.images.length > 1 ? (
+                  {selectedProduct && selectedProduct.images.length > 1 ? (
                     <div className="flex flex-wrap gap-2">
                       {selectedProduct.images.map((img, i) => (
                         <button
@@ -783,71 +834,91 @@ export function ProductsPage() {
                       ))}
                     </div>
                   ) : null}
-                </div>
-              ) : null}
 
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="flex size-6 items-center justify-center rounded-lg bg-muted/60">
-                    <Package className="size-3 text-muted-foreground/60" />
-                  </div>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Description</span>
-                </div>
-                <p className="pl-8 text-sm leading-relaxed text-foreground/80">
-                  {selectedProduct?.description ?? (
-                    <span className="italic text-muted-foreground/40">Aucune description</span>
-                  )}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
-                  <p className="text-2xl font-bold text-foreground">{selectedProduct?._count.barcodes ?? 0}</p>
-                  <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-muted-foreground/60">
-                    <ScanLine className="size-3" /> Codes-barres
-                  </p>
-                </div>
-                <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
-                  <p className="text-2xl font-bold text-foreground">{selectedProduct?._count.images ?? 0}</p>
-                  <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-muted-foreground/60">
-                    <ImageIcon className="size-3" /> Images
-                  </p>
-                </div>
-                <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
-                  <p className="text-xs font-medium text-muted-foreground/60">Unité</p>
-                  <p className="mt-1 text-lg font-semibold text-foreground">
-                    {selectedProduct?.unit.symbol ?? selectedProduct?.unit.code ?? "—"}
-                  </p>
-                </div>
-              </div>
-
-              {selectedProduct?.barcodes?.length ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="flex size-6 items-center justify-center rounded-lg bg-muted/60">
-                      <ScanLine className="size-3 text-muted-foreground/60" />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
+                      <p className="text-2xl font-bold text-foreground">{selectedProduct?._count.barcodes ?? 0}</p>
+                      <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-muted-foreground/60">
+                        <ScanLine className="size-3" /> Codes-barres
+                      </p>
                     </div>
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
-                      Codes-barres associés
-                    </span>
-                  </div>
-                  <div className="pl-8">
-                    {selectedProduct.barcodes.map((b) => (
-                      <div key={b.id} className="flex items-center justify-between gap-2 rounded-lg border border-border/20 bg-muted/10 px-3 py-2">
-                        <code className="truncate font-mono text-xs text-foreground">{b.code}</code>
-                        <div className="flex shrink-0 items-center gap-2">
-                          <span className="font-mono text-[10px] text-muted-foreground/50">{b.type}</span>
-                          {b.isPrimary ? (
-                            <Badge className="border-0 bg-emerald-500/15 px-1.5 py-0 text-[10px] text-emerald-600 dark:text-emerald-400">
-                              Principal
-                            </Badge>
-                          ) : null}
-                        </div>
-                      </div>
-                    ))}
+                    <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
+                      <p className="text-2xl font-bold text-foreground">{selectedProduct?._count.images ?? 0}</p>
+                      <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-muted-foreground/60">
+                        <ImageIcon className="size-3" /> Images
+                      </p>
+                    </div>
                   </div>
                 </div>
-              ) : null}
+
+                <div className="space-y-5 lg:col-span-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex size-6 items-center justify-center rounded-lg bg-muted/60">
+                        <Package className="size-3 text-muted-foreground/60" />
+                      </div>
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Description</span>
+                    </div>
+                    <p className="pl-8 text-sm leading-relaxed text-foreground/80">
+                      {selectedProduct?.description ?? (
+                        <span className="italic text-muted-foreground/40">Aucune description</span>
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Unité</p>
+                      <p className="mt-1 text-lg font-semibold text-foreground">
+                        {selectedProduct?.unit.symbol ?? selectedProduct?.unit.code ?? "—"}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Marque</p>
+                      <p className="mt-1 truncate text-lg font-semibold text-foreground">
+                        {selectedProduct?.brand?.name ?? <span className="italic text-muted-foreground/40">Générique</span>}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Statut</p>
+                      <p className={`mt-1 flex items-center gap-1.5 text-lg font-semibold ${selectedProduct?.isActive ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground/50"}`}>
+                        <span className={`inline-block size-2 rounded-full ${selectedProduct?.isActive ? "bg-emerald-500" : "bg-muted-foreground/30"}`} />
+                        {selectedProduct?.isActive ? "Actif" : "Inactif"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex size-6 items-center justify-center rounded-lg bg-muted/60">
+                        <ScanLine className="size-3 text-muted-foreground/60" />
+                      </div>
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+                        Codes-barres associés ({selectedProduct?.barcodes?.length ?? 0})
+                      </span>
+                    </div>
+                    {selectedProduct && selectedProduct.barcodes.length > 0 ? (
+                      <div className="space-y-1.5 pl-8">
+                        {selectedProduct.barcodes.map((b) => (
+                          <div key={b.id} className="flex items-center justify-between gap-2 rounded-lg border border-border/20 bg-muted/10 px-3 py-2">
+                            <code className="truncate font-mono text-xs text-foreground">{b.code}</code>
+                            <div className="flex shrink-0 items-center gap-2">
+                              <span className="font-mono text-[10px] text-muted-foreground/50">{b.type}</span>
+                              {b.isPrimary ? (
+                                <Badge className="border-0 bg-emerald-500/15 px-1.5 py-0 text-[10px] text-emerald-600 dark:text-emerald-400">
+                                  Principal
+                                </Badge>
+                              ) : null}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="pl-8 text-sm italic text-muted-foreground/40">Aucun code-barres associé</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center justify-between border-t border-border/20 bg-muted/20 px-6 py-3.5">
