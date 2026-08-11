@@ -5,9 +5,13 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider     = "mysql"
   relationMode = "foreignKeys"
 }
+
+// ═══════════════════════════════════════════════════════════
+// AUTHENTIFICATION / RBAC
+// ═══════════════════════════════════════════════════════════
 
 model Permission {
   id          String   @id @default(cuid()) @db.VarChar(30)
@@ -26,7 +30,7 @@ model RolePermission {
   roleId       String @map("role_id") @db.VarChar(30)
   permissionId String @map("permission_id") @db.VarChar(30)
 
-  createdAt   DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
@@ -42,10 +46,12 @@ model Role {
   description String?  @db.Text
   isSystem    Boolean  @default(false) @map("is_system")
   isActive    Boolean  @default(true) @map("is_active")
+
   users           User[]
   rolePermissions RolePermission[]
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("roles")
 }
@@ -58,19 +64,19 @@ enum UserStatus {
 }
 
 model User {
-  id        String @id @default(cuid()) @db.VarChar(30)
+  id String @id @default(cuid()) @db.VarChar(30)
 
-  email     String @unique @db.VarChar(100)
-  username  String @unique @db.VarChar(50)
-  password  String @db.VarChar(255)
+  email    String @unique @db.VarChar(100)
+  username String @unique @db.VarChar(50)
+  password String @db.VarChar(255)
 
-  status                   UserStatus @default(ACTIVE)
-  mustChangePassword       Boolean @default(true) @map("must_change_password")
-  twoFactorEnabled         Boolean @default(false) @map("two_factor_enabled")
-  failedLoginAttempts      Int @default(0) @map("failed_login_attempts")
-  lockedUntil              DateTime? @map("locked_until")
-  lastLoginAt              DateTime? @map("last_login_at")
-  emailVerifiedAt          DateTime? @map("email_verified_at")
+  status              UserStatus @default(ACTIVE)
+  mustChangePassword  Boolean    @default(true) @map("must_change_password")
+  twoFactorEnabled    Boolean    @default(false) @map("two_factor_enabled")
+  failedLoginAttempts Int        @default(0) @map("failed_login_attempts")
+  lockedUntil         DateTime?  @map("locked_until")
+  lastLoginAt         DateTime?  @map("last_login_at")
+  emailVerifiedAt     DateTime?  @map("email_verified_at")
 
   roleId String @map("role_id") @db.VarChar(30)
 
@@ -81,44 +87,45 @@ model User {
 
   profile UserProfile?
 
-  entries     Entry[]
-  exits       Exit[]
-  inventories Inventory[]
+  entries      Entry[]
+  exits        Exit[]
+  inventories  Inventory[]
+  stockMoves   StockMove[]
 
   @@map("users")
 }
 
 model UserProfile {
-  id             String    @id @default(cuid()) @db.VarChar(30)
-  userId         String    @unique @map("user_id") @db.VarChar(30)
+  id     String @id @default(cuid()) @db.VarChar(30)
+  userId String @unique @map("user_id") @db.VarChar(30)
 
-  employeeCode   String    @unique @map("employee_code") @db.VarChar(30)
+  employeeCode String @unique @map("employee_code") @db.VarChar(30)
 
-  firstName      String    @map("first_name") @db.VarChar(100)
-  lastName       String    @map("last_name") @db.VarChar(100)
-  displayName    String    @map("display_name") @db.VarChar(150)
-  profilePhoto   String?   @map("profile_photo") @db.VarChar(255)
+  firstName    String  @map("first_name") @db.VarChar(100)
+  lastName     String  @map("last_name") @db.VarChar(100)
+  displayName  String  @map("display_name") @db.VarChar(150)
+  profilePhoto String? @map("profile_photo") @db.VarChar(255)
 
-  phone          String?   @db.VarChar(30)
-  secondaryPhone String?   @map("secondary_phone") @db.VarChar(30)
+  phone          String? @db.VarChar(30)
+  secondaryPhone String? @map("secondary_phone") @db.VarChar(30)
 
-  birthDate      DateTime? @map("birth_date") @db.Date
-  gender         String?   @db.VarChar(20)
+  birthDate DateTime? @map("birth_date") @db.Date
+  gender    String?   @db.VarChar(20)
 
-  address        String?   @db.VarChar(255)
-  city           String?   @db.VarChar(100)
-  region         String?   @db.VarChar(100)
-  country        String?   @db.VarChar(100)
-  postalCode     String?   @map("postal_code") @db.VarChar(20)
+  address    String? @db.VarChar(255)
+  city       String? @db.VarChar(100)
+  region     String? @db.VarChar(100)
+  country    String? @db.VarChar(100)
+  postalCode String? @map("postal_code") @db.VarChar(20)
 
-  departmentId   String?   @map("department_id") @db.VarChar(30)
-  jobTitleId     String?   @map("job_title_id") @db.VarChar(30)
-  warehouseId    String?   @map("warehouse_id") @db.VarChar(30)
+  departmentId String? @map("department_id") @db.VarChar(30)
+  jobTitleId   String? @map("job_title_id") @db.VarChar(30)
+  warehouseId  String? @map("warehouse_id") @db.VarChar(30)
 
-  signature      String?   @db.Text
+  signature String? @db.Text
 
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   department Department? @relation(fields: [departmentId], references: [id])
@@ -156,6 +163,10 @@ model JobTitle {
   @@map("job_titles")
 }
 
+// ═══════════════════════════════════════════════════════════
+// CATALOGUE PRODUIT
+// ═══════════════════════════════════════════════════════════
+
 model Category {
   id          Int     @id @default(autoincrement())
   name        String  @db.VarChar(150)
@@ -184,11 +195,11 @@ model Category {
 }
 
 model Brand {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(150)
-  slug        String   @unique @db.VarChar(180)
-  description String?  @db.Text
-  logoUrl     String?  @map("logo_url") @db.VarChar(500)
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(150)
+  slug        String  @unique @db.VarChar(180)
+  description String? @db.Text
+  logoUrl     String? @map("logo_url") @db.VarChar(500)
 
   isActive  Boolean @default(true) @map("is_active")
   sortOrder Int     @default(0) @map("sort_order")
@@ -204,36 +215,61 @@ model Brand {
 }
 
 model UnitOfMeasure {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(100)
-  code        String   @unique @db.VarChar(20)
-  symbol      String?  @db.VarChar(10)
-  description String?  @db.Text
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(100)
+  code        String  @unique @db.VarChar(20)
+  symbol      String? @db.VarChar(10)
+  description String? @db.Text
 
-  isActive  Boolean @default(true)
+  // Permet de convertir entre UoM d'une même catégorie
+  // ex: Carton -> Unité (factor = 12)
+  category String  @default("unit") @db.VarChar(50) @map("uom_category")
+  ratio    Decimal @default(1) @db.Decimal(12, 6)
+  isReference Boolean @default(false) @map("is_reference")
+
+  isActive Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  products Product[]
+  products         Product[] @relation("StockingUnit")
+  purchaseProducts Product[] @relation("PurchaseUnit")
+  saleProducts     Product[] @relation("SaleUnit")
 
   @@index([name])
   @@index([isActive])
   @@map("units_of_measure")
 }
 
+enum ProductType {
+  STORABLE   // stocké, suivi de quantité
+  CONSUMABLE // non suivi en stock précis (ex: fournitures)
+  SERVICE    // pas de stock physique
+}
+
+enum TrackingType {
+  NONE   // pas de suivi individuel
+  LOT    // suivi par lot
+  SERIAL // suivi par numéro de série unitaire
+}
+
 model Product {
-  id   Int    @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   // ─────────────────────────────────────────────
   // Identité produit
   // ─────────────────────────────────────────────
 
-  sku         String  @unique @db.VarChar(100)
-  name        String  @db.VarChar(200)
-  slug        String  @unique @db.VarChar(220)
+  sku  String @unique @db.VarChar(100)
+  name String @db.VarChar(200)
+  slug String @unique @db.VarChar(220)
 
-  description String? @db.Text
+  description         String? @db.Text
+  descriptionPurchase String? @map("description_purchase") @db.Text
+  descriptionSale      String? @map("description_sale") @db.Text
+  internalNotes        String? @map("internal_notes") @db.Text
+
+  type ProductType @default(STORABLE)
 
   // ─────────────────────────────────────────────
   // Référentiels
@@ -241,11 +277,41 @@ model Product {
 
   brandId    Int?
   categoryId Int?
-  unitId     Int
+  unitId     Int @map("unit_id") // UoM de stockage / référence
 
-  brand    Brand?        @relation(fields: [brandId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  category Category?     @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  unit     UnitOfMeasure @relation(fields: [unitId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  purchaseUnitId Int? @map("purchase_unit_id")
+  saleUnitId     Int? @map("sale_unit_id")
+
+  brand        Brand?         @relation(fields: [brandId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  category     Category?      @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  unit         UnitOfMeasure  @relation("StockingUnit", fields: [unitId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  purchaseUnit UnitOfMeasure? @relation("PurchaseUnit", fields: [purchaseUnitId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  saleUnit     UnitOfMeasure? @relation("SaleUnit", fields: [saleUnitId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  // ─────────────────────────────────────────────
+  // Prix et coûts
+  // ─────────────────────────────────────────────
+
+  costPrice Decimal @default(0) @map("cost_price") @db.Decimal(12, 4)
+  salePrice Decimal @default(0) @map("sale_price") @db.Decimal(12, 4)
+  taxRate   Decimal @default(0) @map("tax_rate") @db.Decimal(5, 2) // %
+
+  // ─────────────────────────────────────────────
+  // Traçabilité (lot / série / péremption)
+  // ─────────────────────────────────────────────
+
+  tracking      TrackingType @default(NONE)
+  hasExpiry     Boolean      @default(false) @map("has_expiry")
+  shelfLifeDays Int?         @map("shelf_life_days")
+
+  // ─────────────────────────────────────────────
+  // Logistique
+  // ─────────────────────────────────────────────
+
+  weight Decimal? @db.Decimal(10, 3) // kg
+  length Decimal? @db.Decimal(10, 2) // cm
+  width  Decimal? @db.Decimal(10, 2) // cm
+  height Decimal? @db.Decimal(10, 2) // cm
 
   // ─────────────────────────────────────────────
   // Médias
@@ -260,17 +326,34 @@ model Product {
   barcodes ProductBarcode[]
 
   // ─────────────────────────────────────────────
+  // Fournisseurs
+  // ─────────────────────────────────────────────
+
+  productSuppliers ProductSupplier[]
+
+  // ─────────────────────────────────────────────
+  // Stock
+  // ─────────────────────────────────────────────
+
+  stockLevels   StockLevel[]
+  reorderRules  ReorderRule[]
+  entryLines    EntryLine[]
+  exitLines     ExitLine[]
+  inventoryLines InventoryLine[]
+  stockMoves    StockMove[]
+
+  // ─────────────────────────────────────────────
   // Statut
   // ─────────────────────────────────────────────
 
-  isActive Boolean @default(true)
+  isActive Boolean @default(true) @map("is_active")
 
   // ─────────────────────────────────────────────
   // Audit
   // ─────────────────────────────────────────────
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // ─────────────────────────────────────────────
   // Index
@@ -281,7 +364,7 @@ model Product {
   @@index([categoryId])
   @@index([unitId])
   @@index([isActive])
-
+  @@index([type])
   @@map("products")
 }
 
@@ -294,22 +377,22 @@ enum ImageStorageProvider {
 }
 
 model ProductImage {
-  id        Int    @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  productId Int @map("product_id")
+  productId Int     @map("product_id")
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   // URL publique/CDN
-  url       String @db.VarChar(1000)
+  url String @db.VarChar(1000)
 
   // Identifiant du fichier chez Cloudinary/S3/etc.
   storageKey String? @map("storage_key") @db.VarChar(500)
 
   // Provider de stockage
-  provider  ImageStorageProvider @default(CLOUDINARY)
+  provider ImageStorageProvider @default(CLOUDINARY)
 
   // Informations d'affichage
-  alt       String? @db.VarChar(255)
+  alt String? @db.VarChar(255)
 
   // Image principale du produit
   isPrimary Boolean @default(false) @map("is_primary")
@@ -323,7 +406,6 @@ model ProductImage {
   @@index([productId])
   @@index([productId, sortOrder])
   @@index([productId, isPrimary])
-
   @@map("product_images")
 }
 
@@ -342,16 +424,16 @@ enum BarcodeType {
 }
 
 model ProductBarcode {
-  id        Int    @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  productId Int @map("product_id")
+  productId Int     @map("product_id")
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   // Valeur réelle du code-barres
-  code      String @unique @db.VarChar(100)
+  code String @unique @db.VarChar(100)
 
   // Type de code
-  type      BarcodeType @default(EAN13)
+  type BarcodeType @default(EAN13)
 
   // Code principal utilisé par défaut
   isPrimary Boolean @default(false) @map("is_primary")
@@ -362,9 +444,38 @@ model ProductBarcode {
   @@index([productId])
   @@index([productId, isPrimary])
   @@index([type])
-
   @@map("product_barcodes")
 }
+
+// Prix/délai par fournisseur pour un même produit (style product.supplierinfo Odoo)
+model ProductSupplier {
+  id String @id @default(cuid()) @db.VarChar(30)
+
+  productId  Int    @map("product_id")
+  supplierId String @map("supplier_id") @db.VarChar(30)
+
+  supplierSku  String? @map("supplier_sku") @db.VarChar(100)
+  price        Decimal @db.Decimal(12, 4)
+  minQty       Decimal @default(1) @map("min_qty") @db.Decimal(12, 3)
+  leadTimeDays Int?    @map("lead_time_days")
+  isPreferred  Boolean @default(false) @map("is_preferred")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, supplierId])
+  @@index([productId])
+  @@index([supplierId])
+  @@index([isPreferred])
+  @@map("product_suppliers")
+}
+
+// ═══════════════════════════════════════════════════════════
+// ENTREPÔTS / EMPLACEMENTS
+// ═══════════════════════════════════════════════════════════
 
 model Warehouse {
   id        String   @id @default(cuid()) @db.VarChar(30)
@@ -374,11 +485,14 @@ model Warehouse {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  zones            Zone[]
-  userProfiles  UserProfile[]
-  entries        Entry[]
-  exits          Exit[]
-  inventories    Inventory[]
+  zones        Zone[]
+  userProfiles UserProfile[]
+  entries      Entry[]
+  exits        Exit[]
+  inventories  Inventory[]
+  stockLevels  StockLevel[]
+  reorderRules ReorderRule[]
+  stockMoves   StockMove[]
 
   @@map("warehouses")
 }
@@ -394,6 +508,9 @@ model Zone {
 
   warehouse Warehouse @relation(fields: [warehouseId], references: [id])
 
+  stockLevels StockLevel[]
+
+  @@index([warehouseId])
   @@map("zones")
 }
 
@@ -408,9 +525,113 @@ model Supplier {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  entries Entry[]
+  entries          Entry[]
+  productSuppliers ProductSupplier[]
 
   @@map("suppliers")
+}
+
+// ═══════════════════════════════════════════════════════════
+// STOCK EN TEMPS RÉEL
+// ═══════════════════════════════════════════════════════════
+
+// Quantité disponible par produit / entrepôt / zone (équivalent stock.quant)
+model StockLevel {
+  id String @id @default(cuid()) @db.VarChar(30)
+
+  productId   Int     @map("product_id")
+  warehouseId String  @map("warehouse_id") @db.VarChar(30)
+  zoneId      String? @map("zone_id") @db.VarChar(30)
+
+  quantityOnHand   Decimal @default(0) @map("quantity_on_hand") @db.Decimal(14, 3)
+  quantityReserved Decimal @default(0) @map("quantity_reserved") @db.Decimal(14, 3)
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  zone      Zone?     @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, warehouseId, zoneId])
+  @@index([productId])
+  @@index([warehouseId])
+  @@map("stock_levels")
+}
+
+// Point de commande / stock mini-maxi par entrepôt (équivalent orderpoint Odoo)
+model ReorderRule {
+  id String @id @default(cuid()) @db.VarChar(30)
+
+  productId   Int    @map("product_id")
+  warehouseId String @map("warehouse_id") @db.VarChar(30)
+
+  minQty Decimal @map("min_qty") @db.Decimal(14, 3)
+  maxQty Decimal @map("max_qty") @db.Decimal(14, 3)
+
+  isActive Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, warehouseId])
+  @@index([productId])
+  @@index([warehouseId])
+  @@map("reorder_rules")
+}
+
+// Journal unique de tous les mouvements de stock (équivalent stock.move)
+// Alimenté automatiquement à la validation d'une Entry / Exit / Inventory
+enum StockMoveType {
+  ENTRY
+  EXIT
+  INVENTORY_ADJUSTMENT
+  TRANSFER
+}
+
+model StockMove {
+  id String @id @default(cuid()) @db.VarChar(30)
+
+  productId   Int    @map("product_id")
+  warehouseId String @map("warehouse_id") @db.VarChar(30)
+  userId      String @map("user_id") @db.VarChar(30)
+
+  type     StockMoveType
+  quantity Decimal       @db.Decimal(14, 3) // signé: + entrée, - sortie
+  unitCost Decimal?      @map("unit_cost") @db.Decimal(12, 4)
+
+  lotNumber  String?   @map("lot_number") @db.VarChar(100)
+  expiryDate DateTime? @map("expiry_date")
+
+  // Référence polymorphe vers le document d'origine
+  sourceType String @map("source_type") @db.VarChar(30) // "entry" | "exit" | "inventory"
+  sourceId   String @map("source_id") @db.VarChar(30)
+
+  date      DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Restrict)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([productId])
+  @@index([warehouseId])
+  @@index([sourceType, sourceId])
+  @@index([date])
+  @@map("stock_moves")
+}
+
+// ═══════════════════════════════════════════════════════════
+// ENTRÉES DE STOCK
+// ═══════════════════════════════════════════════════════════
+
+enum DocumentStatus {
+  DRAFT
+  CONFIRMED
+  DONE
+  CANCELLED
 }
 
 model Entry {
@@ -418,37 +639,99 @@ model Entry {
   reference   String   @unique @db.VarChar(50)
   date        DateTime @default(now())
   description String?  @db.VarChar(255)
+  status      DocumentStatus @default(DRAFT)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  supplierId String @map("supplier_id") @db.VarChar(30)
-  userId     String @map("user_id") @db.VarChar(30)
+  supplierId  String @map("supplier_id") @db.VarChar(30)
+  userId      String @map("user_id") @db.VarChar(30)
+  warehouseId String @map("warehouse_id") @db.VarChar(30)
 
-  supplier Supplier   @relation(fields: [supplierId], references: [id])
-  user     User       @relation(fields: [userId], references: [id])
-  warehouseId String  @map("warehouse_id") @db.VarChar(30)
-  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  supplier  Supplier  @relation(fields: [supplierId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id])
 
+  lines EntryLine[]
+
+  @@index([supplierId])
+  @@index([userId])
+  @@index([warehouseId])
+  @@index([status])
   @@map("entries")
 }
 
+model EntryLine {
+  id      String @id @default(cuid()) @db.VarChar(30)
+  entryId String @map("entry_id") @db.VarChar(30)
+
+  productId Int     @map("product_id")
+  quantity  Decimal @db.Decimal(14, 3)
+  unitCost  Decimal @map("unit_cost") @db.Decimal(12, 4)
+
+  lotNumber  String?   @map("lot_number") @db.VarChar(100)
+  expiryDate DateTime? @map("expiry_date")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  entry   Entry   @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([entryId])
+  @@index([productId])
+  @@map("entry_lines")
+}
+
+// ═══════════════════════════════════════════════════════════
+// SORTIES DE STOCK
+// ═══════════════════════════════════════════════════════════
+
 model Exit {
-  id          String   @id @default(cuid()) @db.VarChar(30)
-  reference   String   @unique @db.VarChar(50)
-  date        DateTime @default(now())
-  type        String   @default("vente") @db.VarChar(30)
-  description String?  @db.VarChar(255)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id          String         @id @default(cuid()) @db.VarChar(30)
+  reference   String         @unique @db.VarChar(50)
+  date        DateTime       @default(now())
+  type        String         @default("vente") @db.VarChar(30)
+  description String?        @db.VarChar(255)
+  status      DocumentStatus @default(DRAFT)
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
 
-  userId      String @map("user_id")
-  warehouseId String @map("warehouse_id")
+  userId      String @map("user_id") @db.VarChar(30)
+  warehouseId String @map("warehouse_id") @db.VarChar(30)
 
-  user      User       @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
   warehouse Warehouse @relation(fields: [warehouseId], references: [id])
 
+  lines ExitLine[]
+
+  @@index([userId])
+  @@index([warehouseId])
+  @@index([status])
   @@map("exits")
 }
+
+model ExitLine {
+  id     String @id @default(cuid()) @db.VarChar(30)
+  exitId String @map("exit_id") @db.VarChar(30)
+
+  productId  Int     @map("product_id")
+  quantity   Decimal @db.Decimal(14, 3)
+  unitPrice  Decimal @map("unit_price") @db.Decimal(12, 4)
+
+  lotNumber String? @map("lot_number") @db.VarChar(100)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  exit    Exit    @relation(fields: [exitId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([exitId])
+  @@index([productId])
+  @@map("exit_lines")
+}
+
+// ═══════════════════════════════════════════════════════════
+// INVENTAIRES
+// ═══════════════════════════════════════════════════════════
 
 model Inventory {
   id          String   @id @default(cuid()) @db.VarChar(30)
@@ -462,8 +745,31 @@ model Inventory {
   userId      String @map("user_id") @db.VarChar(30)
   warehouseId String @map("warehouse_id") @db.VarChar(30)
 
-  user      User       @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
   warehouse Warehouse @relation(fields: [warehouseId], references: [id])
 
+  lines InventoryLine[]
+
+  @@index([userId])
+  @@index([warehouseId])
   @@map("inventories")
+}
+
+model InventoryLine {
+  id          String @id @default(cuid()) @db.VarChar(30)
+  inventoryId String @map("inventory_id") @db.VarChar(30)
+
+  productId       Int     @map("product_id")
+  quantityCounted Decimal @map("quantity_counted") @db.Decimal(14, 3)
+  quantityExpected Decimal @map("quantity_expected") @db.Decimal(14, 3)
+  // écart = quantityCounted - quantityExpected
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([inventoryId])
+  @@index([productId])
+  @@map("inventory_lines")
 }
