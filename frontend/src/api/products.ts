@@ -72,3 +72,20 @@ export function updateProduct(id: number, payload: UpdateProductPayload) {
 export function deleteProduct(id: number) {
   return api<void>(`/products/${id}`, { method: "DELETE" })
 }
+
+export function uploadProductImage(productId: number, file: File) {
+  const form = new FormData()
+  form.append("file", file)
+  return api<ProductImage>(`/products/${productId}/images`, { method: "POST", body: form })
+}
+
+export function updateProductImage(
+  imageId: number,
+  payload: { isPrimary?: boolean; alt?: string },
+) {
+  return api<ProductImage>(`/products/images/${imageId}`, { method: "PATCH", body: payload })
+}
+
+export function deleteProductImage(imageId: number) {
+  return api<void>(`/products/images/${imageId}`, { method: "DELETE" })
+}

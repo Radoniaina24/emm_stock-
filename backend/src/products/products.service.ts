@@ -4,10 +4,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'fs';
+import { join } from 'path';
 import { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
+import { UpdateProductImageDto } from './dto/update-product-image.dto.js';
+
+const IMAGES_DIR = join(process.cwd(), 'uploads', 'products');
+const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const MAX_SIZE = 2 * 1024 * 1024;
 
 @Injectable()
 export class ProductsService {
@@ -203,6 +210,111 @@ export class ProductsService {
     operations.push(this.prisma.product.delete({ where: { id } }));
 
     await this.prisma.$transaction(operations);
+  }
+
+  async uploadImage(productId: number, file: Express.Multer.File) {
+    const product = await this.prisma.product.findUnique({ where: { id: productId } });
+    if (!product) throw new NotFoundException('Produit introuvable');
+    if (!file) throw new BadRequestException('Aucun fichier fourni');
+    if (!ALLOWED_MIME.has(file.mimetype)) {
+      throw new BadRequestException('Formats acceptés : JPG, PNG, WebP');
+    }
+    if (file.size > MAX_SIZE) {
+      throw new BadRequestException('Fichier trop volumineux (max 2 Mo)');
+    }
+
+    if (!existsSync(IMAGES_DIR)) {
+      mkdirSync(IMAGES_DIR, { recursive: true });
+    }
+
+    const ext = this.extensionFor(file.mimetype);
+    const filename = `${product.sku}-${Date.now()}-${Math.round(Math.random() * 1e6)}.${ext}`;
+    writeFileSync(join(IMAGES_DIR, filename), file.buffer);
+
+    const last = await this.prisma.productImage.findFirst({
+      where: { productId },
+      orderBy: { sortOrder: 'desc' },
+      select: { sortOrder: true },
+    });
+    const hasPrimary = await this.prisma.productImage.findFirst({
+      where: { productId, isPrimary: true },
+      select: { id: true },
+    });
+
+    return this.prisma.productImage.create({
+      data: {
+        productId,
+        url: `/uploads/products/${filename}`,
+        storageKey: filename,
+        provider: 'LOCAL',
+        isPrimary: !hasPrimary,
+        sortOrder: (last?.sortOrder ?? 0) + 1,
+      },
+    });
+  }
+
+  async updateImage(imageId: number, dto: UpdateProductImageDto) {
+    const image = await this.prisma.productImage.findUnique({ where: { id: imageId } });
+    if (!image) throw new NotFoundException('Image introuvable');
+
+    const data: Record<string, unknown> = {};
+    if (dto.alt !== undefined) data.alt = dto.alt;
+    if (dto.isPrimary !== undefined) data.isPrimary = dto.isPrimary;
+
+    if (dto.isPrimary) {
+      await this.prisma.productImage.updateMany({
+        where: { productId: image.productId, isPrimary: true, NOT: { id: imageId } },
+        data: { isPrimary: false },
+      });
+    }
+
+    return this.prisma.productImage.update({
+      where: { id: imageId },
+      data,
+    });
+  }
+
+  async deleteImage(imageId: number) {
+    const image = await this.prisma.productImage.findUnique({ where: { id: imageId } });
+    if (!image) throw new NotFoundException('Image introuvable');
+
+    this.removeImageFile(image.url, image.storageKey);
+    await this.prisma.productImage.delete({ where: { id: imageId } });
+
+    if (image.isPrimary) {
+      const next = await this.prisma.productImage.findFirst({
+        where: { productId: image.productId },
+        orderBy: { sortOrder: 'asc' },
+        select: { id: true },
+      });
+      if (next) {
+        await this.prisma.productImage.update({
+          where: { id: next.id },
+          data: { isPrimary: true },
+        });
+      }
+    }
+  }
+
+  private extensionFor(mime: string): string {
+    if (mime === 'image/png') return 'png';
+    if (mime === 'image/webp') return 'webp';
+    return 'jpg';
+  }
+
+  private removeImageFile(url: string, storageKey: string | null | undefined) {
+    const filename = storageKey?.startsWith('/')
+      ? storageKey.replace(/^\//, '')
+      : storageKey ?? url.replace('/uploads/products/', '');
+    if (!/^[a-zA-Z0-9._-]+$/.test(filename)) return;
+    const full = join(IMAGES_DIR, filename);
+    if (existsSync(full)) {
+      try {
+        unlinkSync(full);
+      } catch {
+        // ignore
+      }
+    }
   }
 
   private slugify(value: string): string {

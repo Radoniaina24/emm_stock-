@@ -1,15 +1,17 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react"
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react"
 import {
   AlertTriangle,
   Building2,
   Edit,
   Eye,
   Image as ImageIcon,
+  ImagePlus,
   Layers3,
   Package,
   Plus,
   ScanLine,
   Settings2,
+  Star,
   Trash2,
 } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -29,12 +31,12 @@ import {
 } from "@/components/ui/modal"
 import { toast } from "@/components/ui/toast"
 import { SearchableSelect } from "@/components/ui/searchable-select"
-import { useProductsQuery, useProductQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation } from "@/hooks/use-products"
+import { useProductsQuery, useProductQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation, useUploadProductImageMutation, useUpdateProductImageMutation, useDeleteProductImageMutation } from "@/hooks/use-products"
 import { useCategoriesQuery } from "@/hooks/use-categories"
 import { useBrandsQuery } from "@/hooks/use-brands"
 import { useUnitsOfMeasureQuery } from "@/hooks/use-units-of-measure"
 import { ApiError } from "@/lib/api"
-import { resolveImageUrl, type Product } from "@/api/products"
+import { resolveImageUrl, type Product, type ProductImage } from "@/api/products"
 
 function ProductThumb({
   product,
@@ -109,7 +111,57 @@ function slugify(value: string): string {
     .replace(/^-+|-+$/g, "")
 }
 
+const SKU_STOPWORDS = new Set([
+  "chaussure", "chaussures", "chaussette", "chaussettes", "chapeau", "chapeaux",
+  "chemise", "chemises", "pantalon", "pantalons", "short", "shorts",
+  "veste", "vestes", "manteau", "manteaux", "pull", "pulls", "sweat", "sweats",
+  "t-shirt", "tshirt", "tee", "robe", "robes", "jupe", "jupes",
+  "sac", "sacs", "ceinture", "ceintures", "montre", "montres",
+  "lunettes", "casquette", "casquettes", "paire", "paires",
+  "de", "du", "des", "la", "le", "les", "un", "une", "pour", "avec", "et",
+])
+
+const SKU_COLOR_CODES: Record<string, string> = {
+  noir: "BLK",
+  blanc: "WHT",
+  rouge: "RED",
+  bleu: "BLU",
+  vert: "GRN",
+  jaune: "YLW",
+  gris: "GRY",
+  rose: "PNK",
+  orange: "ORG",
+  violet: "PPL",
+  marron: "BRN",
+  beige: "BGE",
+  or: "GLD",
+  argent: "SLV",
+  bordeaux: "BRD",
+  turquoise: "TRQ",
+  kaki: "KAK",
+  navy: "NVY",
+}
+
+function generateSku(name: string, brandName: string | null | undefined): string {
+  const segments: string[] = []
+  if (brandName) {
+    const brandToken = slugify(brandName).split("-")[0]
+    if (brandToken) segments.push(brandToken.slice(0, 3).toUpperCase())
+  }
+  for (const word of slugify(name).split("-")) {
+    if (!word) continue
+    if (segments.length >= 4) break
+    if (SKU_STOPWORDS.has(word)) continue
+    if (/^\d+$/.test(word)) segments.push(word)
+    else if (SKU_COLOR_CODES[word]) segments.push(SKU_COLOR_CODES[word])
+    else segments.push(word.slice(0, 3).toUpperCase())
+  }
+  return segments.join("-")
+}
+
 type Option = { value: string; label: string }
+
+type PendingImage = { file: File; url: string }
 
 function FormFields({
   form,
@@ -117,6 +169,12 @@ function FormFields({
   fieldErrors,
   prefix,
   slugs,
+  images,
+  pendingImages,
+  onAddFiles,
+  onRemovePending,
+  onSetPrimary,
+  onDeleteImage,
 }: {
   form: ProductFormData
   setForm: React.Dispatch<React.SetStateAction<ProductFormData>>
@@ -127,8 +185,16 @@ function FormFields({
     categoryOptions: Option[]
     unitOptions: Option[]
     autoSlug: React.MutableRefObject<boolean>
+    autoSku: React.MutableRefObject<boolean>
   }
+  images: ProductImage[]
+  pendingImages: PendingImage[]
+  onAddFiles: (files: File[]) => void
+  onRemovePending: (index: number) => void
+  onSetPrimary: (image: ProductImage) => void
+  onDeleteImage: (image: ProductImage) => void
 }) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
   function inputClass(field: keyof ProductFormData, extra = "") {
     const base = "h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none transition-all placeholder:text-muted-foreground/30 hover:border-border focus:shadow-sm focus:ring-2"
     const state = fieldErrors[field]
@@ -163,10 +229,16 @@ function FormFields({
             <input
               id={`${prefix}-sku`}
               value={form.sku}
-              onChange={(e) => setForm((prev) => ({ ...prev, sku: e.target.value.toUpperCase() }))}
-              placeholder="SKU-ELEC-021"
+              onChange={(e) => {
+                slugs.autoSku.current = false
+                setForm((prev) => ({ ...prev, sku: e.target.value.toUpperCase() }))
+              }}
+              placeholder="NIK-RUN-BLK-42"
               className={`${inputClass("sku")} font-mono`}
             />
+            <p className="text-xs text-muted-foreground/50">
+              Généré automatiquement depuis le nom et la marque — modifiable en le touchant.
+            </p>
             {fieldErrors.sku && <p className="text-xs text-destructive">{fieldErrors.sku}</p>}
           </div>
           <div className="space-y-1.5">
@@ -178,13 +250,15 @@ function FormFields({
               value={form.name}
               onChange={(e) => {
                 const name = e.target.value
+                const brandName = slugs.brandOptions.find((o) => o.value === form.brandId)?.label
                 setForm((prev) => ({
                   ...prev,
                   name,
                   slug: slugs.autoSlug.current ? slugify(name) : prev.slug,
+                  sku: slugs.autoSku.current ? generateSku(name, brandName) : prev.sku,
                 }))
               }}
-              placeholder="Tablette graphique"
+              placeholder="Chaussure Running Noir 42"
               className={inputClass("name")}
             />
             {fieldErrors.name && <p className="text-xs text-destructive">{fieldErrors.name}</p>}
@@ -245,7 +319,16 @@ function FormFields({
                 value={form.brandId}
                 placeholder="Aucune…"
                 options={slugs.brandOptions}
-                onSelect={(value) => setForm((prev) => ({ ...prev, brandId: value }))}
+                onSelect={(value) => {
+                  setForm((prev) => {
+                    const brandName = slugs.brandOptions.find((o) => o.value === value)?.label
+                    return {
+                      ...prev,
+                      brandId: value,
+                      sku: slugs.autoSku.current && prev.name ? generateSku(prev.name, brandName) : prev.sku,
+                    }
+                  })
+                }}
                 triggerClassName="h-10 w-full bg-background"
               />
             </div>
@@ -265,6 +348,95 @@ function FormFields({
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="flex size-6 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400">
+            <ImageIcon className="size-3" />
+          </div>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+            Images ({images.length + pendingImages.length})
+          </span>
+        </div>
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+          {images.map((img) => {
+            const src = resolveImageUrl(img)
+            return (
+              <div key={img.id} className="group relative aspect-square overflow-hidden rounded-xl border border-border/20 bg-muted/20">
+                {src && (
+                  <img src={src} alt={img.alt ?? "Image produit"} className="size-full object-cover" />
+                )}
+                {img.isPrimary && (
+                  <span className="absolute top-1.5 left-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-500/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm">
+                    <Star className="size-2.5 fill-current" /> Principal
+                  </span>
+                )}
+                <div className="absolute inset-0 flex items-center justify-center gap-1.5 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button
+                    type="button"
+                    onClick={() => onSetPrimary(img)}
+                    disabled={img.isPrimary}
+                    title={img.isPrimary ? "Image principale" : "Définir comme principale"}
+                    className="flex size-8 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur-sm transition-colors hover:bg-white/25 disabled:cursor-default disabled:opacity-40"
+                  >
+                    <Star className={`size-4 ${img.isPrimary ? "fill-amber-400 text-amber-400" : ""}`} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onDeleteImage(img)}
+                    title="Supprimer l'image"
+                    className="flex size-8 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur-sm transition-colors hover:bg-destructive/80"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+
+          {pendingImages.map((pending, index) => (
+            <div key={pending.url} className="group relative aspect-square overflow-hidden rounded-xl border border-primary/30 bg-muted/20 ring-1 ring-primary/20">
+              <img src={pending.url} alt={pending.file.name} className="size-full object-cover" />
+              <span className="absolute top-1.5 left-1.5 rounded-full bg-primary/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm">
+                En attente
+              </span>
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                <button
+                  type="button"
+                  onClick={() => onRemovePending(index)}
+                  title="Retirer"
+                  className="flex size-8 items-center justify-center rounded-lg bg-white/15 text-white backdrop-blur-sm transition-colors hover:bg-destructive/80"
+                >
+                  <Trash2 className="size-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+
+          <label
+            className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-border/60 text-muted-foreground/50 transition-all hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+            title="Ajouter des images"
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                const files = e.target.files ? Array.from(e.target.files) : []
+                if (files.length > 0) onAddFiles(files)
+                e.target.value = ""
+              }}
+            />
+            <ImagePlus className="size-5" />
+            <span className="text-[11px] font-medium">Ajouter</span>
+          </label>
+        </div>
+        <p className="text-xs text-muted-foreground/50">
+          JPG, PNG ou WebP — 2 Mo max par image. La première image ajoutée devient principale.
+        </p>
       </div>
 
       <div className="space-y-3">
@@ -319,6 +491,9 @@ export function ProductsPage() {
   const createProduct = useCreateProductMutation()
   const updateProduct = useUpdateProductMutation()
   const deleteProduct = useDeleteProductMutation()
+  const uploadImage = useUploadProductImageMutation()
+  const updateImage = useUpdateProductImageMutation()
+  const deleteImage = useDeleteProductImageMutation()
 
   const all = useMemo(() => products ?? [], [products])
 
@@ -365,14 +540,81 @@ export function ProductsPage() {
 
   const [form, setForm] = useState<ProductFormData>(initialForm)
   const autoSlug = useMemo(() => ({ current: true }), [])
+  const autoSku = useMemo(() => ({ current: true }), [])
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
+  const [pendingImages, setPendingImages] = useState<PendingImage[]>([])
+  const [editImages, setEditImages] = useState<ProductImage[]>([])
+
+  const { data: editingDetail } = useProductQuery(editingProduct?.id ?? 0)
+
+  useEffect(() => {
+    setEditImages(editingProduct ? editingDetail?.images ?? [] : [])
+  }, [editingProduct, editingDetail])
 
   function resetForm() {
     setForm({ ...initialForm })
     autoSlug.current = true
+    autoSku.current = true
     setFieldErrors({})
     setFormError(null)
+    for (const pending of pendingImages) URL.revokeObjectURL(pending.url)
+    setPendingImages([])
+    setEditImages([])
+  }
+
+  function handleAddFiles(files: File[]) {
+    const invalidCount = files.filter(
+      (f) => !["image/jpeg", "image/png", "image/webp"].includes(f.type) || f.size > 2 * 1024 * 1024,
+    ).length
+    if (invalidCount > 0) {
+      toast.error(`${invalidCount} fichier(s) ignoré(s) — JPG, PNG ou WebP, max 2 Mo.`)
+    }
+    const accepted = files
+      .filter((f) => ["image/jpeg", "image/png", "image/webp"].includes(f.type) && f.size <= 2 * 1024 * 1024)
+      .map((file) => ({ file, url: URL.createObjectURL(file) }))
+    if (accepted.length > 0) {
+      setPendingImages((prev) => [...prev, ...accepted])
+      toast.success(`${accepted.length} image(s) ajoutée(s)`)
+    }
+  }
+
+  function handleRemovePending(index: number) {
+    setPendingImages((prev) => {
+      const next = [...prev]
+      const [removed] = next.splice(index, 1)
+      if (removed) URL.revokeObjectURL(removed.url)
+      return next
+    })
+  }
+
+  function handleSetPrimary(image: ProductImage) {
+    if (image.isPrimary) return
+    setEditImages((prev) => prev.map((i) => ({ ...i, isPrimary: i.id === image.id })))
+    updateImage.mutate(
+      { imageId: image.id, payload: { isPrimary: true } },
+      {
+        onError: (err) => toast.error(err instanceof ApiError ? err.message : "Une erreur est survenue."),
+      },
+    )
+  }
+
+  function handleDeleteImage(image: ProductImage) {
+    setEditImages((prev) => prev.filter((i) => i.id !== image.id))
+    deleteImage.mutate(image.id, {
+      onSuccess: () => toast.success("Image supprimée"),
+      onError: (err) => toast.error(err instanceof ApiError ? err.message : "Une erreur est survenue."),
+    })
+  }
+
+  async function uploadPendingImages(productId: number) {
+    for (const pending of pendingImages) {
+      try {
+        await uploadImage.mutateAsync({ productId, file: pending.file })
+      } catch {
+        toast.error(`Échec de l'upload de ${pending.file.name}`)
+      }
+    }
   }
 
   function fillForm(product: Product) {
@@ -387,6 +629,7 @@ export function ProductsPage() {
       isActive: product.isActive,
     })
     autoSlug.current = false
+    autoSku.current = false
     setFieldErrors({})
   }
 
@@ -412,7 +655,7 @@ export function ProductsPage() {
     if (!data) return
 
     try {
-      await createProduct.mutateAsync({
+      const created = await createProduct.mutateAsync({
         sku: data.sku,
         name: data.name,
         slug: data.slug || undefined,
@@ -422,6 +665,7 @@ export function ProductsPage() {
         unitId: Number(data.unitId),
         isActive: data.isActive,
       })
+      await uploadPendingImages(created.id)
       toast.success("Produit créé avec succès")
       setShowCreate(false)
       resetForm()
@@ -451,6 +695,7 @@ export function ProductsPage() {
           isActive: data.isActive,
         },
       })
+      await uploadPendingImages(editingProduct.id)
       toast.success("Produit modifié avec succès")
       setEditingProduct(null)
       resetForm()
@@ -679,7 +924,13 @@ export function ProductsPage() {
                   setForm={setForm}
                   fieldErrors={fieldErrors}
                   prefix="create"
-                  slugs={{ brandOptions, categoryOptions, unitOptions, autoSlug }}
+                  slugs={{ brandOptions, categoryOptions, unitOptions, autoSlug, autoSku }}
+                  images={editImages}
+                  pendingImages={pendingImages}
+                  onAddFiles={handleAddFiles}
+                  onRemovePending={handleRemovePending}
+                  onSetPrimary={handleSetPrimary}
+                  onDeleteImage={handleDeleteImage}
                 />
                 {formError ? (
                   <div className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/5 px-3.5 py-2.5 text-sm text-destructive">
@@ -726,7 +977,13 @@ export function ProductsPage() {
                   setForm={setForm}
                   fieldErrors={fieldErrors}
                   prefix="edit"
-                  slugs={{ brandOptions, categoryOptions, unitOptions, autoSlug }}
+                  slugs={{ brandOptions, categoryOptions, unitOptions, autoSlug, autoSku }}
+                  images={editImages}
+                  pendingImages={pendingImages}
+                  onAddFiles={handleAddFiles}
+                  onRemovePending={handleRemovePending}
+                  onSetPrimary={handleSetPrimary}
+                  onDeleteImage={handleDeleteImage}
                 />
                 {formError ? (
                   <div className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/5 px-3.5 py-2.5 text-sm text-destructive">

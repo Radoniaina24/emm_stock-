@@ -58,3 +58,35 @@ export function useDeleteProductMutation() {
     },
   })
 }
+
+export function useUploadProductImageMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ productId, file }: { productId: number; file: File }) =>
+      productsApi.uploadProductImage(productId, file),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["products"] })
+    },
+  })
+}
+
+export function useUpdateProductImageMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ imageId, payload }: { imageId: number; payload: { isPrimary?: boolean; alt?: string } }) =>
+      productsApi.updateProductImage(imageId, payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["products"] })
+    },
+  })
+}
+
+export function useDeleteProductImageMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (imageId: number) => productsApi.deleteProductImage(imageId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["products"] })
+    },
+  })
+}
