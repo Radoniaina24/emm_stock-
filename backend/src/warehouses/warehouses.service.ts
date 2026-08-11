@@ -24,7 +24,7 @@ export class WarehousesService {
   async findOne(id: string) {
     const warehouse = await this.prisma.warehouse.findUnique({
       where: { id },
-      include: { _count: { select: { zones: true, stocks: true } } },
+      include: { _count: { select: { zones: true, inventories: true } } },
     });
     if (!warehouse) throw new NotFoundException('Entrepôt introuvable');
     return warehouse;
@@ -42,14 +42,13 @@ export class WarehousesService {
   async remove(id: string) {
     const warehouse = await this.prisma.warehouse.findUnique({
       where: { id },
-      include: { _count: { select: { zones: true, stocks: true, entries: true, exits: true } } },
+      include: { _count: { select: { zones: true, inventories: true } } },
     });
     if (!warehouse) throw new NotFoundException('Entrepôt introuvable');
 
-    if (warehouse._count.zones > 0 || warehouse._count.stocks > 0 ||
-        warehouse._count.entries > 0 || warehouse._count.exits > 0) {
+    if (warehouse._count.zones > 0 || warehouse._count.inventories > 0) {
       throw new BadRequestException(
-        'Impossible de supprimer un entrepôt avec des zones, stocks, entrées ou sorties associés'
+        'Impossible de supprimer un entrepôt avec des zones ou inventaires associés'
       );
     }
 

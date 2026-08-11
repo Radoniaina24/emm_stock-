@@ -18,22 +18,22 @@ export type BarcodeType = (typeof BARCODE_TYPES)[number]
 
 export type ProductBarcode = {
   id: number
-  productId: string
+  productId: number
   code: string
   type: BarcodeType
   isPrimary: boolean
   createdAt: string
   updatedAt: string
   product: {
-    id: string
-    reference: string
+    id: number
+    sku: string
     name: string
     unit: { symbol: string | null }
   }
 }
 
 export type CreateProductBarcodePayload = {
-  productId: string
+  productId: number
   code: string
   type?: BarcodeType
   isPrimary?: boolean

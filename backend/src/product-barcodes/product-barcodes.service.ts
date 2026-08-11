@@ -21,7 +21,7 @@ export class ProductBarcodesService {
       product: {
         select: {
           id: true,
-          reference: true,
+          sku: true,
           name: true,
           unit: { select: { symbol: true } },
         },
@@ -45,7 +45,7 @@ export class ProductBarcodesService {
     }
   }
 
-  private async assertProductExists(productId: string): Promise<void> {
+  private async assertProductExists(productId: number): Promise<void> {
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
       select: { id: true },

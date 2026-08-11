@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsIn,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -26,10 +27,10 @@ export const BARCODE_TYPES = [
 export type BarcodeType = (typeof BARCODE_TYPES)[number];
 
 export class CreateProductBarcodeDto {
-  @ApiProperty({ example: 'cmx1abc2def3gh4' })
-  @IsString()
+  @ApiProperty({ example: 1 })
+  @IsInt()
   @IsNotEmpty({ message: 'Le produit est obligatoire' })
-  productId: string;
+  productId: number;
 
   @ApiProperty({ example: '3614272812344' })
   @IsString()

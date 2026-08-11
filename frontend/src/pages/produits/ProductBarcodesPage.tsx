@@ -90,11 +90,12 @@ function FormFields({
           Produit
         </label>
         <SearchableSelect
+          variant="inline"
           value={form.productId}
           placeholder="Choisir un produit…"
           options={productOptions}
           onSelect={(value) => setForm((prev) => ({ ...prev, productId: value }))}
-          triggerClassName={fieldErrors.productId ? "border-destructive/60" : undefined}
+          triggerClassName={`h-10 w-full bg-background${fieldErrors.productId ? " border-destructive/60" : ""}`}
         />
         {fieldErrors.productId && <p className="text-xs text-destructive">{fieldErrors.productId}</p>}
       </div>
@@ -162,8 +163,8 @@ export function ProductBarcodesPage() {
   const productOptions = useMemo(
     () =>
       (products ?? []).map((p) => ({
-        value: p.id,
-        label: `${p.name} · ${p.reference}`,
+        value: String(p.id),
+        label: `${p.name} · ${p.sku}`,
       })),
     [products],
   )
@@ -184,7 +185,7 @@ export function ProductBarcodesPage() {
 
   function fillForm(barcode: ProductBarcode) {
     setForm({
-      productId: barcode.productId,
+      productId: String(barcode.productId),
       code: barcode.code,
       type: barcode.type,
       isPrimary: barcode.isPrimary,
@@ -215,7 +216,7 @@ export function ProductBarcodesPage() {
 
     try {
       await createBarcode.mutateAsync({
-        productId: data.productId,
+        productId: Number(data.productId),
         code: data.code,
         type: data.type,
         isPrimary: data.isPrimary,
@@ -239,7 +240,7 @@ export function ProductBarcodesPage() {
       await updateBarcode.mutateAsync({
         id: editingBarcode.id,
         payload: {
-          productId: data.productId,
+          productId: Number(data.productId),
           code: data.code,
           type: data.type,
           isPrimary: data.isPrimary,
@@ -306,7 +307,7 @@ export function ProductBarcodesPage() {
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-foreground">{product.name}</p>
               <p className="truncate font-mono text-[11px] text-muted-foreground/50">
-                {product.reference}
+                {product.sku}
                 {product.unit?.symbol ? ` · ${product.unit.symbol}` : ""}
               </p>
             </div>
@@ -379,7 +380,7 @@ export function ProductBarcodesPage() {
         columns={columns}
         data={all}
         searchAccessor={(b) =>
-          [b.code, b.type, b.product.name, b.product.reference].filter(Boolean).join(" ")
+          [b.code, b.type, b.product.name, b.product.sku].filter(Boolean).join(" ")
         }
         searchPlaceholder="Rechercher par code, type, produit ou référence…"
         loading={isLoading}
@@ -562,7 +563,7 @@ export function ProductBarcodesPage() {
                 <div className="pl-8">
                   <p className="text-sm font-medium text-foreground">{selectedBarcode?.product.name}</p>
                   <p className="mt-0.5 font-mono text-xs text-muted-foreground/60">
-                    {selectedBarcode?.product.reference}
+                    {selectedBarcode?.product.sku}
                     {selectedBarcode?.product.unit?.symbol ? ` · ${selectedBarcode.product.unit.symbol}` : ""}
                   </p>
                 </div>

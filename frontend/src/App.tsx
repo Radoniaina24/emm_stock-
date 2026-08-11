@@ -28,6 +28,7 @@ import { CategoriesPage } from "@/pages/produits/CategoriesPage"
 import { BrandsPage } from "@/pages/produits/BrandsPage"
 import { UnitsOfMeasurePage } from "@/pages/produits/UnitsOfMeasurePage"
 import { ProductBarcodesPage } from "@/pages/produits/ProductBarcodesPage"
+import { ProductsPage } from "@/pages/produits/ProductsPage"
 import { UtilisateursPage } from "@/pages/administration/UtilisateursPage"
 import { CreateUserPage } from "@/pages/administration/create/CreateUserPage"
 import { EditUserPage } from "@/pages/administration/edit/EditUserPage"
@@ -52,8 +53,8 @@ function App() {
           >
             <Route index element={<HomePage />} />
             <Route path="profil" element={<ProfilePage />} />
-            <Route path="produits" element={<div className="text-muted-foreground">Liste des produits</div>} />
-            <Route path="produits/ajouter" element={<div className="text-muted-foreground">Ajouter un produit</div>} />
+            <Route path="produits" element={<ProductsPage />} />
+            <Route path="produits/ajouter" element={<ProductsPage />} />
             <Route path="produits/categories" element={<CategoriesPage />} />
             <Route path="produits/marques" element={<BrandsPage />} />
             <Route path="produits/familles" element={<div className="text-muted-foreground">Familles de produits</div>} />
