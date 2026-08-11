@@ -25,6 +25,8 @@ export class ProductsService {
       category: { select: { id: true, name: true, slug: true } },
       brand: { select: { id: true, name: true, slug: true } },
       unit: { select: { id: true, name: true, code: true, symbol: true } },
+      purchaseUnit: { select: { id: true, name: true, code: true, symbol: true } },
+      saleUnit: { select: { id: true, name: true, code: true, symbol: true } },
       images: {
         where: { isPrimary: true },
         take: 1,
@@ -68,18 +70,41 @@ export class ProductsService {
   }
 
   private async assertReferentials(dto: CreateProductDto | UpdateProductDto) {
-    const checks: Array<[number | null | undefined, 'brand' | 'category' | 'unit', string]> = [
-      [dto.brandId, 'brand', 'La marque sélectionnée n\'existe pas'],
-      [dto.categoryId, 'category', 'La catégorie sélectionnée n\'existe pas'],
-      [dto.unitId, 'unit', "L'unité de mesure sélectionnée n'existe pas"],
+    const checks: Array<{
+      id: number | null | undefined;
+      message: string;
+      check: () => Promise<unknown>;
+    }> = [
+      {
+        id: dto.brandId,
+        message: "La marque sélectionnée n'existe pas",
+        check: () => this.prisma.brand.findUnique({ where: { id: dto.brandId! }, select: { id: true } }),
+      },
+      {
+        id: dto.categoryId,
+        message: "La catégorie sélectionnée n'existe pas",
+        check: () => this.prisma.category.findUnique({ where: { id: dto.categoryId! }, select: { id: true } }),
+      },
+      {
+        id: dto.unitId,
+        message: "L'unité de mesure sélectionnée n'existe pas",
+        check: () => this.prisma.unitOfMeasure.findUnique({ where: { id: dto.unitId! }, select: { id: true } }),
+      },
+      {
+        id: dto.purchaseUnitId,
+        message: "L'unité d'achat sélectionnée n'existe pas",
+        check: () => this.prisma.unitOfMeasure.findUnique({ where: { id: dto.purchaseUnitId! }, select: { id: true } }),
+      },
+      {
+        id: dto.saleUnitId,
+        message: "L'unité de vente sélectionnée n'existe pas",
+        check: () => this.prisma.unitOfMeasure.findUnique({ where: { id: dto.saleUnitId! }, select: { id: true } }),
+      },
     ];
 
-    for (const [id, model, message] of checks) {
+    for (const { id, message, check } of checks) {
       if (id == null) continue;
-      const exists = await this.prisma[model].findUnique({
-        where: { id },
-        select: { id: true },
-      });
+      const exists = await check();
       if (!exists) throw new BadRequestException(message);
     }
   }
@@ -97,9 +122,25 @@ export class ProductsService {
           name: dto.name,
           slug,
           description: dto.description ?? null,
+          descriptionPurchase: dto.descriptionPurchase ?? null,
+          descriptionSale: dto.descriptionSale ?? null,
+          internalNotes: dto.internalNotes ?? null,
+          type: dto.type ?? 'STORABLE',
           brandId: dto.brandId ?? null,
           categoryId: dto.categoryId ?? null,
           unitId: dto.unitId,
+          purchaseUnitId: dto.purchaseUnitId ?? null,
+          saleUnitId: dto.saleUnitId ?? null,
+          costPrice: dto.costPrice ?? 0,
+          salePrice: dto.salePrice ?? 0,
+          taxRate: dto.taxRate ?? 0,
+          tracking: dto.tracking ?? 'NONE',
+          hasExpiry: dto.hasExpiry ?? false,
+          shelfLifeDays: dto.shelfLifeDays ?? null,
+          weight: dto.weight ?? null,
+          length: dto.length ?? null,
+          width: dto.width ?? null,
+          height: dto.height ?? null,
           isActive: dto.isActive ?? true,
         },
         include: this.detailInclude(),
@@ -166,7 +207,13 @@ export class ProductsService {
       slug = await this.uniqueSlug(dto.name, id);
     }
 
-    if (dto.brandId !== undefined || dto.categoryId !== undefined || dto.unitId !== undefined) {
+    if (
+      dto.brandId !== undefined ||
+      dto.categoryId !== undefined ||
+      dto.unitId !== undefined ||
+      dto.purchaseUnitId !== undefined ||
+      dto.saleUnitId !== undefined
+    ) {
       await this.assertReferentials(dto);
     }
 
@@ -175,9 +222,25 @@ export class ProductsService {
     if (dto.name !== undefined) data.name = dto.name;
     if (slug !== undefined) data.slug = slug;
     if (dto.description !== undefined) data.description = dto.description;
+    if (dto.descriptionPurchase !== undefined) data.descriptionPurchase = dto.descriptionPurchase;
+    if (dto.descriptionSale !== undefined) data.descriptionSale = dto.descriptionSale;
+    if (dto.internalNotes !== undefined) data.internalNotes = dto.internalNotes;
+    if (dto.type !== undefined) data.type = dto.type;
     if (dto.brandId !== undefined) data.brandId = dto.brandId;
     if (dto.categoryId !== undefined) data.categoryId = dto.categoryId;
     if (dto.unitId !== undefined) data.unitId = dto.unitId;
+    if (dto.purchaseUnitId !== undefined) data.purchaseUnitId = dto.purchaseUnitId;
+    if (dto.saleUnitId !== undefined) data.saleUnitId = dto.saleUnitId;
+    if (dto.costPrice !== undefined) data.costPrice = dto.costPrice;
+    if (dto.salePrice !== undefined) data.salePrice = dto.salePrice;
+    if (dto.taxRate !== undefined) data.taxRate = dto.taxRate;
+    if (dto.tracking !== undefined) data.tracking = dto.tracking;
+    if (dto.hasExpiry !== undefined) data.hasExpiry = dto.hasExpiry;
+    if (dto.shelfLifeDays !== undefined) data.shelfLifeDays = dto.shelfLifeDays;
+    if (dto.weight !== undefined) data.weight = dto.weight;
+    if (dto.length !== undefined) data.length = dto.length;
+    if (dto.width !== undefined) data.width = dto.width;
+    if (dto.height !== undefined) data.height = dto.height;
     if (dto.isActive !== undefined) data.isActive = dto.isActive;
 
     return this.withImage(

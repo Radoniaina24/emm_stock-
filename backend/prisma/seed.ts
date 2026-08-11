@@ -129,6 +129,695 @@ const warehouses: WarehouseSeed[] = [
   { name: "Stock Produits Finis", location: "Zone Industrielle, Antsirabe" },
 ]
 
+type CategorySeed = {
+  name: string
+  description?: string
+  children?: CategorySeed[]
+}
+
+const categories: CategorySeed[] = [
+  {
+    name: "Ordinateurs",
+    description: "Tous les types d'ordinateurs : fixes, portables, serveurs et hybrides",
+    children: [
+      {
+        name: "Ordinateurs de bureau",
+        children: [
+          { name: "Tours professionnelles", description: "PC de bureau complets pour les entreprises" },
+          { name: "Mini-PC", description: "PC compacts à faible encombrement" },
+          { name: "Stations de travail", description: "PC hautes performances pour la CAO et le calcul" },
+          { name: "PC tout-en-un", description: "Écran et unité centrale intégrés" },
+        ],
+      },
+      {
+        name: "Ordinateurs portables",
+        children: [
+          { name: "Ultrabooks", description: "Portables fins et légers" },
+          { name: "Portables professionnels", description: "Portables pour un usage entreprise" },
+          { name: "Portables gaming", description: "Portables orientés jeux vidéo" },
+          { name: "Chromebooks", description: "Portables sous ChromeOS" },
+        ],
+      },
+      {
+        name: "Serveurs",
+        children: [
+          { name: "Serveurs tour", description: "Serveurs au format tour" },
+          { name: "Serveurs rack", description: "Serveurs au format rack 19 pouces" },
+          { name: "Serveurs blade", description: "Serveurs à lames pour datacenter" },
+        ],
+      },
+      {
+        name: "Tablettes et hybrides",
+        children: [
+          { name: "Tablettes tactiles", description: "Tablettes avec ou sans clavier" },
+          { name: "PC 2-en-1 convertibles", description: "Portables avec écran tactile pivotant" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Écrans et affichage",
+    description: "Écrans, vidéoprojecteurs et solutions d'affichage",
+    children: [
+      {
+        name: "Écrans d'ordinateur",
+        children: [
+          { name: "Écrans bureautiques", description: "Écrans standard pour le travail de bureau" },
+          { name: "Écrans gaming", description: "Écrans haute fréquence pour le jeu" },
+          { name: "Écrans professionnels", description: "Écrans calibrés pour la photo et la vidéo" },
+        ],
+      },
+      {
+        name: "Vidéoprojecteurs",
+        children: [
+          { name: "Projecteurs portables", description: "Vidéoprojecteurs compacts et transportables" },
+          { name: "Projecteurs de salle de réunion", description: "Projecteurs pour salles de conférence" },
+        ],
+      },
+      {
+        name: "Affichage dynamique",
+        children: [
+          { name: "Écrans publicitaires", description: "Écrans pour l'affichage en magasin" },
+          { name: "Moniteurs interactifs", description: "Écrans tactiles pour réunions et formation" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Composants informatiques",
+    description: "Composants pour l'assemblage et l'upgrade de PC",
+    children: [
+      {
+        name: "Processeurs",
+        children: [
+          { name: "Processeurs Intel", description: "CPU de la gamme Intel" },
+          { name: "Processeurs AMD", description: "CPU de la gamme AMD" },
+        ],
+      },
+      {
+        name: "Cartes mères",
+        children: [
+          { name: "Cartes mères Intel", description: "Cartes mères pour sockets Intel" },
+          { name: "Cartes mères AMD", description: "Cartes mères pour sockets AMD" },
+        ],
+      },
+      {
+        name: "Cartes graphiques",
+        children: [
+          { name: "Cartes graphiques NVIDIA", description: "GPU de la marque NVIDIA" },
+          { name: "Cartes graphiques AMD", description: "GPU de la marque AMD" },
+        ],
+      },
+      {
+        name: "Mémoire RAM",
+        children: [
+          { name: "RAM DDR4", description: "Barrettes de mémoire DDR4" },
+          { name: "RAM DDR5", description: "Barrettes de mémoire DDR5" },
+        ],
+      },
+      {
+        name: "Stockage interne",
+        children: [
+          { name: "SSD SATA", description: "Disques SSD au format 2,5 pouces" },
+          { name: "SSD NVMe", description: "SSD M.2 hautes performances" },
+          { name: "Disques durs HDD", description: "Disques mécaniques 3,5 et 2,5 pouces" },
+        ],
+      },
+      {
+        name: "Alimentations",
+        children: [
+          { name: "Alimentations ATX", description: "Blocs d'alimentation au format ATX" },
+          { name: "Alimentations modulaires", description: "Alimentations à câbles amovibles" },
+        ],
+      },
+      {
+        name: "Boîtiers",
+        children: [
+          { name: "Boîtiers tour", description: "Boîtiers au format moyen ou grande tour" },
+          { name: "Boîtiers compacts", description: "Boîtiers mini-ITX et micro-ATX" },
+        ],
+      },
+      {
+        name: "Refroidissement",
+        children: [
+          { name: "Ventilateurs", description: "Ventilateurs de boîtier et de processeur" },
+          { name: "Watercooling", description: "Systèmes de refroidissement liquide" },
+          { name: "Pâte thermique", description: "Pâte et pads thermiques" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Périphériques",
+    description: "Claviers, souris, webcams, audio et accessoires d'entrée",
+    children: [
+      {
+        name: "Claviers",
+        children: [
+          { name: "Claviers mécaniques", description: "Claviers à switchs mécaniques" },
+          { name: "Claviers sans fil", description: "Claviers Bluetooth et RF" },
+          { name: "Claviers de bureau", description: "Claviers membranaires standards" },
+        ],
+      },
+      {
+        name: "Souris",
+        children: [
+          { name: "Souris filaires", description: "Souris à connexion USB" },
+          { name: "Souris sans fil", description: "Souris Bluetooth et RF" },
+          { name: "Souris gaming", description: "Souris orientées jeu" },
+        ],
+      },
+      {
+        name: "Webcams",
+        children: [
+          { name: "Webcams USB", description: "Webcams standards pour visioconférence" },
+          { name: "Webcams 4K", description: "Webcams haute définition" },
+        ],
+      },
+      {
+        name: "Microphones",
+        children: [
+          { name: "Micros USB", description: "Microphones à connexion USB" },
+          { name: "Micros à condensateur", description: "Micros de studio XLR" },
+        ],
+      },
+      {
+        name: "Audio et casques",
+        children: [
+          { name: "Casques audio", description: "Casques stéréo et surround" },
+          { name: "Casques avec micro", description: "Casques pour visioconférence et gaming" },
+          { name: "Haut-parleurs", description: "Enceintes et barres de son" },
+        ],
+      },
+      {
+        name: "Tablettes graphiques",
+        children: [
+          { name: "Tablettes à dessin", description: "Tablettes de dessin numériques" },
+          { name: "Écrans à stylet", description: "Moniteurs avec stylet intégré" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Réseau et connectivité",
+    description: "Équipements réseau, câblage et solutions de connexion",
+    children: [
+      {
+        name: "Routeurs et modems",
+        children: [
+          { name: "Routeurs Wi-Fi", description: "Routeurs domestiques et SOHO" },
+          { name: "Routeurs professionnels", description: "Routeurs d'entreprise et VPN" },
+        ],
+      },
+      {
+        name: "Switches",
+        children: [
+          { name: "Switches non gérés", description: "Switches plug-and-play" },
+          { name: "Switches gérés", description: "Switches administrables et PoE" },
+        ],
+      },
+      {
+        name: "Points d'accès",
+        children: [
+          { name: "Points d'accès intérieurs", description: "Bornes Wi-Fi pour bureaux" },
+          { name: "Points d'accès extérieurs", description: "Bornes Wi-Fi pour extérieur" },
+        ],
+      },
+      {
+        name: "Câblage",
+        children: [
+          { name: "Câbles Ethernet", description: "Câbles RJ45 catégorie 5e, 6 et 6a" },
+          { name: "Câbles HDMI", description: "Câbles HDMI et adaptateurs" },
+          { name: "Câbles USB", description: "Câbles USB-A, USB-C et adaptateurs" },
+          { name: "Câbles fibre optique", description: "Câbles et cordons fibre" },
+        ],
+      },
+      {
+        name: "Adaptateurs et convertisseurs",
+        children: [
+          { name: "Adaptateurs USB-C", description: "Docks et adaptateurs USB-C" },
+          { name: "Convertisseurs vidéo", description: "Convertisseurs VGA, HDMI, DisplayPort" },
+        ],
+      },
+      {
+        name: "Répéteurs et extensions",
+        children: [
+          { name: "Répéteurs Wi-Fi", description: "Extensions de couverture Wi-Fi" },
+          { name: "CPL", description: "Courants porteurs en ligne" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Stockage externe et sauvegarde",
+    description: "Disques externes, clés USB, cartes mémoire et NAS",
+    children: [
+      {
+        name: "Disques durs externes",
+        children: [
+          { name: "HDD externes", description: "Disques mécaniques externes" },
+          { name: "SSD externes", description: "Disques SSD externes" },
+        ],
+      },
+      {
+        name: "Clés USB",
+        children: [
+          { name: "Clés USB classiques", description: "Clés USB standard" },
+          { name: "Clés USB sécurisées", description: "Clés USB chiffrées" },
+        ],
+      },
+      {
+        name: "Cartes mémoire",
+        children: [
+          { name: "Cartes SD", description: "Cartes SD et SDHC/SDXC" },
+          { name: "Cartes microSD", description: "Cartes microSD et adaptateurs" },
+        ],
+      },
+      {
+        name: "NAS",
+        children: [
+          { name: "NAS 2 baies", description: "Serveurs de stockage réseau 2 baies" },
+          { name: "NAS 4 baies", description: "Serveurs de stockage réseau 4 baies" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Imprimantes et consommables",
+    description: "Imprimantes, multifonctions et consommables d'impression",
+    children: [
+      {
+        name: "Imprimantes",
+        children: [
+          { name: "Imprimantes laser", description: "Imprimantes laser noir et blanc et couleur" },
+          { name: "Imprimantes jet d'encre", description: "Imprimantes à jet d'encre" },
+          { name: "Imprimantes multifonctions", description: "Imprimantes avec scanner et copieur" },
+        ],
+      },
+      {
+        name: "Consommables",
+        children: [
+          { name: "Cartouches d'encre", description: "Cartouches pour imprimantes jet d'encre" },
+          { name: "Toners laser", description: "Toners pour imprimantes laser" },
+          { name: "Rubans thermiques", description: "Rubans pour imprimantes d'étiquettes" },
+        ],
+      },
+      {
+        name: "Accessoires d'impression",
+        children: [
+          { name: "Papier et étiquettes", description: "Papier photo, étiquettes et supports" },
+          { name: "Bacs et unités", description: "Bacs papier et unités supplémentaires" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Téléphonie et visioconférence",
+    description: "Téléphones, casques et solutions de visioconférence",
+    children: [
+      {
+        name: "Téléphones",
+        children: [
+          { name: "Téléphones IP", description: "Téléphones VoIP et SIP" },
+          { name: "Téléphones analogiques", description: "Téléphones filaires classiques" },
+        ],
+      },
+      {
+        name: "Accessoires téléphoniques",
+        children: [
+          { name: "Casques téléphonie", description: "Casques pour standard téléphonique" },
+          { name: "Supports téléphones", description: "Supports et fixes" },
+        ],
+      },
+      {
+        name: "Visioconférence",
+        children: [
+          { name: "Caméras de visioconférence", description: "Caméras pour salles de réunion" },
+          { name: "Barres de visioconférence", description: "Solutions tout-en-un pour salles" },
+          { name: "Systèmes de salle", description: "Kits complets de visioconférence" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Alimentation et énergie",
+    description: "Onduleurs, batteries, chargeurs et protection électrique",
+    children: [
+      {
+        name: "Onduleurs",
+        children: [
+          { name: "Onduleurs de bureau", description: "UPS pour postes de travail" },
+          { name: "Onduleurs de rack", description: "UPS pour armoires serveurs" },
+        ],
+      },
+      {
+        name: "Batteries et chargeurs",
+        children: [
+          { name: "Batteries de portables", description: "Batteries de remplacement pour portables" },
+          { name: "Chargeurs secteur", description: "Chargeurs et adaptateurs d'alimentation" },
+        ],
+      },
+      {
+        name: "Multiprises et protections",
+        children: [
+          { name: "Multiprises", description: "Blocs multiprises" },
+          { name: "Parafoudres", description: "Protections contre les surtensions" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Sécurité informatique",
+    description: "Logiciels et matériels de sécurité et de surveillance",
+    children: [
+      {
+        name: "Antivirus et protection",
+        children: [
+          { name: "Licences antivirus", description: "Licences de logiciels antivirus" },
+          { name: "Pare-feux logiciels", description: "Solutions de pare-feu" },
+        ],
+      },
+      {
+        name: "Contrôle d'accès",
+        children: [
+          { name: "Badgeuses", description: "Lecteurs de badges et contrôleurs" },
+          { name: "Lecteurs biométriques", description: "Lecteurs d'empreintes et biométrie" },
+        ],
+      },
+      {
+        name: "Caméras de surveillance",
+        children: [
+          { name: "Caméras IP", description: "Caméras réseau intérieures et extérieures" },
+          { name: "Enregistreurs NVR", description: "Enregistreurs vidéo réseau" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Logiciels et licences",
+    description: "Systèmes d'exploitation, bureautique et logiciels professionnels",
+    children: [
+      {
+        name: "Systèmes d'exploitation",
+        children: [
+          { name: "Windows", description: "Licences Windows" },
+          { name: "Linux", description: "Distributions et licences Linux" },
+          { name: "macOS", description: "Systèmes macOS" },
+        ],
+      },
+      {
+        name: "Bureautique",
+        children: [
+          { name: "Suites bureautiques", description: "Packages bureautiques complets" },
+          { name: "Licences Microsoft 365", description: "Abonnements et licences Microsoft 365" },
+        ],
+      },
+      {
+        name: "Logiciels professionnels",
+        children: [
+          { name: "Comptabilité et gestion", description: "Logiciels de comptabilité et ERP" },
+          { name: "Gestion de projet", description: "Outils de gestion de projet" },
+          { name: "CAO et conception", description: "Logiciels de CAO et 3D" },
+        ],
+      },
+      {
+        name: "Sécurité et VPN",
+        children: [
+          { name: "Logiciels antivirus", description: "Licences logicielles de sécurité" },
+          { name: "VPN", description: "Solutions VPN d'entreprise" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Consommables et entretien",
+    description: "Produits de nettoyage, supports et protections d'équipement",
+    children: [
+      {
+        name: "Nettoyage",
+        children: [
+          { name: "Aérosols dépoussiérants", description: "Air comprimé pour matériel" },
+          { name: "Lingettes nettoyantes", description: "Lingettes pour écrans et claviers" },
+        ],
+      },
+      {
+        name: "Fixations et supports",
+        children: [
+          { name: "Supports d'écran", description: "Bras et supports VESA" },
+          { name: "Fixations murales", description: "Supports muraux pour écrans et projecteurs" },
+        ],
+      },
+      {
+        name: "Sacoches et protections",
+        children: [
+          { name: "Sacoches pour portables", description: "Sacoches et étuis" },
+          { name: "Housses de protection", description: "Protections pour tablettes et PC" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Pièces détachées",
+    description: "Pièces de rechange pour équipements informatiques",
+    children: [
+      {
+        name: "Pièces pour portables",
+        children: [
+          { name: "Écrans de portables", description: "Écrans de remplacement" },
+          { name: "Claviers de portables", description: "Claviers de remplacement" },
+          { name: "Ventilateurs de portables", description: "Ventilateurs et dissipateurs" },
+        ],
+      },
+      {
+        name: "Pièces pour imprimantes",
+        children: [
+          { name: "Têtes d'impression", description: "Têtes d'impression de rechange" },
+          { name: "Rouleaux et courroies", description: "Pièces mécaniques d'imprimante" },
+        ],
+      },
+      {
+        name: "Connecteurs et composants",
+        children: [
+          { name: "Nappes et connecteurs", description: "Nappes et connecteurs divers" },
+          { name: "Boutons et éléments", description: "Pièces plastiques et mécaniques" },
+        ],
+      },
+    ],
+  },
+]
+
+type BrandSeed = {
+  name: string
+  category: string
+  description: string
+}
+
+const brands: BrandSeed[] = [
+  // ───────────────────────── Ordinateurs ─────────────────────────
+  { name: "HP", category: "Ordinateurs", description: "Ordinateurs portables et de bureau professionnels" },
+  { name: "Dell", category: "Ordinateurs", description: "PC, stations de travail et serveurs" },
+  { name: "Lenovo", category: "Ordinateurs", description: "PC portables, ThinkPad et serveurs" },
+  { name: "ASUS", category: "Ordinateurs", description: "Ordinateurs portables, cartes mères et composants" },
+  { name: "Acer", category: "Ordinateurs", description: "PC de bureau, portables et écrans" },
+  { name: "MSI", category: "Ordinateurs", description: "PC gaming, cartes mères et cartes graphiques" },
+  { name: "Apple", category: "Ordinateurs", description: "Mac, MacBook, iPad et accessoires" },
+  { name: "Microsoft", category: "Ordinateurs", description: "Surface, logiciels et accessoires" },
+  { name: "Huawei", category: "Ordinateurs", description: "PC portables, tablettes et équipements réseau" },
+  { name: "Samsung", category: "Ordinateurs", description: "PC, écrans, SSD et mémoires" },
+  { name: "Toshiba", category: "Ordinateurs", description: "PC portables et disques durs" },
+  { name: "Fujitsu", category: "Ordinateurs", description: "PC d'entreprise et serveurs" },
+  { name: "Razer", category: "Ordinateurs", description: "PC portables et périphériques gaming" },
+  { name: "HPE", category: "Ordinateurs", description: "Serveurs ProLiant et solutions d'entreprise" },
+  { name: "Supermicro", category: "Ordinateurs", description: "Serveurs et solutions pour datacenter" },
+  { name: "IBM", category: "Ordinateurs", description: "Serveurs, mainframes et solutions d'entreprise" },
+  { name: "NEC", category: "Ordinateurs", description: "PC d'entreprise et écrans" },
+
+  // ───────────────────────── Écrans et affichage ─────────────────────────
+  { name: "LG", category: "Écrans et affichage", description: "Écrans, moniteurs et dalles" },
+  { name: "Philips", category: "Écrans et affichage", description: "Écrans et solutions d'affichage" },
+  { name: "AOC", category: "Écrans et affichage", description: "Moniteurs bureautiques et gaming" },
+  { name: "BenQ", category: "Écrans et affichage", description: "Moniteurs professionnels et vidéoprojecteurs" },
+  { name: "ViewSonic", category: "Écrans et affichage", description: "Moniteurs et vidéoprojecteurs" },
+  { name: "EIZO", category: "Écrans et affichage", description: "Moniteurs professionnels haut de gamme" },
+  { name: "Iiyama", category: "Écrans et affichage", description: "Moniteurs bureautiques et professionnels" },
+  { name: "Sony", category: "Écrans et affichage", description: "Écrans professionnels et vidéoprojecteurs" },
+  { name: "Epson", category: "Écrans et affichage", description: "Vidéoprojecteurs et imprimantes" },
+  { name: "Optoma", category: "Écrans et affichage", description: "Vidéoprojecteurs professionnels" },
+  { name: "Promethean", category: "Écrans et affichage", description: "Écrans interactifs pour l'éducation" },
+  { name: "BrightSign", category: "Écrans et affichage", description: "Lecteurs pour affichage dynamique" },
+
+  // ───────────────────────── Composants informatiques ─────────────────────────
+  { name: "Intel", category: "Composants informatiques", description: "Processeurs et solutions serveurs" },
+  { name: "AMD", category: "Composants informatiques", description: "Processeurs Ryzen et cartes graphiques Radeon" },
+  { name: "NVIDIA", category: "Composants informatiques", description: "Cartes graphiques GeForce et Quadro" },
+  { name: "Gigabyte", category: "Composants informatiques", description: "Cartes mères, GPU et composants" },
+  { name: "ASRock", category: "Composants informatiques", description: "Cartes mères et composants" },
+  { name: "Biostar", category: "Composants informatiques", description: "Cartes mères et composants" },
+  { name: "EVGA", category: "Composants informatiques", description: "Cartes graphiques et alimentations" },
+  { name: "PNY", category: "Composants informatiques", description: "Cartes graphiques et mémoires" },
+  { name: "Zotac", category: "Composants informatiques", description: "Cartes graphiques et mini-PC" },
+  { name: "Palit", category: "Composants informatiques", description: "Cartes graphiques" },
+  { name: "Gainward", category: "Composants informatiques", description: "Cartes graphiques" },
+  { name: "Corsair", category: "Composants informatiques", description: "Mémoire, alimentations, refroidissement et périphériques" },
+  { name: "G.Skill", category: "Composants informatiques", description: "Barrettes de mémoire haute performance" },
+  { name: "Kingston", category: "Composants informatiques", description: "Mémoire, SSD et clés USB" },
+  { name: "Crucial", category: "Composants informatiques", description: "Mémoire et SSD" },
+  { name: "ADATA", category: "Composants informatiques", description: "Mémoire, SSD et périphériques de stockage" },
+  { name: "Patriot", category: "Composants informatiques", description: "Mémoire et SSD" },
+  { name: "TeamGroup", category: "Composants informatiques", description: "Mémoire et SSD" },
+  { name: "Western Digital", category: "Composants informatiques", description: "Disques durs et SSD" },
+  { name: "Seagate", category: "Composants informatiques", description: "Disques durs et SSD" },
+  { name: "KIOXIA", category: "Composants informatiques", description: "SSD et mémoire flash" },
+  { name: "Seasonic", category: "Composants informatiques", description: "Alimentations haut de gamme" },
+  { name: "be quiet!", category: "Composants informatiques", description: "Alimentations, boîtiers et refroidissement silencieux" },
+  { name: "Cooler Master", category: "Composants informatiques", description: "Boîtiers, alimentations et refroidissement" },
+  { name: "Thermaltake", category: "Composants informatiques", description: "Boîtiers, alimentations et refroidissement" },
+  { name: "NZXT", category: "Composants informatiques", description: "Boîtiers et refroidissement" },
+  { name: "Fractal Design", category: "Composants informatiques", description: "Boîtiers de qualité" },
+  { name: "Lian Li", category: "Composants informatiques", description: "Boîtiers et refroidissement" },
+  { name: "Phanteks", category: "Composants informatiques", description: "Boîtiers et refroidissement" },
+  { name: "Antec", category: "Composants informatiques", description: "Boîtiers et alimentations" },
+  { name: "Noctua", category: "Composants informatiques", description: "Ventilateurs et refroidissement silencieux" },
+  { name: "Arctic", category: "Composants informatiques", description: "Refroidissement et ventilateurs" },
+  { name: "Deepcool", category: "Composants informatiques", description: "Refroidissement et boîtiers" },
+  { name: "EKWB", category: "Composants informatiques", description: "Watercooling sur mesure" },
+  { name: "Thermalright", category: "Composants informatiques", description: "Ventilateurs et refroidissement" },
+
+  // ───────────────────────── Périphériques ─────────────────────────
+  { name: "Logitech", category: "Périphériques", description: "Souris, claviers, webcams et visioconférence" },
+  { name: "SteelSeries", category: "Périphériques", description: "Périphériques gaming" },
+  { name: "HyperX", category: "Périphériques", description: "Casques, clés USB et mémoire gaming" },
+  { name: "Cherry", category: "Périphériques", description: "Claviers et switchs mécaniques" },
+  { name: "Keychron", category: "Périphériques", description: "Claviers mécaniques personnalisables" },
+  { name: "Ducky", category: "Périphériques", description: "Claviers mécaniques haut de gamme" },
+  { name: "Wooting", category: "Périphériques", description: "Claviers mécaniques analogiques" },
+  { name: "Elgato", category: "Périphériques", description: "Webcams et équipement de streaming" },
+  { name: "Blue", category: "Périphériques", description: "Microphones et accessoires d'enregistrement" },
+  { name: "Rode", category: "Périphériques", description: "Microphones professionnels" },
+  { name: "Shure", category: "Périphériques", description: "Microphones professionnels" },
+  { name: "Audio-Technica", category: "Périphériques", description: "Microphones et casques audio" },
+  { name: "Sennheiser", category: "Périphériques", description: "Casques et microphones professionnels" },
+  { name: "Jabra", category: "Périphériques", description: "Casques d'entreprise et visioconférence" },
+  { name: "Bose", category: "Périphériques", description: "Casques et audio" },
+  { name: "JBL", category: "Périphériques", description: "Enceintes et casques" },
+  { name: "Poly", category: "Périphériques", description: "Casques d'entreprise et visioconférence" },
+  { name: "Plantronics", category: "Périphériques", description: "Casques téléphoniques et Bluetooth" },
+  { name: "EPOS", category: "Périphériques", description: "Casques gaming et professionnels" },
+  { name: "Wacom", category: "Périphériques", description: "Tablettes graphiques et stylet" },
+  { name: "Huion", category: "Périphériques", description: "Tablettes graphiques" },
+  { name: "XP-Pen", category: "Périphériques", description: "Tablettes graphiques et écrans à stylet" },
+  { name: "Gaomon", category: "Périphériques", description: "Tablettes graphiques" },
+
+  // ───────────────────────── Réseau et connectivité ─────────────────────────
+  { name: "TP-Link", category: "Réseau et connectivité", description: "Routeurs, switches et points d'accès" },
+  { name: "Netgear", category: "Réseau et connectivité", description: "Routeurs, switches et NAS" },
+  { name: "D-Link", category: "Réseau et connectivité", description: "Équipements réseau" },
+  { name: "Linksys", category: "Réseau et connectivité", description: "Routeurs et équipements réseau" },
+  { name: "Cisco", category: "Réseau et connectivité", description: "Switches, routeurs et solutions d'entreprise" },
+  { name: "Ubiquiti", category: "Réseau et connectivité", description: "Points d'accès et équipements réseau pro" },
+  { name: "MikroTik", category: "Réseau et connectivité", description: "Routeurs et switches professionnels" },
+  { name: "Aruba", category: "Réseau et connectivité", description: "Points d'accès et switches d'entreprise" },
+  { name: "Zyxel", category: "Réseau et connectivité", description: "Équipements réseau et sécurité" },
+  { name: "Tenda", category: "Réseau et connectivité", description: "Routeurs et répéteurs Wi-Fi" },
+  { name: "H3C", category: "Réseau et connectivité", description: "Switches et équipements réseau" },
+  { name: "Juniper", category: "Réseau et connectivité", description: "Équipements réseau d'entreprise" },
+  { name: "Belkin", category: "Réseau et connectivité", description: "Câbles et accessoires de connexion" },
+  { name: "UGREEN", category: "Réseau et connectivité", description: "Câbles, adaptateurs et accessoires" },
+  { name: "Anker", category: "Réseau et connectivité", description: "Câbles, chargeurs et batteries externes" },
+  { name: "StarTech", category: "Réseau et connectivité", description: "Câbles et adaptateurs professionnels" },
+  { name: "Lindy", category: "Réseau et connectivité", description: "Câbles et connectique" },
+  { name: "Legrand", category: "Réseau et connectivité", description: "Câblage et infrastructures réseau" },
+  { name: "Nexans", category: "Réseau et connectivité", description: "Câbles cuivre et fibre optique" },
+  { name: "Commscope", category: "Réseau et connectivité", description: "Câblage et solutions fibre" },
+
+  // ───────────────────────── Stockage externe et sauvegarde ─────────────────────────
+  { name: "LaCie", category: "Stockage externe et sauvegarde", description: "Disques externes professionnels" },
+  { name: "Transcend", category: "Stockage externe et sauvegarde", description: "Clés USB, cartes mémoire et SSD" },
+  { name: "Lexar", category: "Stockage externe et sauvegarde", description: "Cartes mémoire et clés USB" },
+  { name: "Intenso", category: "Stockage externe et sauvegarde", description: "Clés USB et cartes mémoire" },
+  { name: "SanDisk", category: "Stockage externe et sauvegarde", description: "Clés USB, cartes mémoire et SSD" },
+  { name: "Synology", category: "Stockage externe et sauvegarde", description: "NAS et solutions de sauvegarde" },
+  { name: "QNAP", category: "Stockage externe et sauvegarde", description: "NAS et solutions de stockage" },
+  { name: "Asustor", category: "Stockage externe et sauvegarde", description: "NAS et solutions de stockage" },
+  { name: "TerraMaster", category: "Stockage externe et sauvegarde", description: "NAS et solutions de stockage" },
+  { name: "Drobo", category: "Stockage externe et sauvegarde", description: "Solutions de stockage RAID" },
+
+  // ───────────────────────── Imprimantes et consommables ─────────────────────────
+  { name: "Canon", category: "Imprimantes et consommables", description: "Imprimantes, multifonctions et consommables" },
+  { name: "Brother", category: "Imprimantes et consommables", description: "Imprimantes laser et multifonctions" },
+  { name: "Kyocera", category: "Imprimantes et consommables", description: "Imprimantes professionnelles" },
+  { name: "Xerox", category: "Imprimantes et consommables", description: "Imprimantes et multifonctions pro" },
+  { name: "Ricoh", category: "Imprimantes et consommables", description: "Imprimantes et solutions documentaires" },
+  { name: "OKI", category: "Imprimantes et consommables", description: "Imprimantes laser et LED" },
+  { name: "Zebra", category: "Imprimantes et consommables", description: "Imprimantes d'étiquettes et de codes-barres" },
+  { name: "Datamax", category: "Imprimantes et consommables", description: "Imprimantes d'étiquettes industrielles" },
+  { name: "SATO", category: "Imprimantes et consommables", description: "Imprimantes d'étiquettes professionnelles" },
+  { name: "TSC", category: "Imprimantes et consommables", description: "Imprimantes d'étiquettes et codes-barres" },
+
+  // ───────────────────────── Téléphonie et visioconférence ─────────────────────────
+  { name: "Yealink", category: "Téléphonie et visioconférence", description: "Téléphones IP et solutions de visioconférence" },
+  { name: "Grandstream", category: "Téléphonie et visioconférence", description: "Téléphones IP et équipements VoIP" },
+  { name: "Fanvil", category: "Téléphonie et visioconférence", description: "Téléphones IP" },
+  { name: "Snom", category: "Téléphonie et visioconférence", description: "Téléphones IP professionnels" },
+  { name: "AverMedia", category: "Téléphonie et visioconférence", description: "Caméras et solutions de visioconférence" },
+  { name: "Huddly", category: "Téléphonie et visioconférence", description: "Caméras intelligentes de visioconférence" },
+  { name: "Neat", category: "Téléphonie et visioconférence", description: "Systèmes de visioconférence haut de gamme" },
+
+  // ───────────────────────── Alimentation et énergie ─────────────────────────
+  { name: "APC", category: "Alimentation et énergie", description: "Onduleurs et protection d'alimentation" },
+  { name: "Eaton", category: "Alimentation et énergie", description: "Onduleurs et gestion de l'énergie" },
+  { name: "CyberPower", category: "Alimentation et énergie", description: "Onduleurs et multiprises" },
+  { name: "Vertiv", category: "Alimentation et énergie", description: "Alimentation et refroidissement pour datacenter" },
+  { name: "Delta", category: "Alimentation et énergie", description: "Onduleurs et alimentations industrielles" },
+  { name: "Baseus", category: "Alimentation et énergie", description: "Chargeurs et accessoires mobiles" },
+
+  // ───────────────────────── Sécurité informatique ─────────────────────────
+  { name: "Kaspersky", category: "Sécurité informatique", description: "Solutions antivirus et sécurité" },
+  { name: "Norton", category: "Sécurité informatique", description: "Antivirus et sécurité en ligne" },
+  { name: "McAfee", category: "Sécurité informatique", description: "Antivirus et sécurité" },
+  { name: "ESET", category: "Sécurité informatique", description: "Antivirus et sécurité professionnelle" },
+  { name: "Bitdefender", category: "Sécurité informatique", description: "Antivirus et cybersécurité" },
+  { name: "Trend Micro", category: "Sécurité informatique", description: "Sécurité et protection d'entreprise" },
+  { name: "Sophos", category: "Sécurité informatique", description: "Sécurité réseau et pare-feux" },
+  { name: "CrowdStrike", category: "Sécurité informatique", description: "Protection des postes de travail" },
+  { name: "Fortinet", category: "Sécurité informatique", description: "Pare-feux et sécurité réseau" },
+  { name: "Palo Alto Networks", category: "Sécurité informatique", description: "Pare-feux nouvelle génération" },
+  { name: "Hikvision", category: "Sécurité informatique", description: "Caméras et vidéosurveillance IP" },
+  { name: "Dahua", category: "Sécurité informatique", description: "Caméras et vidéosurveillance" },
+  { name: "Axis", category: "Sécurité informatique", description: "Caméras réseau professionnelles" },
+  { name: "Bosch", category: "Sécurité informatique", description: "Vidéosurveillance et contrôle d'accès" },
+  { name: "Hanwha", category: "Sécurité informatique", description: "Caméras et vidéosurveillance" },
+  { name: "ZKTeco", category: "Sécurité informatique", description: "Contrôle d'accès et biométrie" },
+  { name: "Suprema", category: "Sécurité informatique", description: "Biométrie et contrôle d'accès" },
+  { name: "Paxton", category: "Sécurité informatique", description: "Systèmes de contrôle d'accès" },
+
+  // ───────────────────────── Logiciels et licences ─────────────────────────
+  { name: "Adobe", category: "Logiciels et licences", description: "Logiciels créatifs et PDF" },
+  { name: "Oracle", category: "Logiciels et licences", description: "Bases de données et logiciels d'entreprise" },
+  { name: "VMware", category: "Logiciels et licences", description: "Virtualisation et cloud" },
+  { name: "Red Hat", category: "Logiciels et licences", description: "Linux et solutions open source" },
+  { name: "Canonical", category: "Logiciels et licences", description: "Ubuntu et solutions Linux" },
+  { name: "JetBrains", category: "Logiciels et licences", description: "Outils de développement" },
+  { name: "Atlassian", category: "Logiciels et licences", description: "Jira, Confluence et outils de collaboration" },
+  { name: "Autodesk", category: "Logiciels et licences", description: "Logiciels de CAO et conception" },
+  { name: "SAP", category: "Logiciels et licences", description: "ERP et logiciels d'entreprise" },
+  { name: "Sage", category: "Logiciels et licences", description: "Logiciels de gestion et comptabilité" },
+  { name: "Cegid", category: "Logiciels et licences", description: "Logiciels de gestion d'entreprise" },
+  { name: "Odoo", category: "Logiciels et licences", description: "ERP et logiciels de gestion open source" },
+  { name: "Veeam", category: "Logiciels et licences", description: "Sauvegarde et restauration" },
+  { name: "Acronis", category: "Logiciels et licences", description: "Sauvegarde et protection des données" },
+  { name: "Slack", category: "Logiciels et licences", description: "Collaboration et messagerie d'équipe" },
+
+  // ───────────────────────── Consommables et entretien ─────────────────────────
+  { name: "3M", category: "Consommables et entretien", description: "Produits de nettoyage et entretien" },
+  { name: "Ergotron", category: "Consommables et entretien", description: "Bras et supports pour écrans" },
+  { name: "NewStar", category: "Consommables et entretien", description: "Supports pour écrans et vidéoprojecteurs" },
+  { name: "Duronic", category: "Consommables et entretien", description: "Supports muraux et bras VESA" },
+  { name: "Targus", category: "Consommables et entretien", description: "Sacoches et protections pour PC" },
+  { name: "Samsonite", category: "Consommables et entretien", description: "Sacoches et bagagerie pour PC" },
+  { name: "Case Logic", category: "Consommables et entretien", description: "Housses et étuis de protection" },
+]
+
 const roles: RoleSeed[] = [
   { code: "SUPER_ADMIN", name: "Super Administrateur", description: "Accès complet à toutes les fonctionnalités de l'application, y compris la gestion des rôles, permissions et paramètres système.", isSystem: true },
   { code: "ADMIN", name: "Administrateur", description: "Gère les utilisateurs, les paramètres de l'entreprise, les produits et les opérations courantes.", isSystem: true },
@@ -559,6 +1248,77 @@ async function main() {
       console.log(`ℹ️  ${warehouses.length - existingWhCount} entrepôts manquants ignorés`)
     }
     console.log(`ℹ️  ${Math.max(existingWhCount, warehouses.length)} entrepôts disponibles`)
+  }
+
+  function slugify(input: string): string {
+    return input
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+  }
+
+  const [catRows] = await conn.execute("SELECT COUNT(*) as cnt FROM categories")
+  const catCount = (catRows as any)[0].cnt
+  if (catCount === 0) {
+    let categoryCount = 0
+    const usedSlugs = new Set<string>()
+
+    async function insertCategory(node: CategorySeed, parentId: number | null, sortOrder: number) {
+      let slug = slugify(node.name)
+      let baseSlug = slug
+      let suffix = 2
+      while (usedSlugs.has(slug)) {
+        slug = `${baseSlug}-${suffix}`
+        suffix++
+      }
+      usedSlugs.add(slug)
+      const [res] = await conn.execute(
+        "INSERT INTO categories (name, slug, description, parent_id, is_active, sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())",
+        [node.name, slug, node.description ?? null, parentId, true, sortOrder]
+      )
+      const newId = (res as any).insertId
+      categoryCount++
+      if (node.children) {
+        for (let i = 0; i < node.children.length; i++) {
+          await insertCategory(node.children[i], newId, i)
+        }
+      }
+    }
+
+    for (let i = 0; i < categories.length; i++) {
+      await insertCategory(categories[i], null, i)
+    }
+    console.log(`✅ ${categoryCount} catégories créées avec succès`)
+  } else {
+    console.log(`ℹ️  ${catCount} catégories déjà existantes. Aucun seed effectué.`)
+  }
+
+  const [brandRows] = await conn.execute("SELECT COUNT(*) as cnt FROM brands")
+  const brandCount = (brandRows as any)[0].cnt
+  if (brandCount === 0) {
+    const usedBrandSlugs = new Set<string>()
+    let brandInserted = 0
+    for (let i = 0; i < brands.length; i++) {
+      const b = brands[i]
+      let slug = slugify(b.name)
+      let baseSlug = slug
+      let suffix = 2
+      while (usedBrandSlugs.has(slug)) {
+        slug = `${baseSlug}-${suffix}`
+        suffix++
+      }
+      usedBrandSlugs.add(slug)
+      await conn.execute(
+        "INSERT INTO brands (name, slug, description, is_active, sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
+        [b.name, slug, `${b.description}. (Catégorie: ${b.category})`, true, i]
+      )
+      brandInserted++
+    }
+    console.log(`✅ ${brandInserted} marques créées avec succès`)
+  } else {
+    console.log(`ℹ️  ${brandCount} marques déjà existantes. Aucun seed effectué.`)
   }
 
   const [rows] = await conn.execute("SELECT COUNT(*) as cnt FROM roles")
