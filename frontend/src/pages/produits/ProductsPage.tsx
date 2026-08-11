@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react"
+import { useNavigate } from "react-router-dom"
 import {
   AlertTriangle,
   Building2,
@@ -15,7 +16,6 @@ import {
   Trash2,
 } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
-import { z } from "zod"
 
 import { DataTable } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
@@ -31,11 +31,21 @@ import {
 } from "@/components/ui/modal"
 import { toast } from "@/components/ui/toast"
 import { SearchableSelect } from "@/components/ui/searchable-select"
-import { useProductsQuery, useProductQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation, useUploadProductImageMutation, useUpdateProductImageMutation, useDeleteProductImageMutation } from "@/hooks/use-products"
+import { useProductsQuery, useProductQuery, useUpdateProductMutation, useDeleteProductMutation, useUploadProductImageMutation, useUpdateProductImageMutation, useDeleteProductImageMutation } from "@/hooks/use-products"
 import { useCategoriesQuery } from "@/hooks/use-categories"
 import { useBrandsQuery } from "@/hooks/use-brands"
 import { useUnitsOfMeasureQuery } from "@/hooks/use-units-of-measure"
 import { ApiError } from "@/lib/api"
+import {
+  productSchema,
+  slugify,
+  generateSku,
+  initialProductForm,
+  type ProductFormData,
+  type ProductFieldErrors,
+  type ProductOption,
+  type PendingImage,
+} from "@/lib/product-form"
 import { resolveImageUrl, type Product, type ProductImage } from "@/api/products"
 
 function ProductThumb({
@@ -67,102 +77,6 @@ function ProductThumb({
   )
 }
 
-const productSchema = z.object({
-  sku: z
-    .string()
-    .min(3, "Le SKU doit contenir au moins 3 caractères")
-    .max(100, "Le SKU est trop long")
-    .regex(/^[A-Za-z0-9][A-Za-z0-9-]*$/, "Le SKU ne peut contenir que des lettres, chiffres et tirets"),
-  name: z.string().min(2, "Le nom doit contenir au moins 2 caractères").max(200, "Le nom est trop long"),
-  slug: z
-    .string()
-    .min(2, "Le slug doit contenir au moins 2 caractères")
-    .max(220, "Le slug est trop long")
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug invalide (minuscules, chiffres et tirets)"),
-  description: z.string().max(5000, "La description est trop longue"),
-  brandId: z.string(),
-  categoryId: z.string(),
-  unitId: z.string().min(1, "L'unité de mesure est obligatoire"),
-  isActive: z.boolean(),
-})
-
-type ProductFormData = z.infer<typeof productSchema>
-
-const initialForm: ProductFormData = {
-  sku: "",
-  name: "",
-  slug: "",
-  description: "",
-  brandId: "",
-  categoryId: "",
-  unitId: "",
-  isActive: true,
-}
-
-type FieldErrors = Partial<Record<keyof ProductFormData, string>>
-
-function slugify(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-}
-
-const SKU_STOPWORDS = new Set([
-  "chaussure", "chaussures", "chaussette", "chaussettes", "chapeau", "chapeaux",
-  "chemise", "chemises", "pantalon", "pantalons", "short", "shorts",
-  "veste", "vestes", "manteau", "manteaux", "pull", "pulls", "sweat", "sweats",
-  "t-shirt", "tshirt", "tee", "robe", "robes", "jupe", "jupes",
-  "sac", "sacs", "ceinture", "ceintures", "montre", "montres",
-  "lunettes", "casquette", "casquettes", "paire", "paires",
-  "de", "du", "des", "la", "le", "les", "un", "une", "pour", "avec", "et",
-])
-
-const SKU_COLOR_CODES: Record<string, string> = {
-  noir: "BLK",
-  blanc: "WHT",
-  rouge: "RED",
-  bleu: "BLU",
-  vert: "GRN",
-  jaune: "YLW",
-  gris: "GRY",
-  rose: "PNK",
-  orange: "ORG",
-  violet: "PPL",
-  marron: "BRN",
-  beige: "BGE",
-  or: "GLD",
-  argent: "SLV",
-  bordeaux: "BRD",
-  turquoise: "TRQ",
-  kaki: "KAK",
-  navy: "NVY",
-}
-
-function generateSku(name: string, brandName: string | null | undefined): string {
-  const segments: string[] = []
-  if (brandName) {
-    const brandToken = slugify(brandName).split("-")[0]
-    if (brandToken) segments.push(brandToken.slice(0, 3).toUpperCase())
-  }
-  for (const word of slugify(name).split("-")) {
-    if (!word) continue
-    if (segments.length >= 4) break
-    if (SKU_STOPWORDS.has(word)) continue
-    if (/^\d+$/.test(word)) segments.push(word)
-    else if (SKU_COLOR_CODES[word]) segments.push(SKU_COLOR_CODES[word])
-    else segments.push(word.slice(0, 3).toUpperCase())
-  }
-  return segments.join("-")
-}
-
-type Option = { value: string; label: string }
-
-type PendingImage = { file: File; url: string }
-
 function FormFields({
   form,
   setForm,
@@ -178,12 +92,12 @@ function FormFields({
 }: {
   form: ProductFormData
   setForm: React.Dispatch<React.SetStateAction<ProductFormData>>
-  fieldErrors: FieldErrors
+  fieldErrors: ProductFieldErrors
   prefix: string
   slugs: {
-    brandOptions: Option[]
-    categoryOptions: Option[]
-    unitOptions: Option[]
+    brandOptions: ProductOption[]
+    categoryOptions: ProductOption[]
+    unitOptions: ProductOption[]
     autoSlug: React.MutableRefObject<boolean>
     autoSku: React.MutableRefObject<boolean>
   }
@@ -484,11 +398,11 @@ function FormFields({
 }
 
 export function ProductsPage() {
+  const navigate = useNavigate()
   const { data: products, isLoading } = useProductsQuery()
   const { data: categories } = useCategoriesQuery()
   const { data: brands } = useBrandsQuery()
   const { data: units } = useUnitsOfMeasureQuery()
-  const createProduct = useCreateProductMutation()
   const updateProduct = useUpdateProductMutation()
   const deleteProduct = useDeleteProductMutation()
   const uploadImage = useUploadProductImageMutation()
@@ -501,7 +415,6 @@ export function ProductsPage() {
   const { data: selectedProduct } = useProductQuery(selectedProductId ?? 0)
   const [detailImageIndex, setDetailImageIndex] = useState(0)
   const [productToDelete, setProductToDelete] = useState<Product | null>(null)
-  const [showCreate, setShowCreate] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
 
   useEffect(() => {
@@ -538,10 +451,10 @@ export function ProductsPage() {
     }))
   }, [categories])
 
-  const [form, setForm] = useState<ProductFormData>(initialForm)
+  const [form, setForm] = useState<ProductFormData>(initialProductForm)
   const autoSlug = useMemo(() => ({ current: true }), [])
   const autoSku = useMemo(() => ({ current: true }), [])
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
+  const [fieldErrors, setFieldErrors] = useState<ProductFieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [pendingImages, setPendingImages] = useState<PendingImage[]>([])
   const [editImages, setEditImages] = useState<ProductImage[]>([])
@@ -553,7 +466,7 @@ export function ProductsPage() {
   }, [editingProduct, editingDetail])
 
   function resetForm() {
-    setForm({ ...initialForm })
+    setForm({ ...initialProductForm })
     autoSlug.current = true
     autoSku.current = true
     setFieldErrors({})
@@ -636,7 +549,7 @@ export function ProductsPage() {
   function validate(): ProductFormData | null {
     const result = productSchema.safeParse(form)
     if (!result.success) {
-      const errors: FieldErrors = {}
+      const errors: ProductFieldErrors = {}
       for (const issue of result.error.issues) {
         const field = issue.path[0] as keyof ProductFormData
         if (!errors[field]) errors[field] = issue.message
@@ -646,32 +559,6 @@ export function ProductsPage() {
     }
     setFieldErrors({})
     return result.data
-  }
-
-  async function handleCreate(event: FormEvent) {
-    event.preventDefault()
-    setFormError(null)
-    const data = validate()
-    if (!data) return
-
-    try {
-      const created = await createProduct.mutateAsync({
-        sku: data.sku,
-        name: data.name,
-        slug: data.slug || undefined,
-        description: data.description || undefined,
-        brandId: data.brandId ? Number(data.brandId) : undefined,
-        categoryId: data.categoryId ? Number(data.categoryId) : undefined,
-        unitId: Number(data.unitId),
-        isActive: data.isActive,
-      })
-      await uploadPendingImages(created.id)
-      toast.success("Produit créé avec succès")
-      setShowCreate(false)
-      resetForm()
-    } catch (err) {
-      setFormError(err instanceof ApiError ? err.message : "Une erreur est survenue.")
-    }
   }
 
   async function handleUpdate(event: FormEvent) {
@@ -845,7 +732,7 @@ export function ProductsPage() {
               {activeCount} actifs
             </span>
             <Button
-              onClick={() => { resetForm(); setShowCreate(true) }}
+              onClick={() => navigate("/dashboard/produits/ajouter")}
               className="gap-2 bg-white text-blue-700 shadow-lg hover:bg-blue-50"
             >
               <Plus className="size-4" />
@@ -899,61 +786,6 @@ export function ProductsPage() {
           </div>
         )}
       />
-
-      <ModalRoot open={showCreate} onOpenChange={(open) => { if (!open) { setShowCreate(false); resetForm() } }}>
-        <ModalPopup size="lg">
-          <ModalClose />
-          <ModalHeader>
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20">
-                <Package className="size-5" />
-              </div>
-              <div>
-                <ModalTitle>Nouveau produit</ModalTitle>
-                <p className="mt-0.5 text-sm text-muted-foreground">
-                  Ajoutez un produit à votre catalogue
-                </p>
-              </div>
-            </div>
-          </ModalHeader>
-          <form onSubmit={handleCreate}>
-            <ModalContent className="max-h-[70vh] overflow-y-auto">
-              <div className="space-y-5">
-                <FormFields
-                  form={form}
-                  setForm={setForm}
-                  fieldErrors={fieldErrors}
-                  prefix="create"
-                  slugs={{ brandOptions, categoryOptions, unitOptions, autoSlug, autoSku }}
-                  images={editImages}
-                  pendingImages={pendingImages}
-                  onAddFiles={handleAddFiles}
-                  onRemovePending={handleRemovePending}
-                  onSetPrimary={handleSetPrimary}
-                  onDeleteImage={handleDeleteImage}
-                />
-                {formError ? (
-                  <div className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/5 px-3.5 py-2.5 text-sm text-destructive">
-                    <span className="inline-block size-1.5 shrink-0 rounded-full bg-destructive" />
-                    {formError}
-                  </div>
-                ) : null}
-              </div>
-            </ModalContent>
-            <ModalFooter>
-              <Button type="button" variant="ghost" onClick={() => { setShowCreate(false); resetForm() }}>Annuler</Button>
-              <Button type="submit" disabled={createProduct.isPending}>
-                {createProduct.isPending ? (
-                  <span className="flex items-center gap-2">
-                    <span className="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                    Création…
-                  </span>
-                ) : "Créer le produit"}
-              </Button>
-            </ModalFooter>
-          </form>
-        </ModalPopup>
-      </ModalRoot>
 
       <ModalRoot open={!!editingProduct} onOpenChange={(open) => { if (!open) { setEditingProduct(null); resetForm() } }}>
         <ModalPopup size="lg">
