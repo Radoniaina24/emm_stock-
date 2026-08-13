@@ -8,6 +8,8 @@ import { ApiError } from "@/lib/api"
 import { useCategoriesQuery } from "@/hooks/use-categories"
 import { useBrandsQuery } from "@/hooks/use-brands"
 import { useUnitsOfMeasureQuery } from "@/hooks/use-units-of-measure"
+import { useSuppliersQuery } from "@/hooks/use-suppliers"
+import { useProductSuppliersQuery } from "@/hooks/use-product-suppliers"
 import {
   useProductQuery,
   useUpdateProductMutation,
@@ -15,6 +17,11 @@ import {
   useUpdateProductImageMutation,
   useDeleteProductImageMutation,
 } from "@/hooks/use-products"
+import {
+  createProductSupplier,
+  updateProductSupplier,
+  deleteProductSupplier,
+} from "@/api/product-suppliers"
 import {
   productSchema,
   toNumber,
@@ -31,6 +38,7 @@ import { PricingCard } from "@/pages/produits/create/PricingCard"
 import { LogisticsCard } from "@/pages/produits/create/LogisticsCard"
 import { SettingsCard } from "@/pages/produits/create/SettingsCard"
 import { ProductPreviewCard } from "@/pages/produits/create/ProductPreviewCard"
+import { SuppliersCard, type SupplierLinkDraft } from "@/pages/produits/create/SuppliersCard"
 
 function fillForm(product: Product): ProductFormData {
   return {
@@ -73,18 +81,37 @@ export function EditProductPage() {
   const { data: categories } = useCategoriesQuery()
   const { data: brands } = useBrandsQuery()
   const { data: units } = useUnitsOfMeasureQuery()
+  const { data: suppliers } = useSuppliersQuery()
+  const { data: existingSupplierLinks } = useProductSuppliersQuery(
+    Number.isNaN(id) ? undefined : { productId: id },
+  )
 
   const [form, setForm] = useState<ProductFormData | null>(null)
   const [fieldErrors, setFieldErrors] = useState<ProductFieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [pendingImages, setPendingImages] = useState<PendingImage[]>([])
   const [existingImages, setExistingImages] = useState<ProductImage[]>([])
+  const [supplierLinks, setSupplierLinks] = useState<SupplierLinkDraft[]>([])
 
   useEffect(() => {
     if (!product) return
     setForm(fillForm(product))
     setExistingImages(product.images ?? [])
   }, [product])
+
+  useEffect(() => {
+    if (!existingSupplierLinks) return
+    setSupplierLinks(
+      existingSupplierLinks.map((l) => ({
+        supplierId: l.supplierId,
+        supplierSku: l.supplierSku ?? "",
+        price: l.price,
+        minQty: l.minQty,
+        leadTimeDays: l.leadTimeDays !== null ? String(l.leadTimeDays) : "",
+        isPreferred: l.isPreferred,
+      })),
+    )
+  }, [existingSupplierLinks])
 
   const brandOptions = useMemo<ProductOption[]>(
     () => (brands ?? []).map((b) => ({ value: String(b.id), label: b.name })),
@@ -115,6 +142,11 @@ export function EditProductPage() {
       childrenCount: list.filter((x) => x.parentId === c.id).length,
     }))
   }, [categories])
+
+  const supplierOptions = useMemo(
+    () => (suppliers ?? []).map((s) => ({ id: s.id, name: s.name })),
+    [suppliers],
+  )
 
   const set = useCallback(<K extends keyof ProductFormData>(key: K, value: ProductFormData[K]) => {
     setForm((prev) => (prev ? { ...prev, [key]: value } : prev))
@@ -229,6 +261,45 @@ export function EditProductPage() {
         },
       })
       await uploadPendingImages(product.id)
+
+      if (existingSupplierLinks) {
+        const existingBySupplier = new Map(existingSupplierLinks.map((l) => [l.supplierId, l]))
+        for (const link of supplierLinks) {
+          const payload = {
+            supplierSku: link.supplierSku || undefined,
+            price: Number(link.price),
+            minQty: link.minQty !== "" ? Number(link.minQty) : undefined,
+            leadTimeDays: link.leadTimeDays !== "" ? Number(link.leadTimeDays) : undefined,
+            isPreferred: link.isPreferred,
+          }
+          try {
+            const existing = existingBySupplier.get(link.supplierId)
+            if (existing) {
+              await updateProductSupplier(existing.id, payload)
+            } else {
+              await createProductSupplier({ productId: product.id, supplierId: link.supplierId, ...payload })
+            }
+          } catch (err) {
+            toast.error(
+              err instanceof ApiError
+                ? `Fournisseur ${link.supplierId} : ${err.message}`
+                : `Échec de la synchronisation d'un fournisseur.`,
+            )
+          }
+        }
+        for (const existing of existingSupplierLinks) {
+          if (!supplierLinks.some((l) => l.supplierId === existing.supplierId)) {
+            try {
+              await deleteProductSupplier(existing.id)
+            } catch (err) {
+              toast.error(
+                err instanceof ApiError ? err.message : `Échec de la suppression d'un fournisseur.`,
+              )
+            }
+          }
+        }
+      }
+
       toast.success("Produit modifié avec succès")
       navigate("/dashboard/produits")
     } catch (err) {
@@ -377,6 +448,12 @@ export function EditProductPage() {
               onDescriptionSaleChange={(v) => set("descriptionSale", v)}
               onInternalNotesChange={(v) => set("internalNotes", v)}
               errors={fieldErrors}
+            />
+
+            <SuppliersCard
+              supplierOptions={supplierOptions}
+              value={supplierLinks}
+              onChange={setSupplierLinks}
             />
           </div>
 

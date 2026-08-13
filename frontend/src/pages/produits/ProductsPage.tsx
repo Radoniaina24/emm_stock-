@@ -30,6 +30,7 @@ import type { ColumnDef } from "@tanstack/react-table"
 import { DataTable } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { SearchableSelect } from "@/components/ui/searchable-select"
 import {
   ModalClose,
   ModalContent,
@@ -42,6 +43,10 @@ import {
 import { toast } from "@/components/ui/toast"
 import { useProductsQuery, useProductQuery, useDeleteProductMutation } from "@/hooks/use-products"
 import { useProductSuppliersQuery } from "@/hooks/use-product-suppliers"
+import { useCategoriesQuery } from "@/hooks/use-categories"
+import { useBrandsQuery } from "@/hooks/use-brands"
+import { useUnitsOfMeasureQuery } from "@/hooks/use-units-of-measure"
+import { useSuppliersQuery } from "@/hooks/use-suppliers"
 import { ApiError } from "@/lib/api"
 import { resolveImageUrl, type Product } from "@/api/products"
 
@@ -79,6 +84,11 @@ export function ProductsPage() {
   const navigate = useNavigate()
   const { data: products, isLoading } = useProductsQuery()
   const deleteProduct = useDeleteProductMutation()
+  const { data: categories } = useCategoriesQuery()
+  const { data: brands } = useBrandsQuery()
+  const { data: units } = useUnitsOfMeasureQuery()
+  const { data: suppliers } = useSuppliersQuery()
+  const { data: allProductSuppliers } = useProductSuppliersQuery()
 
   const all = useMemo(() => products ?? [], [products])
 
@@ -89,6 +99,116 @@ export function ProductsPage() {
   )
   const [detailImageIndex, setDetailImageIndex] = useState(0)
   const [productToDelete, setProductToDelete] = useState<Product | null>(null)
+
+  const [supplierFilter, setSupplierFilter] = useState("all")
+  const [unitFilter, setUnitFilter] = useState("all")
+  const [categoryFilter, setCategoryFilter] = useState("all")
+  const [brandFilter, setBrandFilter] = useState("all")
+
+  const categoryOptions = useMemo(
+    () => (categories ?? []).map((c) => ({ value: String(c.id), label: c.name })),
+    [categories],
+  )
+  const brandOptions = useMemo(
+    () => (brands ?? []).map((b) => ({ value: String(b.id), label: b.name })),
+    [brands],
+  )
+  const unitOptions = useMemo(
+    () =>
+      (units ?? []).map((u) => ({
+        value: String(u.id),
+        label: u.symbol ? `${u.name} (${u.symbol})` : u.name,
+      })),
+    [units],
+  )
+  const supplierOptions = useMemo(
+    () => (suppliers ?? []).map((s) => ({ value: s.id, label: s.name })),
+    [suppliers],
+  )
+
+  const productIdsBySupplier = useMemo(() => {
+    const map = new Map<string, Set<number>>()
+    for (const ps of allProductSuppliers ?? []) {
+      if (!map.has(ps.supplierId)) map.set(ps.supplierId, new Set())
+      map.get(ps.supplierId)!.add(ps.productId)
+    }
+    return map
+  }, [allProductSuppliers])
+
+  const filtered = useMemo(() => {
+    return (products ?? []).filter((p) => {
+      if (categoryFilter !== "all" && String(p.categoryId) !== categoryFilter) return false
+      if (brandFilter !== "all" && String(p.brandId) !== brandFilter) return false
+      if (unitFilter !== "all" && String(p.unitId) !== unitFilter) return false
+      if (supplierFilter !== "all") {
+        const set = productIdsBySupplier.get(supplierFilter)
+        if (!set || !set.has(p.id)) return false
+      }
+      return true
+    })
+  }, [products, categoryFilter, brandFilter, unitFilter, supplierFilter, productIdsBySupplier])
+
+  const filters = (
+    <div className="flex flex-wrap items-center gap-3">
+      <div className="w-48">
+        <SearchableSelect
+          variant="inline"
+          value={categoryFilter}
+          placeholder="Catégorie"
+          options={[{ value: "all", label: "Toutes les catégories" }, ...categoryOptions]}
+          onSelect={(v) => setCategoryFilter(v)}
+          triggerClassName="h-10 w-full bg-background"
+        />
+      </div>
+      <div className="w-48">
+        <SearchableSelect
+          variant="inline"
+          value={brandFilter}
+          placeholder="Marque"
+          options={[{ value: "all", label: "Toutes les marques" }, ...brandOptions]}
+          onSelect={(v) => setBrandFilter(v)}
+          triggerClassName="h-10 w-full bg-background"
+        />
+      </div>
+      <div className="w-48">
+        <SearchableSelect
+          variant="inline"
+          value={unitFilter}
+          placeholder="Unité"
+          options={[{ value: "all", label: "Toutes les unités" }, ...unitOptions]}
+          onSelect={(v) => setUnitFilter(v)}
+          triggerClassName="h-10 w-full bg-background"
+        />
+      </div>
+      <div className="w-48">
+        <SearchableSelect
+          variant="inline"
+          value={supplierFilter}
+          placeholder="Fournisseur"
+          options={[{ value: "all", label: "Tous les fournisseurs" }, ...supplierOptions]}
+          onSelect={(v) => setSupplierFilter(v)}
+          triggerClassName="h-10 w-full bg-background"
+        />
+      </div>
+      {(categoryFilter !== "all" ||
+        brandFilter !== "all" ||
+        unitFilter !== "all" ||
+        supplierFilter !== "all") && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            setCategoryFilter("all")
+            setBrandFilter("all")
+            setUnitFilter("all")
+            setSupplierFilter("all")
+          }}
+        >
+          Réinitialiser
+        </Button>
+      )}
+    </div>
+  )
 
   useEffect(() => {
     setDetailImageIndex(0)
@@ -261,7 +381,7 @@ export function ProductsPage() {
 
       <DataTable
         columns={columns}
-        data={all}
+        data={filtered}
         searchAccessor={(p) =>
           [p.name, p.sku, p.description, p.category?.name, p.brand?.name, p.unit.code]
             .filter(Boolean)
@@ -271,6 +391,7 @@ export function ProductsPage() {
         loading={isLoading}
         exportFilename="produits.csv"
         emptyMessage="Aucun produit trouvé."
+        filters={filters}
         renderActions={(row) => (
           <div className="flex items-center justify-end gap-0.5">
             <Button

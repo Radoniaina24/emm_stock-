@@ -24,14 +24,8 @@ import {
   ModalRoot,
   ModalTitle,
 } from "@/components/ui/modal"
-import {
-  SelectRoot,
-  SelectTrigger,
-  SelectValue,
-  SelectPopup,
-  SelectList,
-  SelectItem,
-} from "@/components/ui/select"
+import { SearchableSelect } from "@/components/ui/searchable-select"
+import { inputClass } from "@/lib/product-form"
 import { toast } from "@/components/ui/toast"
 import {
   useProductSuppliersQuery,
@@ -97,58 +91,54 @@ function FormFields({
   suppliers: { id: string; name: string }[]
   disabledIdentity: boolean
 }) {
-  function inputClass(field: keyof FormData) {
-    const base = "h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none transition-all placeholder:text-muted-foreground/30 hover:border-border focus:shadow-sm focus:ring-2"
-    return fieldErrors[field]
-      ? `${base} border-destructive/60 focus:border-destructive/40 focus:ring-destructive/10`
-      : `${base} border-border/60 focus:border-primary/40 focus:ring-primary/10`
-  }
+  const productOptions = products.map((p) => ({ value: String(p.id), label: `${p.name} (${p.sku})` }))
+  const supplierOptions = suppliers.map((s) => ({ value: s.id, label: s.name }))
+  const selectedProduct = products.find((p) => String(p.id) === form.productId)
+  const selectedSupplier = suppliers.find((s) => s.id === form.supplierId)
 
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-foreground/80">Produit</label>
-          <SelectRoot
-            value={form.productId}
-            onValueChange={(v) => setForm((p) => ({ ...p, productId: String(v) }))}
-            disabled={disabledIdentity}
-          >
-            <SelectTrigger className={inputClass("productId")}>
-              <SelectValue placeholder="Sélectionner…" />
-            </SelectTrigger>
-            <SelectPopup>
-              <SelectList>
-                {products.map((p) => (
-                  <SelectItem key={p.id} value={String(p.id)}>
-                    {p.name} <span className="text-muted-foreground/50">({p.sku})</span>
-                  </SelectItem>
-                ))}
-              </SelectList>
-            </SelectPopup>
-          </SelectRoot>
+          {disabledIdentity ? (
+            <div className={`${inputClass(false)} flex items-center justify-between gap-2`}>
+              <span className="truncate">
+                {selectedProduct ? `${selectedProduct.name} (${selectedProduct.sku})` : form.productId}
+              </span>
+              <span className="shrink-0 text-xs text-muted-foreground/50">Non modifiable</span>
+            </div>
+          ) : (
+            <SearchableSelect
+              variant="inline"
+              value={form.productId}
+              placeholder="Sélectionner…"
+              options={productOptions}
+              onSelect={(v) => setForm((p) => ({ ...p, productId: v }))}
+              triggerClassName={`h-10 w-full bg-background${fieldErrors.productId ? " border-destructive/60" : ""}`}
+            />
+          )}
           {fieldErrors.productId && <p className="text-xs text-destructive">{fieldErrors.productId}</p>}
         </div>
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-foreground/80">Fournisseur</label>
-          <SelectRoot
-            value={form.supplierId}
-            onValueChange={(v) => setForm((p) => ({ ...p, supplierId: String(v) }))}
-            disabled={disabledIdentity}
-          >
-            <SelectTrigger className={inputClass("supplierId")}>
-              <SelectValue placeholder="Sélectionner…" />
-            </SelectTrigger>
-            <SelectPopup>
-              <SelectList>
-                {suppliers.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.name}
-                  </SelectItem>
-                ))}
-              </SelectList>
-            </SelectPopup>
-          </SelectRoot>
+          {disabledIdentity ? (
+            <div className={`${inputClass(false)} flex items-center justify-between gap-2`}>
+              <span className="truncate">
+                {selectedSupplier ? selectedSupplier.name : form.supplierId}
+              </span>
+              <span className="shrink-0 text-xs text-muted-foreground/50">Non modifiable</span>
+            </div>
+          ) : (
+            <SearchableSelect
+              variant="inline"
+              value={form.supplierId}
+              placeholder="Sélectionner…"
+              options={supplierOptions}
+              onSelect={(v) => setForm((p) => ({ ...p, supplierId: v }))}
+              triggerClassName={`h-10 w-full bg-background${fieldErrors.supplierId ? " border-destructive/60" : ""}`}
+            />
+          )}
           {fieldErrors.supplierId && <p className="text-xs text-destructive">{fieldErrors.supplierId}</p>}
         </div>
       </div>
@@ -162,7 +152,7 @@ function FormFields({
           value={form.supplierSku}
           onChange={(e) => setForm((p) => ({ ...p, supplierSku: e.target.value }))}
           placeholder="SAM-SSD-512"
-          className={inputClass("supplierSku")}
+          className={inputClass(fieldErrors.supplierSku)}
         />
         {fieldErrors.supplierSku && <p className="text-xs text-destructive">{fieldErrors.supplierSku}</p>}
       </div>
@@ -180,7 +170,7 @@ function FormFields({
             value={form.price}
             onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))}
             placeholder="0.00"
-            className={inputClass("price")}
+            className={inputClass(fieldErrors.price)}
           />
           {fieldErrors.price && <p className="text-xs text-destructive">{fieldErrors.price}</p>}
         </div>
@@ -196,7 +186,7 @@ function FormFields({
             value={form.minQty}
             onChange={(e) => setForm((p) => ({ ...p, minQty: e.target.value }))}
             placeholder="1"
-            className={inputClass("minQty")}
+            className={inputClass(fieldErrors.minQty)}
           />
           {fieldErrors.minQty && <p className="text-xs text-destructive">{fieldErrors.minQty}</p>}
         </div>
@@ -212,7 +202,7 @@ function FormFields({
             value={form.leadTimeDays}
             onChange={(e) => setForm((p) => ({ ...p, leadTimeDays: e.target.value }))}
             placeholder="14"
-            className={inputClass("leadTimeDays")}
+            className={inputClass(fieldErrors.leadTimeDays)}
           />
           {fieldErrors.leadTimeDays && (
             <p className="text-xs text-destructive">{fieldErrors.leadTimeDays}</p>
@@ -465,38 +455,30 @@ export function ProductSuppliersPage() {
   const filterBar = (
     <div className="flex flex-wrap items-center gap-3">
       <div className="w-56">
-        <SelectRoot value={productFilter} onValueChange={(v) => setProductFilter(String(v))}>
-          <SelectTrigger>
-            <SelectValue placeholder="Tous les produits" />
-          </SelectTrigger>
-          <SelectPopup>
-            <SelectList>
-              <SelectItem value="all">Tous les produits</SelectItem>
-              {productOptions.map((p) => (
-                <SelectItem key={p.id} value={String(p.id)}>
-                  {p.name}
-                </SelectItem>
-              ))}
-            </SelectList>
-          </SelectPopup>
-        </SelectRoot>
+        <SearchableSelect
+          variant="inline"
+          value={productFilter}
+          placeholder="Tous les produits"
+          options={[
+            { value: "all", label: "Tous les produits" },
+            ...productOptions.map((p) => ({ value: String(p.id), label: p.name })),
+          ]}
+          onSelect={(v) => setProductFilter(v)}
+          triggerClassName="h-10 w-full bg-background"
+        />
       </div>
       <div className="w-56">
-        <SelectRoot value={supplierFilter} onValueChange={(v) => setSupplierFilter(String(v))}>
-          <SelectTrigger>
-            <SelectValue placeholder="Tous les fournisseurs" />
-          </SelectTrigger>
-          <SelectPopup>
-            <SelectList>
-              <SelectItem value="all">Tous les fournisseurs</SelectItem>
-              {supplierOptions.map((s) => (
-                <SelectItem key={s.id} value={s.id}>
-                  {s.name}
-                </SelectItem>
-              ))}
-            </SelectList>
-          </SelectPopup>
-        </SelectRoot>
+        <SearchableSelect
+          variant="inline"
+          value={supplierFilter}
+          placeholder="Tous les fournisseurs"
+          options={[
+            { value: "all", label: "Tous les fournisseurs" },
+            ...supplierOptions.map((s) => ({ value: s.id, label: s.name })),
+          ]}
+          onSelect={(v) => setSupplierFilter(v)}
+          triggerClassName="h-10 w-full bg-background"
+        />
       </div>
       {(productFilter !== "all" || supplierFilter !== "all") && (
         <Button

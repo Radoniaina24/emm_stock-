@@ -8,10 +8,12 @@ import { ApiError } from "@/lib/api"
 import { useCategoriesQuery } from "@/hooks/use-categories"
 import { useBrandsQuery } from "@/hooks/use-brands"
 import { useUnitsOfMeasureQuery } from "@/hooks/use-units-of-measure"
+import { useSuppliersQuery } from "@/hooks/use-suppliers"
 import {
   useCreateProductMutation,
   useUploadProductImageMutation,
 } from "@/hooks/use-products"
+import { createProductSupplier } from "@/api/product-suppliers"
 import {
   productSchema,
   slugify,
@@ -30,6 +32,7 @@ import { PricingCard } from "./PricingCard"
 import { LogisticsCard } from "./LogisticsCard"
 import { SettingsCard } from "./SettingsCard"
 import { ProductPreviewCard } from "./ProductPreviewCard"
+import { SuppliersCard, type SupplierLinkDraft } from "./SuppliersCard"
 
 export function CreateProductPage() {
   const navigate = useNavigate()
@@ -38,8 +41,10 @@ export function CreateProductPage() {
   const { data: categories } = useCategoriesQuery()
   const { data: brands } = useBrandsQuery()
   const { data: units } = useUnitsOfMeasureQuery()
+  const { data: suppliers } = useSuppliersQuery()
 
   const [form, setForm] = useState<ProductFormData>(initialProductForm)
+  const [supplierLinks, setSupplierLinks] = useState<SupplierLinkDraft[]>([])
   const autoSlug = useMemo(() => ({ current: true }), [])
   const autoSku = useMemo(() => ({ current: true }), [])
   const [fieldErrors, setFieldErrors] = useState<ProductFieldErrors>({})
@@ -58,6 +63,11 @@ export function CreateProductPage() {
         label: u.symbol ? `${u.name} (${u.symbol})` : `${u.name} (${u.code})`,
       })),
     [units],
+  )
+
+  const supplierOptions = useMemo(
+    () => (suppliers ?? []).map((s) => ({ id: s.id, name: s.name })),
+    [suppliers],
   )
 
   const categoryOptions = useMemo<ProductOption[]>(() => {
@@ -170,6 +180,25 @@ export function CreateProductPage() {
         isActive: data.isActive,
       })
       await uploadPendingImages(created.id)
+      for (const link of supplierLinks) {
+        try {
+          await createProductSupplier({
+            productId: created.id,
+            supplierId: link.supplierId,
+            supplierSku: link.supplierSku || undefined,
+            price: Number(link.price),
+            minQty: link.minQty !== "" ? Number(link.minQty) : undefined,
+            leadTimeDays: link.leadTimeDays !== "" ? Number(link.leadTimeDays) : undefined,
+            isPreferred: link.isPreferred,
+          })
+        } catch (err) {
+          toast.error(
+            err instanceof ApiError
+              ? `Fournisseur ${link.supplierId} : ${err.message}`
+              : `Échec de l'association d'un fournisseur.`,
+          )
+        }
+      }
       toast.success("Produit créé avec succès")
       navigate("/dashboard/produits")
     } catch (err) {
@@ -306,6 +335,12 @@ export function CreateProductPage() {
               onDescriptionSaleChange={(v) => set("descriptionSale", v)}
               onInternalNotesChange={(v) => set("internalNotes", v)}
               errors={fieldErrors}
+            />
+
+            <SuppliersCard
+              supplierOptions={supplierOptions}
+              value={supplierLinks}
+              onChange={setSupplierLinks}
             />
           </div>
 
