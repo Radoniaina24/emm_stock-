@@ -17,9 +17,10 @@ import { ProductBarcodesModule } from './product-barcodes/product-barcodes.modul
 import { ProductsModule } from './products/products.module.js';
 import { StockModule } from './stock/stock.module.js';
 import { SuppliersModule } from './suppliers/suppliers.module.js';
+import { ProductSuppliersModule } from './product-suppliers/product-suppliers.module.js';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, RolesModule, PermissionsModule, RolePermissionsModule, DepartmentsModule, JobTitlesModule, WarehousesModule, CategoriesModule, BrandsModule, UnitsOfMeasureModule, ProductBarcodesModule, ProductsModule, StockModule, SuppliersModule],
+  imports: [PrismaModule, AuthModule, UsersModule, RolesModule, PermissionsModule, RolePermissionsModule, DepartmentsModule, JobTitlesModule, WarehousesModule, CategoriesModule, BrandsModule, UnitsOfMeasureModule, ProductBarcodesModule, ProductsModule, StockModule, SuppliersModule, ProductSuppliersModule],
   controllers: [AppController],
   providers: [AppService],
 })

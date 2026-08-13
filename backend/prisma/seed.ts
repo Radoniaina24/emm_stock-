@@ -1,6 +1,7 @@
 import * as bcrypt from "bcrypt"
 import mysql from "mysql2/promise"
 import { seedSuppliers } from "./seed-suppliers"
+import { seedProductSuppliers } from "./seed-product-suppliers"
 
 type DepartmentSeed = {
   code: string
@@ -1323,6 +1324,7 @@ async function main() {
   }
 
   await seedSuppliers(conn)
+  await seedProductSuppliers(conn)
 
   const [rows] = await conn.execute("SELECT COUNT(*) as cnt FROM roles")
   const roleCount = (rows as any)[0].cnt

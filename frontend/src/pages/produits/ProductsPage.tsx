@@ -21,6 +21,7 @@ import {
   ScanLine,
   Star,
   Tag,
+  Truck,
   Trash2,
   Weight,
 } from "lucide-react"
@@ -40,6 +41,7 @@ import {
 } from "@/components/ui/modal"
 import { toast } from "@/components/ui/toast"
 import { useProductsQuery, useProductQuery, useDeleteProductMutation } from "@/hooks/use-products"
+import { useProductSuppliersQuery } from "@/hooks/use-product-suppliers"
 import { ApiError } from "@/lib/api"
 import { resolveImageUrl, type Product } from "@/api/products"
 
@@ -82,6 +84,9 @@ export function ProductsPage() {
 
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
   const { data: selectedProduct } = useProductQuery(selectedProductId ?? 0)
+  const productSuppliers = useProductSuppliersQuery(
+    selectedProductId ? { productId: selectedProductId } : undefined,
+  )
   const [detailImageIndex, setDetailImageIndex] = useState(0)
   const [productToDelete, setProductToDelete] = useState<Product | null>(null)
 
@@ -639,6 +644,49 @@ export function ProductsPage() {
                           </div>
                         ) : (
                           <p className="mt-3 text-sm italic text-muted-foreground/40">Aucun code-barres associé</p>
+                        )}
+                      </div>
+
+                      <div className="rounded-2xl border border-border/20 bg-card p-5">
+                        <div className="flex items-center gap-2">
+                          <div className="flex size-7 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                            <Truck className="size-3.5" />
+                          </div>
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+                            Fournisseurs ({productSuppliers.data?.length ?? 0})
+                          </span>
+                        </div>
+                        {productSuppliers.isLoading ? (
+                          <p className="mt-3 text-sm italic text-muted-foreground/40">Chargement des fournisseurs…</p>
+                        ) : productSuppliers.data && productSuppliers.data.length > 0 ? (
+                          <div className="mt-3 space-y-2">
+                            {productSuppliers.data.map((ps) => (
+                              <div
+                                key={ps.id}
+                                className="flex items-center justify-between gap-2 rounded-xl border border-border/20 bg-muted/10 px-3.5 py-2.5 transition-colors hover:border-border/40"
+                              >
+                                <div className="min-w-0">
+                                  <p className="truncate text-sm font-medium text-foreground">{ps.supplier.name}</p>
+                                  <p className="truncate font-mono text-xs text-muted-foreground/60">
+                                    {ps.supplierSku ? `Réf. ${ps.supplierSku}` : "—"}
+                                  </p>
+                                </div>
+                                <div className="flex shrink-0 items-center gap-3">
+                                  <span className="font-mono text-sm text-foreground">
+                                    {Number(ps.price).toLocaleString("fr-FR", { minimumFractionDigits: 2 })} Ar
+                                  </span>
+                                  {ps.isPreferred && (
+                                    <Badge variant="warning" className="gap-1">
+                                      <Star className="size-3" />
+                                      Préféré
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="mt-3 text-sm italic text-muted-foreground/40">Aucun fournisseur associé</p>
                         )}
                       </div>
                     </div>

@@ -9,6 +9,7 @@ import {
   MapPin,
   Phone,
   Plus,
+  Star,
   Trash2,
   Truck,
   User,
@@ -35,6 +36,7 @@ import {
   useUpdateSupplierMutation,
   useDeleteSupplierMutation,
 } from "@/hooks/use-suppliers"
+import { useProductSuppliersQuery } from "@/hooks/use-product-suppliers"
 import { ApiError } from "@/lib/api"
 import type { Supplier } from "@/api/suppliers"
 
@@ -171,6 +173,9 @@ export function SuppliersPage() {
   const deleteSupplier = useDeleteSupplierMutation()
 
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null)
+  const supplierProducts = useProductSuppliersQuery(
+    selectedSupplier ? { supplierId: selectedSupplier.id } : undefined,
+  )
   const [supplierToDelete, setSupplierToDelete] = useState<Supplier | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null)
@@ -593,6 +598,44 @@ export function SuppliersPage() {
                     {selectedSupplier?._count.entries ?? 0}
                   </p>
                 </div>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                  Produits fournis
+                </p>
+                {supplierProducts.isLoading ? (
+                  <p className="text-sm text-muted-foreground">Chargement des produits…</p>
+                ) : supplierProducts.data && supplierProducts.data.length > 0 ? (
+                  <div className="divide-y divide-border/10 overflow-hidden rounded-xl border border-border/20">
+                    {supplierProducts.data.map((ps) => (
+                      <div key={ps.id} className="flex items-center justify-between gap-3 px-3 py-2.5">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium text-foreground">{ps.product.name}</p>
+                          <p className="truncate font-mono text-xs text-muted-foreground/60">
+                            {ps.product.sku}
+                            {ps.supplierSku ? ` · ${ps.supplierSku}` : ""}
+                          </p>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-3">
+                          <span className="font-mono text-sm text-foreground">
+                            {Number(ps.price).toFixed(2)}
+                          </span>
+                          {ps.isPreferred && (
+                            <Badge variant="warning" className="gap-1">
+                              <Star className="size-3" />
+                              Préféré
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground/60">
+                    Aucun produit associé à ce fournisseur.
+                  </p>
+                )}
               </div>
 
               <div className="space-y-3">

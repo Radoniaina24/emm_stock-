@@ -36,6 +36,7 @@ import {
   Layers,
   LayoutDashboard,
   LifeBuoy,
+  Link2,
   List,
   Lock,
   MapPin,
@@ -80,6 +81,7 @@ const produitsSubNav = [
   { label: "Unités de mesure", icon: Ruler, to: "/dashboard/produits/unites" },
   { label: "Variantes produits", icon: GitBranch, to: "/dashboard/produits/variantes" },
   { label: "Codes-barres", icon: ScanLine, to: "/dashboard/produits/codes-barres" },
+  { label: "Fournisseurs produits", icon: Link2, to: "/dashboard/produits/fournisseurs" },
   { label: "Import produits", icon: Download, to: "/dashboard/produits/import" },
   { label: "Export produits", icon: Upload, to: "/dashboard/produits/export" },
 ]
