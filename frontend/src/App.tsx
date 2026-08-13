@@ -32,6 +32,7 @@ import { ProductsPage } from "@/pages/produits/ProductsPage"
 import { CreateProductPage } from "@/pages/produits/create/CreateProductPage"
 import { EditProductPage } from "@/pages/produits/edit/EditProductPage"
 import { UtilisateursPage } from "@/pages/administration/UtilisateursPage"
+import { SuppliersPage } from "@/pages/fournisseurs/SuppliersPage"
 import { CreateUserPage } from "@/pages/administration/create/CreateUserPage"
 import { EditUserPage } from "@/pages/administration/edit/EditUserPage"
 import { RolesPage } from "@/pages/administration/RolesPage"
@@ -110,7 +111,7 @@ function App() {
             <Route path="achats/bons-commande" element={<div className="text-muted-foreground">Bons de commande</div>} />
             <Route path="achats/receptions" element={<div className="text-muted-foreground">Réceptions</div>} />
             <Route path="achats/factures-fournisseurs" element={<div className="text-muted-foreground">Factures fournisseurs</div>} />
-            <Route path="fournisseurs" element={<div className="text-muted-foreground">Liste fournisseurs</div>} />
+            <Route path="fournisseurs" element={<SuppliersPage />} />
             <Route path="fournisseurs/contacts" element={<div className="text-muted-foreground">Contacts</div>} />
             <Route path="fournisseurs/historique-achats" element={<div className="text-muted-foreground">Historique achats</div>} />
             <Route path="fournisseurs/evaluation" element={<div className="text-muted-foreground">Évaluation fournisseurs</div>} />
