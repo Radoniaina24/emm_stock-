@@ -2,16 +2,27 @@ import { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import {
   AlertTriangle,
+  Boxes,
   Building2,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
   Coins,
   Edit,
   Eye,
+  FileText,
   Image as ImageIcon,
   Layers3,
+  Loader2,
   Package,
   Plus,
+  Ruler,
   ScanLine,
+  Star,
+  Tag,
   Trash2,
+  Weight,
 } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 
@@ -78,6 +89,16 @@ export function ProductsPage() {
     setDetailImageIndex(0)
   }, [selectedProductId])
 
+  function goPrevImage() {
+    const total = selectedProduct?.images?.length ?? 0
+    if (total > 1) setDetailImageIndex((i) => (i - 1 + total) % total)
+  }
+
+  function goNextImage() {
+    const total = selectedProduct?.images?.length ?? 0
+    if (total > 1) setDetailImageIndex((i) => (i + 1) % total)
+  }
+
 
   async function handleConfirmDelete() {
     if (!productToDelete) return
@@ -92,7 +113,10 @@ export function ProductsPage() {
 
   const activeCount = all.filter((p) => p.isActive).length
 
-  const detailImage = selectedProduct?.images?.[detailImageIndex] ?? selectedProduct?.images?.[0]
+  const galleryImages = selectedProduct?.images ?? []
+  const galleryTotal = galleryImages.length
+  const safeImageIndex = Math.min(detailImageIndex, Math.max(galleryTotal - 1, 0))
+  const detailImage = galleryImages[safeImageIndex] ?? undefined
   const detailImageSrc = resolveImageUrl(detailImage)
 
   const columns: ColumnDef<Product>[] = useMemo(
@@ -276,266 +300,396 @@ export function ProductsPage() {
       />
 
       <ModalRoot open={selectedProductId != null} onOpenChange={(open) => { if (!open) setSelectedProductId(null) }}>
-        <ModalPopup size="full" className="overflow-hidden p-0 sm:mx-4 sm:max-w-4xl">
-          <ModalClose />
+        <ModalPopup size="full" className="overflow-hidden p-0 sm:mx-4 sm:max-w-5xl">
+          <ModalClose className="top-4 right-4 z-30 bg-white/10 text-white ring-1 ring-white/20 backdrop-blur-sm hover:bg-white/25 hover:text-white" />
           <div className="flex max-h-[85vh] flex-col">
-            <div className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-800 to-slate-900 px-6 py-6 text-white">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.12),transparent_60%)]" />
-              <div className="relative flex items-start justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex size-14 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/20 shadow-lg backdrop-blur-sm">
-                    <Package className="size-7 text-white" />
+            <div className="relative shrink-0 overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-800 to-slate-900 px-6 pt-6 pb-5 text-white">
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.14),transparent_55%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(129,140,248,0.3),transparent_60%)]" />
+              <div className="relative flex flex-wrap items-start justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-4 sm:gap-5">
+                  <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white/15 shadow-lg ring-1 ring-white/25 backdrop-blur-sm sm:size-16">
+                    {resolveImageUrl(selectedProduct?.image) ? (
+                      <img
+                        src={resolveImageUrl(selectedProduct?.image) ?? ""}
+                        alt={selectedProduct?.name}
+                        className="size-full object-cover"
+                      />
+                    ) : (
+                      <Package className="size-6 text-white sm:size-7" />
+                    )}
                   </div>
-                  <div>
-                    <p className="text-xl font-bold tracking-tight">{selectedProduct?.name}</p>
-                    <p className="mt-0.5 font-mono text-xs text-indigo-200/70">
-                      {selectedProduct?.sku} · /{selectedProduct?.slug}
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-200/60">
+                      <Tag className="size-3" /> Fiche produit
+                    </p>
+                    <h2 className="mt-1 truncate text-xl font-bold tracking-tight sm:text-2xl">
+                      {selectedProduct?.name ?? "…"}
+                    </h2>
+                    <p className="mt-1 flex flex-wrap items-center gap-x-2 font-mono text-xs text-indigo-200/70">
+                      <span>{selectedProduct?.sku}</span>
+                      <span className="text-indigo-300/40">·</span>
+                      <span>/{selectedProduct?.slug}</span>
                     </p>
                   </div>
                 </div>
-              </div>
-              <div className="relative mt-4 flex flex-wrap items-center gap-2">
-                <Badge className={`border-0 backdrop-blur-sm ${selectedProduct?.isActive ? "bg-emerald-400/20 text-emerald-200" : "bg-white/10 text-white/50"}`}>
-                  <span className={`mr-1.5 inline-block size-1.5 rounded-full ${selectedProduct?.isActive ? "bg-emerald-400" : "bg-white/30"}`} />
+                <Badge
+                  className={`border-0 backdrop-blur-sm ${
+                    selectedProduct?.isActive
+                      ? "bg-emerald-400/20 text-emerald-100 ring-1 ring-emerald-300/20"
+                      : "bg-white/10 text-white/50"
+                  }`}
+                >
+                  <span className={`mr-1.5 inline-block size-1.5 rounded-full ${selectedProduct?.isActive ? "animate-pulse bg-emerald-300" : "bg-white/30"}`} />
                   {selectedProduct?.isActive ? "Actif" : "Inactif"}
                 </Badge>
+              </div>
+              <div className="relative mt-4 flex flex-wrap items-center gap-2">
                 {selectedProduct?.brand && (
-                  <Badge className="border-0 bg-white/10 text-white/70 backdrop-blur-sm">
+                  <Badge className="border-0 bg-white/10 text-white/80 backdrop-blur-sm">
                     <Building2 className="mr-1 size-3" />
                     {selectedProduct.brand.name}
                   </Badge>
                 )}
                 {selectedProduct?.category && (
-                  <Badge className="border-0 bg-white/10 text-white/70 backdrop-blur-sm">
+                  <Badge className="border-0 bg-white/10 text-white/80 backdrop-blur-sm">
                     <Layers3 className="mr-1 size-3" />
                     {selectedProduct.category.name}
                   </Badge>
                 )}
+                {selectedProduct && (
+                  <Badge className="border-0 bg-white/10 text-white/80 backdrop-blur-sm">
+                    <Boxes className="mr-1 size-3" />
+                    {({ STORABLE: "Stockable", CONSUMABLE: "Consommable", SERVICE: "Service" } as const)[selectedProduct.type]}
+                  </Badge>
+                )}
                 {selectedProduct?.unit && (
-                  <Badge className="border-0 bg-white/10 text-white/70 backdrop-blur-sm">
+                  <Badge className="border-0 bg-white/10 text-white/80 backdrop-blur-sm">
                     {selectedProduct.unit.symbol ?? selectedProduct.unit.code}
                   </Badge>
                 )}
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="grid gap-6 lg:grid-cols-5">
-                <div className="space-y-4 lg:col-span-2">
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border/20 bg-muted/20">
-                    {detailImageSrc ? (
-                      <img
-                        src={detailImageSrc}
-                        alt={detailImage?.alt ?? selectedProduct?.name ?? "Produit"}
-                        className="size-full object-cover"
-                        onError={(e) => {
-                          ;(e.target as HTMLImageElement).style.display = "none"
-                        }}
-                      />
-                    ) : (
-                      <div className="flex size-full flex-col items-center justify-center gap-2 text-muted-foreground/30">
-                        <Package className="size-12" />
-                        <span className="text-xs font-medium">Aucune image</span>
-                      </div>
-                    )}
-                  </div>
-                  {selectedProduct && selectedProduct.images.length > 1 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProduct.images.map((img, i) => (
-                        <button
-                          key={img.id}
-                          type="button"
-                          onClick={() => setDetailImageIndex(i)}
-                          className={`size-14 overflow-hidden rounded-lg ring-2 transition-all ${i === detailImageIndex ? "ring-primary" : "ring-border/40 opacity-60 hover:opacity-100"}`}
-                        >
+            {!selectedProduct ? (
+              <div className="flex flex-1 items-center justify-center gap-2 py-20 text-sm text-muted-foreground">
+                <Loader2 className="size-4 animate-spin" />
+                Chargement du produit…
+              </div>
+            ) : (
+              <>
+                <div className="flex-1 overflow-y-auto p-5 sm:p-6">
+                  <div className="grid gap-6 lg:grid-cols-5">
+                    <div className="space-y-4 lg:col-span-2">
+                      <div className="group relative aspect-[4/3] overflow-hidden rounded-2xl border border-border/20 bg-muted/20 shadow-sm">
+                        {detailImageSrc ? (
                           <img
-                            src={resolveImageUrl(img) ?? ""}
-                            alt={img.alt ?? `Image ${i + 1}`}
-                            loading="lazy"
-                            className="size-full object-cover"
+                            src={detailImageSrc}
+                            alt={detailImage?.alt ?? selectedProduct.name}
+                            className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                            onError={(e) => {
+                              ;(e.target as HTMLImageElement).style.display = "none"
+                            }}
                           />
-                        </button>
-                      ))}
-                    </div>
-                  ) : null}
+                        ) : (
+                          <div className="flex size-full flex-col items-center justify-center gap-2 text-muted-foreground/30">
+                            <Package className="size-12" />
+                            <span className="text-xs font-medium">Aucune image</span>
+                          </div>
+                        )}
+                        {galleryTotal > 0 && (
+                          <>
+                            <span className="absolute right-3 top-3 rounded-full bg-black/55 px-2.5 py-1 font-mono text-[10px] font-semibold text-white backdrop-blur-sm">
+                              {safeImageIndex + 1} / {galleryTotal}
+                            </span>
+                            {detailImage?.isPrimary && (
+                              <span className="absolute top-3 left-3 flex items-center gap-1 rounded-full bg-amber-400/90 px-2.5 py-1 text-[10px] font-semibold text-amber-950 shadow-sm">
+                                <Star className="size-3 fill-current" /> Principale
+                              </span>
+                            )}
+                            {galleryTotal > 1 && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={goPrevImage}
+                                  title="Image précédente"
+                                  className="absolute top-1/2 left-3 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white opacity-0 backdrop-blur-sm transition-all duration-200 hover:bg-black/60 group-hover:opacity-100"
+                                >
+                                  <ChevronLeft className="size-5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={goNextImage}
+                                  title="Image suivante"
+                                  className="absolute top-1/2 right-3 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white opacity-0 backdrop-blur-sm transition-all duration-200 hover:bg-black/60 group-hover:opacity-100"
+                                >
+                                  <ChevronRight className="size-5" />
+                                </button>
+                              </>
+                            )}
+                          </>
+                        )}
+                      </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
-                      <p className="text-2xl font-bold text-foreground">{selectedProduct?._count.barcodes ?? 0}</p>
-                      <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-muted-foreground/60">
-                        <ScanLine className="size-3" /> Codes-barres
-                      </p>
-                    </div>
-                    <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
-                      <p className="text-2xl font-bold text-foreground">{selectedProduct?._count.images ?? 0}</p>
-                      <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-muted-foreground/60">
-                        <ImageIcon className="size-3" /> Images
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                      {galleryTotal > 1 && (
+                        <div className="flex flex-wrap gap-2">
+                          {galleryImages.map((img, i) => (
+                            <button
+                              key={img.id}
+                              type="button"
+                              onClick={() => setDetailImageIndex(i)}
+                              className={`relative size-16 overflow-hidden rounded-xl ring-2 transition-all duration-200 ${
+                                i === safeImageIndex ? "shadow-md ring-primary" : "opacity-60 ring-border/40 hover:opacity-100"
+                              }`}
+                            >
+                              <img
+                                src={resolveImageUrl(img) ?? ""}
+                                alt={img.alt ?? `Image ${i + 1}`}
+                                loading="lazy"
+                                className="size-full object-cover"
+                              />
+                              {img.isPrimary && (
+                                <span className="absolute right-0.5 bottom-0.5 text-amber-400 drop-shadow">
+                                  <Star className="size-3 fill-current" />
+                                </span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
 
-                <div className="space-y-5 lg:col-span-3">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="flex size-6 items-center justify-center rounded-lg bg-muted/60">
-                        <Package className="size-3 text-muted-foreground/60" />
-                      </div>
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Description</span>
-                    </div>
-                    <p className="pl-8 text-sm leading-relaxed text-foreground/80">
-                      {selectedProduct?.description ?? (
-                        <span className="italic text-muted-foreground/40">Aucune description</span>
-                      )}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="flex size-6 items-center justify-center rounded-lg bg-muted/60">
-                        <Coins className="size-3 text-muted-foreground/60" />
-                      </div>
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Prix & traçabilité</span>
-                    </div>
-                    <div className="grid grid-cols-4 gap-3">
-                      <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Coût d'achat</p>
-                        <p className="mt-1 text-lg font-semibold text-foreground">
-                          {selectedProduct?.costPrice != null ? `${Number(selectedProduct.costPrice).toLocaleString("fr-FR")} Ar` : "—"}
-                        </p>
-                      </div>
-                      <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Prix de vente</p>
-                        <p className="mt-1 text-lg font-semibold text-foreground">
-                          {selectedProduct?.salePrice != null ? `${Number(selectedProduct.salePrice).toLocaleString("fr-FR")} Ar` : "—"}
-                        </p>
-                      </div>
-                      <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">TVA</p>
-                        <p className="mt-1 text-lg font-semibold text-foreground">
-                          {selectedProduct?.taxRate != null ? `${Number(selectedProduct.taxRate).toLocaleString("fr-FR")} %` : "—"}
-                        </p>
-                      </div>
-                      <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Traçabilité</p>
-                        <p className="mt-1 text-lg font-semibold text-foreground">
-                          {selectedProduct ? ({ NONE: "Aucune", LOT: "Par lot", SERIAL: "Par série" } as const)[selectedProduct.tracking] : "—"}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2 pl-8">
-                      <Badge variant="outline" className="text-[11px]">
-                        Type : {({ STORABLE: "Stockable", CONSUMABLE: "Consommable", SERVICE: "Service" } as const)[selectedProduct?.type ?? "STORABLE"]}
-                      </Badge>
-                      {selectedProduct?.hasExpiry && (
-                        <Badge variant="outline" className="text-[11px]">
-                          Péremption : {selectedProduct.shelfLifeDays ?? "—"} jours
-                        </Badge>
-                      )}
-                      {selectedProduct?.purchaseUnit && (
-                        <Badge variant="outline" className="text-[11px]">
-                          Achat : {selectedProduct.purchaseUnit.symbol ?? selectedProduct.purchaseUnit.code}
-                        </Badge>
-                      )}
-                      {selectedProduct?.saleUnit && (
-                        <Badge variant="outline" className="text-[11px]">
-                          Vente : {selectedProduct.saleUnit.symbol ?? selectedProduct.saleUnit.code}
-                        </Badge>
-                      )}
-                      {(selectedProduct?.weight != null ||
-                        selectedProduct?.length != null ||
-                        selectedProduct?.width != null ||
-                        selectedProduct?.height != null) && (
-                        <Badge variant="outline" className="text-[11px]">
-                          {[
-                            selectedProduct.weight != null ? `${Number(selectedProduct.weight).toLocaleString("fr-FR")} kg` : null,
-                            selectedProduct.length != null ? `L ${Number(selectedProduct.length).toLocaleString("fr-FR")}` : null,
-                            selectedProduct.width != null ? `l ${Number(selectedProduct.width).toLocaleString("fr-FR")}` : null,
-                            selectedProduct.height != null ? `h ${Number(selectedProduct.height).toLocaleString("fr-FR")}` : null,
-                          ]
-                            .filter(Boolean)
-                            .join(" · ")}{" "}
-                          cm
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Unité</p>
-                      <p className="mt-1 text-lg font-semibold text-foreground">
-                        {selectedProduct?.unit.symbol ?? selectedProduct?.unit.code ?? "—"}
-                      </p>
-                    </div>
-                    <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Marque</p>
-                      <p className="mt-1 truncate text-lg font-semibold text-foreground">
-                        {selectedProduct?.brand?.name ?? <span className="italic text-muted-foreground/40">Générique</span>}
-                      </p>
-                    </div>
-                    <div className="rounded-xl border border-border/20 bg-muted/10 p-4">
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Statut</p>
-                      <p className={`mt-1 flex items-center gap-1.5 text-lg font-semibold ${selectedProduct?.isActive ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground/50"}`}>
-                        <span className={`inline-block size-2 rounded-full ${selectedProduct?.isActive ? "bg-emerald-500" : "bg-muted-foreground/30"}`} />
-                        {selectedProduct?.isActive ? "Actif" : "Inactif"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="flex size-6 items-center justify-center rounded-lg bg-muted/60">
-                        <ScanLine className="size-3 text-muted-foreground/60" />
-                      </div>
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
-                        Codes-barres associés ({selectedProduct?.barcodes?.length ?? 0})
-                      </span>
-                    </div>
-                    {selectedProduct && selectedProduct.barcodes.length > 0 ? (
-                      <div className="space-y-1.5 pl-8">
-                        {selectedProduct.barcodes.map((b) => (
-                          <div key={b.id} className="flex items-center justify-between gap-2 rounded-lg border border-border/20 bg-muted/10 px-3 py-2">
-                            <code className="truncate font-mono text-xs text-foreground">{b.code}</code>
-                            <div className="flex shrink-0 items-center gap-2">
-                              <span className="font-mono text-[10px] text-muted-foreground/50">{b.type}</span>
-                              {b.isPrimary ? (
-                                <Badge className="border-0 bg-emerald-500/15 px-1.5 py-0 text-[10px] text-emerald-600 dark:text-emerald-400">
-                                  Principal
-                                </Badge>
-                              ) : null}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="group rounded-2xl border border-border/20 bg-muted/10 p-4 transition-colors hover:border-primary/30 hover:bg-primary/5">
+                          <div className="flex items-center justify-between">
+                            <p className="text-2xl font-bold text-foreground">{selectedProduct._count.barcodes}</p>
+                            <div className="flex size-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                              <ScanLine className="size-4" />
                             </div>
                           </div>
-                        ))}
+                          <p className="mt-1 text-xs font-medium text-muted-foreground/60">Codes-barres</p>
+                        </div>
+                        <div className="group rounded-2xl border border-border/20 bg-muted/10 p-4 transition-colors hover:border-primary/30 hover:bg-primary/5">
+                          <div className="flex items-center justify-between">
+                            <p className="text-2xl font-bold text-foreground">{selectedProduct._count.images}</p>
+                            <div className="flex size-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                              <ImageIcon className="size-4" />
+                            </div>
+                          </div>
+                          <p className="mt-1 text-xs font-medium text-muted-foreground/60">Images</p>
+                        </div>
                       </div>
-                    ) : (
-                      <p className="pl-8 text-sm italic text-muted-foreground/40">Aucun code-barres associé</p>
-                    )}
+                    </div>
+
+                    <div className="space-y-5 lg:col-span-3">
+                      <div className="rounded-2xl border border-border/20 bg-card p-5">
+                        <div className="flex items-center gap-2">
+                          <div className="flex size-7 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                            <FileText className="size-3.5" />
+                          </div>
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+                            Description
+                          </span>
+                        </div>
+                        <p className="mt-3 text-sm leading-relaxed text-foreground/80">
+                          {selectedProduct.description ?? (
+                            <span className="italic text-muted-foreground/40">Aucune description</span>
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl border border-border/20 bg-card p-5">
+                        <div className="flex items-center gap-2">
+                          <div className="flex size-7 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                            <Coins className="size-3.5" />
+                          </div>
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+                            Prix & traçabilité
+                          </span>
+                        </div>
+                        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                          <div className="rounded-xl border border-border/20 bg-muted/10 p-3.5">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+                              Coût d'achat
+                            </p>
+                            <p className="mt-1 text-base font-semibold text-foreground sm:text-lg">
+                              {selectedProduct.costPrice != null
+                                ? `${Number(selectedProduct.costPrice).toLocaleString("fr-FR")} Ar`
+                                : "—"}
+                            </p>
+                          </div>
+                          <div className="rounded-xl border border-emerald-500/25 bg-gradient-to-br from-emerald-500/10 to-teal-500/5 p-3.5">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-600/70 dark:text-emerald-400/70">
+                              Prix de vente
+                            </p>
+                            <p className="mt-1 text-base font-bold text-emerald-600 dark:text-emerald-400 sm:text-lg">
+                              {selectedProduct.salePrice != null
+                                ? `${Number(selectedProduct.salePrice).toLocaleString("fr-FR")} Ar`
+                                : "—"}
+                            </p>
+                          </div>
+                          <div className="rounded-xl border border-border/20 bg-muted/10 p-3.5">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+                              TVA
+                            </p>
+                            <p className="mt-1 text-base font-semibold text-foreground sm:text-lg">
+                              {selectedProduct.taxRate != null
+                                ? `${Number(selectedProduct.taxRate).toLocaleString("fr-FR")} %`
+                                : "—"}
+                            </p>
+                          </div>
+                          <div className="rounded-xl border border-border/20 bg-muted/10 p-3.5">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+                              Traçabilité
+                            </p>
+                            <p className="mt-1 text-base font-semibold text-foreground sm:text-lg">
+                              {({ NONE: "Aucune", LOT: "Par lot", SERIAL: "Par série" } as const)[selectedProduct.tracking]}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {selectedProduct.hasExpiry && (
+                            <Badge variant="outline" className="gap-1 text-[11px]">
+                              <Clock className="size-3" /> Péremption : {selectedProduct.shelfLifeDays ?? "—"} jours
+                            </Badge>
+                          )}
+                          {selectedProduct.purchaseUnit && (
+                            <Badge variant="outline" className="gap-1 text-[11px]">
+                              <Tag className="size-3" /> Achat : {selectedProduct.purchaseUnit.symbol ?? selectedProduct.purchaseUnit.code}
+                            </Badge>
+                          )}
+                          {selectedProduct.saleUnit && (
+                            <Badge variant="outline" className="gap-1 text-[11px]">
+                              <Tag className="size-3" /> Vente : {selectedProduct.saleUnit.symbol ?? selectedProduct.saleUnit.code}
+                            </Badge>
+                          )}
+                          {selectedProduct.weight != null && (
+                            <Badge variant="outline" className="gap-1 text-[11px]">
+                              <Weight className="size-3" /> {Number(selectedProduct.weight).toLocaleString("fr-FR")} kg
+                            </Badge>
+                          )}
+                          {(selectedProduct.length != null ||
+                            selectedProduct.width != null ||
+                            selectedProduct.height != null) && (
+                            <Badge variant="outline" className="gap-1 text-[11px]">
+                              <Ruler className="size-3" />
+                              {[
+                                selectedProduct.length != null ? `L ${Number(selectedProduct.length).toLocaleString("fr-FR")}` : null,
+                                selectedProduct.width != null ? `l ${Number(selectedProduct.width).toLocaleString("fr-FR")}` : null,
+                                selectedProduct.height != null ? `h ${Number(selectedProduct.height).toLocaleString("fr-FR")}` : null,
+                              ]
+                                .filter(Boolean)
+                                .join(" · ")}{" "}
+                              cm
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="rounded-2xl border border-border/20 bg-muted/10 p-4">
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Unité</p>
+                          <p className="mt-1 text-lg font-semibold text-foreground">
+                            {selectedProduct.unit.symbol ?? selectedProduct.unit.code}
+                          </p>
+                        </div>
+                        <div className="rounded-2xl border border-border/20 bg-muted/10 p-4">
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Marque</p>
+                          <p className="mt-1 truncate text-lg font-semibold text-foreground">
+                            {selectedProduct.brand?.name ?? <span className="italic text-muted-foreground/40">Générique</span>}
+                          </p>
+                        </div>
+                        <div className="rounded-2xl border border-border/20 bg-muted/10 p-4">
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Statut</p>
+                          <p className={`mt-1 flex items-center gap-1.5 text-lg font-semibold ${selectedProduct.isActive ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground/50"}`}>
+                            <span className={`inline-block size-2 rounded-full ${selectedProduct.isActive ? "bg-emerald-500" : "bg-muted-foreground/30"}`} />
+                            {selectedProduct.isActive ? "Actif" : "Inactif"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="rounded-2xl border border-border/20 bg-card p-5">
+                        <div className="flex items-center gap-2">
+                          <div className="flex size-7 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                            <ScanLine className="size-3.5" />
+                          </div>
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+                            Codes-barres associés ({selectedProduct.barcodes.length})
+                          </span>
+                        </div>
+                        {selectedProduct.barcodes.length > 0 ? (
+                          <div className="mt-3 space-y-2">
+                            {selectedProduct.barcodes.map((b) => (
+                              <div
+                                key={b.id}
+                                className="flex items-center justify-between gap-2 rounded-xl border border-border/20 bg-muted/10 px-3.5 py-2.5 transition-colors hover:border-border/40"
+                              >
+                                <code className="truncate font-mono text-xs text-foreground">{b.code}</code>
+                                <div className="flex shrink-0 items-center gap-2">
+                                  <span className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground/60">
+                                    {b.type}
+                                  </span>
+                                  {b.isPrimary && (
+                                    <Badge className="border-0 bg-emerald-500/15 px-1.5 py-0 text-[10px] text-emerald-600 dark:text-emerald-400">
+                                      Principal
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="mt-3 text-sm italic text-muted-foreground/40">Aucun code-barres associé</p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="flex items-center justify-between border-t border-border/20 bg-muted/20 px-6 py-3.5">
-              <div className="text-[11px] text-muted-foreground/50">
-                {selectedProduct && (
-                  <>
-                    Créé le {new Date(selectedProduct.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}{" "}
-                    <span className="mx-1 text-muted-foreground/30">•</span>
-                    Modifié le {new Date(selectedProduct.updatedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
-                  </>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                {selectedProduct && (
-                  <Button variant="ghost" size="sm" onClick={() => { setSelectedProductId(null); navigate(`/dashboard/produits/modifier/${selectedProduct.id}`) }}
-                    className="h-8 gap-1.5 rounded-xl text-xs text-muted-foreground/70 hover:text-foreground">
-                    <Edit className="size-3.5" /> Modifier
-                  </Button>
-                )}
-                <Button variant="outline" size="sm" onClick={() => setSelectedProductId(null)} className="h-8 rounded-xl text-xs">Fermer</Button>
-              </div>
-            </div>
+                <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-border/20 bg-muted/20 px-6 py-4">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground/50">
+                    <span className="inline-flex items-center gap-1.5">
+                      <CalendarDays className="size-3.5" />
+                      Créé le{" "}
+                      {new Date(selectedProduct.createdAt).toLocaleDateString("fr-FR", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </span>
+                    <span className="text-muted-foreground/30">•</span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock className="size-3.5" />
+                      Modifié le{" "}
+                      {new Date(selectedProduct.updatedAt).toLocaleDateString("fr-FR", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedProductId(null)}
+                      className="h-8 rounded-xl text-xs"
+                    >
+                      Fermer
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setSelectedProductId(null)
+                        navigate(`/dashboard/produits/modifier/${selectedProduct.id}`)
+                      }}
+                      className="h-8 gap-1.5 rounded-xl text-xs"
+                    >
+                      <Edit className="size-3.5" /> Modifier le produit
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </ModalPopup>
       </ModalRoot>
