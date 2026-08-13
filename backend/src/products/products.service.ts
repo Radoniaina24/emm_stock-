@@ -10,6 +10,7 @@ import { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
+import { ImportProductRowDto } from './dto/import-products.dto.js';
 import { UpdateProductImageDto } from './dto/update-product-image.dto.js';
 
 const IMAGES_DIR = join(process.cwd(), 'uploads', 'products');
@@ -154,6 +155,122 @@ export class ProductsService {
       include: this.detailInclude(),
     });
     return products.map((product) => this.withImage(product));
+  }
+
+  async importProducts(
+    rows: ImportProductRowDto[],
+  ): Promise<{
+    total: number;
+    created: number;
+    updated: number;
+    errors: { row: number; sku: string | null; errors: string[] }[];
+  }> {
+    const created: number[] = [];
+    const updated: number[] = [];
+    const errors: { row: number; sku: string | null; errors: string[] }[] = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      const dto = rows[i];
+      const rowNumber = i + 2;
+      const rowErrors: string[] = [];
+
+      const sku = (dto.sku ?? '').trim().toUpperCase();
+      if (!sku) rowErrors.push('SKU requis');
+      if (!dto.name || !dto.name.trim()) rowErrors.push('Nom requis');
+
+      if (dto.brandId != null) {
+        const exists = await this.prisma.brand.findUnique({
+          where: { id: dto.brandId },
+          select: { id: true },
+        });
+        if (!exists) rowErrors.push('Marque introuvable');
+      }
+      if (dto.categoryId != null) {
+        const exists = await this.prisma.category.findUnique({
+          where: { id: dto.categoryId },
+          select: { id: true },
+        });
+        if (!exists) rowErrors.push('Catégorie introuvable');
+      }
+      const unitExists = await this.prisma.unitOfMeasure.findUnique({
+        where: { id: dto.unitId },
+        select: { id: true },
+      });
+      if (!unitExists) rowErrors.push('Unité de mesure introuvable');
+
+      if (rowErrors.length > 0) {
+        errors.push({ row: rowNumber, sku: sku || null, errors: rowErrors });
+        continue;
+      }
+
+      try {
+        const existing = await this.prisma.product.findUnique({
+          where: { sku },
+          select: { id: true },
+        });
+
+        if (existing) {
+          await this.prisma.product.update({
+            where: { id: existing.id },
+            data: {
+              name: dto.name.trim(),
+              description: dto.description ?? null,
+              type: dto.type ?? 'STORABLE',
+              brandId: dto.brandId ?? null,
+              categoryId: dto.categoryId ?? null,
+              unitId: dto.unitId,
+              costPrice: dto.costPrice ?? 0,
+              salePrice: dto.salePrice ?? 0,
+              taxRate: dto.taxRate ?? 0,
+              tracking: dto.tracking ?? 'NONE',
+              hasExpiry: dto.hasExpiry ?? false,
+              weight: dto.weight ?? null,
+              length: dto.length ?? null,
+              width: dto.width ?? null,
+              height: dto.height ?? null,
+              isActive: dto.isActive ?? true,
+            },
+          });
+          updated.push(existing.id);
+        } else {
+          const slug = await this.uniqueSlug(dto.slug?.trim() || dto.name);
+          await this.prisma.product.create({
+            data: {
+              sku,
+              name: dto.name.trim(),
+              slug,
+              description: dto.description ?? null,
+              type: dto.type ?? 'STORABLE',
+              brandId: dto.brandId ?? null,
+              categoryId: dto.categoryId ?? null,
+              unitId: dto.unitId,
+              costPrice: dto.costPrice ?? 0,
+              salePrice: dto.salePrice ?? 0,
+              taxRate: dto.taxRate ?? 0,
+              tracking: dto.tracking ?? 'NONE',
+              hasExpiry: dto.hasExpiry ?? false,
+              weight: dto.weight ?? null,
+              length: dto.length ?? null,
+              width: dto.width ?? null,
+              height: dto.height ?? null,
+              isActive: dto.isActive ?? true,
+            },
+          });
+          created.push(0);
+        }
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Erreur inconnue';
+        errors.push({ row: rowNumber, sku, errors: [message] });
+      }
+    }
+
+    return {
+      total: rows.length,
+      created: created.length,
+      updated: updated.length,
+      errors,
+    };
   }
 
   async findOne(id: number) {

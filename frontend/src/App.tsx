@@ -29,6 +29,8 @@ import { BrandsPage } from "@/pages/produits/BrandsPage"
 import { UnitsOfMeasurePage } from "@/pages/produits/UnitsOfMeasurePage"
 import { ProductBarcodesPage } from "@/pages/produits/ProductBarcodesPage"
 import { ProductSuppliersPage } from "@/pages/produits/ProductSuppliersPage"
+import ProductImportPage from "@/pages/produits/ProductImportPage"
+import ProductExportPage from "@/pages/produits/ProductExportPage"
 import { ProductsPage } from "@/pages/produits/ProductsPage"
 import { CreateProductPage } from "@/pages/produits/create/CreateProductPage"
 import { EditProductPage } from "@/pages/produits/edit/EditProductPage"
@@ -67,8 +69,8 @@ function App() {
             <Route path="produits/variantes" element={<div className="text-muted-foreground">Variantes produits</div>} />
             <Route path="produits/codes-barres" element={<ProductBarcodesPage />} />
             <Route path="produits/fournisseurs" element={<ProductSuppliersPage />} />
-            <Route path="produits/import" element={<div className="text-muted-foreground">Import produits</div>} />
-            <Route path="produits/export" element={<div className="text-muted-foreground">Export produits</div>} />
+            <Route path="produits/import" element={<ProductImportPage />} />
+            <Route path="produits/export" element={<ProductExportPage />} />
             <Route path="stock" element={<div className="text-muted-foreground">Vue globale du stock</div>} />
             <Route path="stock/par-entrepot" element={<div className="text-muted-foreground">Stock par entrepôt</div>} />
             <Route path="stock/disponible" element={<div className="text-muted-foreground">Stock disponible</div>} />

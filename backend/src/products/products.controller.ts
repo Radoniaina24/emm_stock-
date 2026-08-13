@@ -25,6 +25,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { ProductsService } from './products.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
+import { ImportProductsDto } from './dto/import-products.dto.js';
 import { UpdateProductImageDto } from './dto/update-product-image.dto.js';
 
 @ApiTags('products')
@@ -46,6 +47,13 @@ export class ProductsController {
   @ApiOkResponse({ description: 'Liste des produits' })
   findAll() {
     return this.products.findAll();
+  }
+
+  @Post('import')
+  @ApiOperation({ summary: 'Importer des produits (upsert par SKU)' })
+  @ApiOkResponse({ description: 'Rapport d\'import' })
+  importProducts(@Body() body: ImportProductsDto) {
+    return this.products.importProducts(body.rows);
   }
 
   @Get(':id')
