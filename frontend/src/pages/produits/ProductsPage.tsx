@@ -17,6 +17,7 @@ import {
   Loader2,
   Package,
   Plus,
+  RotateCcw,
   Ruler,
   ScanLine,
   Star,
@@ -30,7 +31,7 @@ import type { ColumnDef } from "@tanstack/react-table"
 import { DataTable } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { SearchableSelect } from "@/components/ui/searchable-select"
+import { SearchableSelect, type SearchableSelectOption } from "@/components/ui/searchable-select"
 import {
   ModalClose,
   ModalContent,
@@ -105,10 +106,55 @@ export function ProductsPage() {
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [brandFilter, setBrandFilter] = useState("all")
 
-  const categoryOptions = useMemo(
-    () => (categories ?? []).map((c) => ({ value: String(c.id), label: c.name })),
-    [categories],
-  )
+  const categoryOptions = useMemo<SearchableSelectOption[]>(() => {
+    const list = categories ?? []
+    const childrenOf = new Map<number | null, typeof list>()
+    for (const c of list) {
+      const key = c.parentId
+      if (!childrenOf.has(key)) childrenOf.set(key, [])
+      childrenOf.get(key)!.push(c)
+    }
+    const result: SearchableSelectOption[] = []
+    const visit = (parentId: number | null, depth: number) => {
+      const children = (childrenOf.get(parentId) ?? [])
+        .slice()
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+      for (const c of children) {
+        result.push({
+          value: String(c.id),
+          label: c.name,
+          depth,
+          childrenCount: c._count.children,
+        })
+        visit(c.id, depth + 1)
+      }
+    }
+    visit(null, 0)
+    return result
+  }, [categories])
+
+  const categoryDescendants = useMemo(() => {
+    const list = categories ?? []
+    const childrenOf = new Map<number | null, number[]>()
+    for (const c of list) {
+      const key = c.parentId
+      if (!childrenOf.has(key)) childrenOf.set(key, [])
+      childrenOf.get(key)!.push(c.id)
+    }
+    const descOf = new Map<number, Set<number>>()
+    const collect = (id: number): Set<number> => {
+      if (descOf.has(id)) return descOf.get(id)!
+      const set = new Set<number>()
+      for (const childId of childrenOf.get(id) ?? []) {
+        set.add(childId)
+        for (const d of collect(childId)) set.add(d)
+      }
+      descOf.set(id, set)
+      return set
+    }
+    for (const c of list) collect(c.id)
+    return descOf
+  }, [categories])
   const brandOptions = useMemo(
     () => (brands ?? []).map((b) => ({ value: String(b.id), label: b.name })),
     [brands],
@@ -137,7 +183,13 @@ export function ProductsPage() {
 
   const filtered = useMemo(() => {
     return (products ?? []).filter((p) => {
-      if (categoryFilter !== "all" && String(p.categoryId) !== categoryFilter) return false
+      if (categoryFilter !== "all") {
+        const id = Number(categoryFilter)
+        const ok =
+          p.categoryId === id ||
+          (categoryDescendants.get(id)?.has(p.categoryId as number) ?? false)
+        if (!ok) return false
+      }
       if (brandFilter !== "all" && String(p.brandId) !== brandFilter) return false
       if (unitFilter !== "all" && String(p.unitId) !== unitFilter) return false
       if (supplierFilter !== "all") {
@@ -146,7 +198,7 @@ export function ProductsPage() {
       }
       return true
     })
-  }, [products, categoryFilter, brandFilter, unitFilter, supplierFilter, productIdsBySupplier])
+  }, [products, categoryFilter, brandFilter, unitFilter, supplierFilter, productIdsBySupplier, categoryDescendants])
 
   const filters = (
     <div className="flex flex-wrap items-center gap-3">
@@ -195,7 +247,6 @@ export function ProductsPage() {
         unitFilter !== "all" ||
         supplierFilter !== "all") && (
         <Button
-          variant="ghost"
           size="sm"
           onClick={() => {
             setCategoryFilter("all")
@@ -203,7 +254,9 @@ export function ProductsPage() {
             setUnitFilter("all")
             setSupplierFilter("all")
           }}
+          className="gap-1.5 bg-amber-400 text-amber-950 hover:bg-amber-300 border-amber-400/50"
         >
+          <RotateCcw className="size-3.5" />
           Réinitialiser
         </Button>
       )}
