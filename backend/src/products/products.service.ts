@@ -185,7 +185,9 @@ export class ProductsService {
       },
     });
     if (!product) throw new NotFoundException('Produit introuvable');
-    return this.withImage(product);
+    const { images, ...rest } = product;
+    const image = images?.find((i) => i.isPrimary) ?? images?.[0] ?? null;
+    return { ...rest, image, images };
   }
 
   async update(id: number, dto: UpdateProductDto) {
