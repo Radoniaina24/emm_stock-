@@ -21,7 +21,9 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Columns3,
-  Download,
+  FileSpreadsheet,
+  FileText,
+  Menu,
   Search,
   X,
 } from "lucide-react"
@@ -430,6 +432,7 @@ function DataTable<TData>({
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   const [globalFilter, setGlobalFilter] = React.useState("")
+  const [exportOpen, setExportOpen] = React.useState(false)
 
   const allColumns = React.useMemo(() => {
     const cols: ColumnDef<TData>[] = [...columns]
@@ -501,15 +504,30 @@ function DataTable<TData>({
     },
   })
 
-  function exportCSV() {
-    const rows = table.getFilteredRowModel().rows
-    const visibleColumns = table.getAllColumns().filter((col) => col.getIsVisible() && !["select", "actions"].includes(col.id))
-    const headers = visibleColumns.map((col) => {
+  function getExportRows() {
+    const selected = table.getFilteredSelectedRowModel().rows
+    return selected.length > 0 ? selected : table.getFilteredRowModel().rows
+  }
+
+  function getExportColumns() {
+    return table
+      .getAllColumns()
+      .filter((col) => col.getIsVisible() && !["select", "actions"].includes(col.id))
+  }
+
+  function buildHeaders(columns: ReturnType<typeof getExportColumns>) {
+    return columns.map((col) => {
       const h = col.columnDef.header
       return typeof h === "string" ? h : col.id
     })
+  }
+
+  function exportCSV() {
+    const rows = getExportRows()
+    const columns = getExportColumns()
+    const headers = buildHeaders(columns)
     const csvRows = rows.map((row) =>
-      visibleColumns
+      columns
         .map((col) => {
           const val = row.getValue(col.id)
           if (val == null) return ""
@@ -523,7 +541,40 @@ function DataTable<TData>({
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = exportFilename ?? "export.csv"
+    a.download = `${exportFilename ?? "export"}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+  }
+
+  function exportExcel() {
+    const rows = getExportRows()
+    const columns = getExportColumns()
+    const headers = buildHeaders(columns)
+    const headerRow = `<tr>${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("")}</tr>`
+    const bodyRows = rows
+      .map(
+        (row) =>
+          `<tr>${columns
+            .map((col) => {
+              const val = row.getValue(col.id)
+              return `<td>${escapeHtml(val == null ? "" : String(val))}</td>`
+            })
+            .join("")}</tr>`,
+      )
+      .join("")
+    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body><table border="1">${headerRow}${bodyRows}</table></body></html>`
+    const blob = new Blob([html], { type: "application/vnd.ms-excel;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `${exportFilename ?? "export"}.xls`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -540,15 +591,53 @@ function DataTable<TData>({
           filters={filters}
         />
         {exportFilename && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={exportCSV}
-            className="h-9 gap-1.5 text-xs font-medium"
-          >
-            <Download className="size-3.5" />
-            Export CSV
-          </Button>
+          <BasePopover.Root open={exportOpen} onOpenChange={setExportOpen}>
+            <BasePopover.Trigger
+              render={
+                <Button
+                  variant="outline"
+                  size="sm"
+                  title="Exporter"
+                  className="h-9 gap-1.5 text-xs font-medium"
+                >
+                  <Menu className="size-3.5" />
+                  Exporter
+                </Button>
+              }
+            />
+            <BasePopover.Portal>
+              <BasePopover.Positioner sideOffset={4} align="end">
+                <BasePopover.Popup className="z-50 min-w-44 origin-top-right rounded-xl border border-border/60 bg-popover p-1 text-sm shadow-lg shadow-black/5 outline-none transition-[transform,opacity] data-[open]:animate-in data-[closed]:animate-out data-[closed]:fade-out-0 data-[open]:fade-in-0 data-[closed]:zoom-out-95 data-[open]:zoom-in-95">
+                  <div className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                    Exporter
+                    {table.getFilteredSelectedRowModel().rows.length > 0 && " (sélection)"}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      exportCSV()
+                      setExportOpen(false)
+                    }}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/70"
+                  >
+                    <FileText className="size-4 text-muted-foreground/70" />
+                    Export CSV
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      exportExcel()
+                      setExportOpen(false)
+                    }}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/70"
+                  >
+                    <FileSpreadsheet className="size-4 text-muted-foreground/70" />
+                    Export Excel
+                  </button>
+                </BasePopover.Popup>
+              </BasePopover.Positioner>
+            </BasePopover.Portal>
+          </BasePopover.Root>
         )}
       </div>
 

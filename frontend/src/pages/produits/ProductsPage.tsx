@@ -435,6 +435,7 @@ export function ProductsPage() {
       <DataTable
         columns={columns}
         data={filtered}
+        enableSelection
         searchAccessor={(p) =>
           [p.name, p.sku, p.description, p.category?.name, p.brand?.name, p.unit.code]
             .filter(Boolean)
