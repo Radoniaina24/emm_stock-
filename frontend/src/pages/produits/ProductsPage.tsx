@@ -323,6 +323,7 @@ export function ProductsPage() {
         "Statut",
         "Codes-barres",
         "Images",
+        "Image (URL)",
         "Fournisseur(s)",
       ]
       const rows: (string | number | null)[][] = items.map((p) => {
@@ -354,6 +355,7 @@ export function ProductsPage() {
           p.isActive ? "Actif" : "Inactif",
           p._count?.barcodes ?? 0,
           p._count?.images ?? 0,
+          resolveImageUrl(p.image) ?? "",
           suppliersText,
         ]
       })
