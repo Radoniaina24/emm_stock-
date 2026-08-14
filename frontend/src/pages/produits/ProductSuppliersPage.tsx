@@ -1,10 +1,12 @@
-import { useMemo, useState, type FormEvent } from "react"
+import { useMemo, useRef, useState, type FormEvent } from "react"
 import {
   Building2,
   Edit,
   Link2,
   Package,
   Plus,
+  RotateCcw,
+  Sparkles,
   Star,
   Trash2,
   Truck,
@@ -25,7 +27,7 @@ import {
   ModalTitle,
 } from "@/components/ui/modal"
 import { SearchableSelect } from "@/components/ui/searchable-select"
-import { inputClass } from "@/lib/product-form"
+import { generateSupplierRef, inputClass } from "@/lib/product-form"
 import { toast } from "@/components/ui/toast"
 import {
   useProductSuppliersQuery,
@@ -91,6 +93,19 @@ function FormFields({
   suppliers: { id: string; name: string }[]
   disabledIdentity: boolean
 }) {
+  const autoRefRef = useRef(true)
+  const [autoRef, setAutoRef] = useState(!form.supplierSku)
+
+  function setAutoRefMode(next: boolean) {
+    autoRefRef.current = next
+    setAutoRef(next)
+  }
+
+  function buildRef(supplierId: string): string {
+    const supplier = suppliers.find((s) => s.id === supplierId)
+    return generateSupplierRef(supplier?.name)
+  }
+
   const productOptions = products.map((p) => ({ value: String(p.id), label: `${p.name} (${p.sku})` }))
   const supplierOptions = suppliers.map((s) => ({ value: s.id, label: s.name }))
   const selectedProduct = products.find((p) => String(p.id) === form.productId)
@@ -135,7 +150,13 @@ function FormFields({
               value={form.supplierId}
               placeholder="Sélectionner…"
               options={supplierOptions}
-              onSelect={(v) => setForm((p) => ({ ...p, supplierId: v }))}
+              onSelect={(v) =>
+                setForm((p) => ({
+                  ...p,
+                  supplierId: v,
+                  supplierSku: autoRefRef.current ? buildRef(v) : p.supplierSku,
+                }))
+              }
               triggerClassName={`h-10 w-full bg-background${fieldErrors.supplierId ? " border-destructive/60" : ""}`}
             />
           )}
@@ -144,16 +165,27 @@ function FormFields({
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-sm font-medium text-foreground/80" htmlFor={`${prefix}-sku`}>
+        <label className="flex items-center gap-1.5 text-sm font-medium text-foreground/80" htmlFor={`${prefix}-sku`}>
           Référence fournisseur
+          {autoRef && (
+            <span className="flex items-center gap-0.5 rounded-full bg-amber-500/10 px-1.5 py-px text-[10px] font-medium text-amber-600 ring-1 ring-amber-500/20 dark:text-amber-400">
+              <Sparkles className="size-2.5" /> auto
+            </span>
+          )}
         </label>
         <input
           id={`${prefix}-sku`}
           value={form.supplierSku}
-          onChange={(e) => setForm((p) => ({ ...p, supplierSku: e.target.value }))}
-          placeholder="SAM-SSD-512"
-          className={inputClass(fieldErrors.supplierSku)}
+          onChange={(e) => {
+            setAutoRefMode(false)
+            setForm((p) => ({ ...p, supplierSku: e.target.value }))
+          }}
+          placeholder="FOU-DIS-196"
+          className={`${inputClass(fieldErrors.supplierSku)} font-mono`}
         />
+        <p className="text-xs text-muted-foreground/50">
+          Générée avec le préfixe fixe FOU-, le code fournisseur et 3 chiffres aléatoires — modifiable en la touchant.
+        </p>
         {fieldErrors.supplierSku && <p className="text-xs text-destructive">{fieldErrors.supplierSku}</p>}
       </div>
 
@@ -482,10 +514,11 @@ export function ProductSuppliersPage() {
       </div>
       {(productFilter !== "all" || supplierFilter !== "all") && (
         <Button
-          variant="ghost"
           size="sm"
           onClick={() => { setProductFilter("all"); setSupplierFilter("all") }}
+          className="gap-1.5 bg-amber-400 text-amber-950 hover:bg-amber-300 border-amber-400/50"
         >
+          <RotateCcw className="size-3.5" />
           Réinitialiser
         </Button>
       )}

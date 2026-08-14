@@ -1,7 +1,7 @@
-import { useState } from "react"
-import { Edit, Plus, Star, Trash2, Truck, X } from "lucide-react"
+import { useRef, useState } from "react"
+import { Edit, Plus, Sparkles, Star, Trash2, Truck, X } from "lucide-react"
 import { SearchableSelect } from "@/components/ui/searchable-select"
-import { inputClass } from "@/lib/product-form"
+import { generateSupplierRef, inputClass } from "@/lib/product-form"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
@@ -37,6 +37,18 @@ export function SuppliersCard({
   const [draft, setDraft] = useState<SupplierLinkDraft>(emptyDraft)
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const autoSkuRef = useRef(true)
+  const [autoSku, setAutoSku] = useState(true)
+
+  function setAutoSkuMode(next: boolean) {
+    autoSkuRef.current = next
+    setAutoSku(next)
+  }
+
+  function buildRef(supplierId: string): string {
+    const supplier = supplierOptions.find((s) => s.id === supplierId)
+    return generateSupplierRef(supplier?.name)
+  }
 
   const selectOptions = supplierOptions.map((s) => ({ value: s.id, label: s.name }))
 
@@ -44,6 +56,7 @@ export function SuppliersCard({
     setDraft(emptyDraft)
     setEditingIndex(null)
     setError(null)
+    setAutoSkuMode(true)
   }
 
   function handleAdd() {
@@ -88,6 +101,8 @@ export function SuppliersCard({
     setDraft({ ...item })
     setEditingIndex(index)
     setError(null)
+    const generated = item.supplierId ? buildRef(item.supplierId) : ""
+    setAutoSkuMode(!item.supplierSku || item.supplierSku === generated)
   }
 
   function handleRemove(index: number) {
@@ -193,7 +208,13 @@ export function SuppliersCard({
               value={draft.supplierId}
               placeholder="Choisir un fournisseur…"
               options={selectOptions}
-              onSelect={(v) => setDraft((p) => ({ ...p, supplierId: v }))}
+              onSelect={(v) =>
+                setDraft((p) => ({
+                  ...p,
+                  supplierId: v,
+                  supplierSku: autoSkuRef.current ? buildRef(v) : p.supplierSku,
+                }))
+              }
               triggerClassName={`h-10 w-full bg-background${error && !draft.supplierId ? " border-destructive/60" : ""}`}
             />
           </div>
@@ -212,13 +233,26 @@ export function SuppliersCard({
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground/80">Réf. fournisseur</label>
+            <label className="flex items-center gap-1.5 text-sm font-medium text-foreground/80">
+              Réf. fournisseur
+              {autoSku && (
+                <span className="flex items-center gap-0.5 rounded-full bg-amber-500/10 px-1.5 py-px text-[10px] font-medium text-amber-600 ring-1 ring-amber-500/20 dark:text-amber-400">
+                  <Sparkles className="size-2.5" /> auto
+                </span>
+              )}
+            </label>
             <input
               value={draft.supplierSku}
-              onChange={(e) => setDraft((p) => ({ ...p, supplierSku: e.target.value }))}
-              placeholder="SAM-SSD-512"
-              className={inputClass(false)}
+              onChange={(e) => {
+                setAutoSkuMode(false)
+                setDraft((p) => ({ ...p, supplierSku: e.target.value }))
+              }}
+              placeholder="FOU-DIS-196"
+              className={`${inputClass(false)} font-mono`}
             />
+            <p className="text-xs text-muted-foreground/50">
+              Générée avec le préfixe fixe FOU-, le code fournisseur et 3 chiffres aléatoires — modifiable en la touchant.
+            </p>
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground/80">Quantité min.</label>

@@ -141,6 +141,25 @@ export function generateSku(name: string, brandName: string | null | undefined):
   return segments.join("-")
 }
 
+export function supplierCode(name: string): string {
+  const token = slugify(name)
+    .split("-")
+    .find((w) => w.length > 0)
+  return token ? token.slice(0, 3).toUpperCase() : ""
+}
+
+export const SUPPLIER_REF_PREFIX = "FOU"
+
+export function randomSupplierSuffix(): string {
+  return String(Math.floor(Math.random() * 900) + 100)
+}
+
+export function generateSupplierRef(supplierName: string | undefined): string {
+  const code = supplierName ? supplierCode(supplierName) : ""
+  if (!code) return `${SUPPLIER_REF_PREFIX}-`
+  return `${SUPPLIER_REF_PREFIX}-${code}-${randomSupplierSuffix()}`
+}
+
 export function inputClass(error?: string) {
   const base = "h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none transition-all placeholder:text-muted-foreground/30 hover:border-border focus:shadow-sm focus:ring-2"
   return error
