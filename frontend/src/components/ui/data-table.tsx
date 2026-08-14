@@ -32,6 +32,15 @@ import { Popover as BasePopover } from "@base-ui/react/popover"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { exportToExcel } from "@/lib/excel"
+import {
+  ModalClose,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalPopup,
+  ModalRoot,
+  ModalTitle,
+} from "@/components/ui/modal"
 
 function Checkbox({
   checked,
@@ -407,8 +416,11 @@ interface DataTableProps<TData> {
   renderActions?: (row: TData) => React.ReactNode
   filters?: React.ReactNode
   className?: string
-  /** Export personnalisé (toutes les colonnes + données liées). Remplace l'export générique par colonnes quand il est fourni. */
-  exportBuilder?: (rows: TData[]) => { headers: string[]; rows: (string | number | null)[][] }
+  /** Export personnalisé (toutes les colonnes + données liées). Quand fourni, l'export ouvre un choix de colonnes. */
+  exportBuilder?: (rows: TData[]) => {
+    columns: { key: string; header: string }[]
+    rows: (string | number | null)[][]
+  }
 }
 
 function DataTable<TData>({
@@ -437,6 +449,13 @@ function DataTable<TData>({
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   const [globalFilter, setGlobalFilter] = React.useState("")
   const [exportOpen, setExportOpen] = React.useState(false)
+  const [exportColumnsOpen, setExportColumnsOpen] = React.useState(false)
+  const [pendingExport, setPendingExport] = React.useState<{
+    format: "csv" | "excel"
+    columns: { key: string; header: string }[]
+    rows: (string | number | null)[][]
+  } | null>(null)
+  const [selectedExportKeys, setSelectedExportKeys] = React.useState<string[]>([])
 
   const allColumns = React.useMemo(() => {
     const cols: ColumnDef<TData>[] = [...columns]
@@ -535,38 +554,14 @@ function DataTable<TData>({
     return new Date().toISOString().slice(0, 10)
   }
 
-  function exportCSV() {
-    const rows = getExportRows()
-    const data = rows.map((r) => r.original)
-    let headers: string[]
-    let lineRows: string[]
-    if (exportBuilder) {
-      const built = exportBuilder(data)
-      headers = built.headers
-      lineRows = built.rows.map((row) =>
-        row
-          .map((val) => {
-            if (val == null) return ""
-            const str = String(val)
-            return str.includes(",") || str.includes('"') ? `"${str.replace(/"/g, '""')}"` : str
-          })
-          .join(","),
-      )
-    } else {
-      const columns = getExportColumns()
-      headers = buildHeaders(columns)
-      lineRows = rows.map((row) =>
-        columns
-          .map((col) => {
-            const val = row.getValue(col.id)
-            if (val == null) return ""
-            const str = String(val)
-            return str.includes(",") || str.includes('"') ? `"${str.replace(/"/g, '""')}"` : str
-          })
-          .join(","),
-      )
-    }
-    const csv = [headers.join(","), ...lineRows].join("\n")
+  function csvCell(val: unknown): string {
+    if (val == null) return ""
+    const str = String(val)
+    return str.includes(",") || str.includes('"') ? `"${str.replace(/"/g, '""')}"` : str
+  }
+
+  function downloadCsv(headers: string[], rows: (string | number | null)[][]) {
+    const csv = [headers.join(","), ...rows.map((r) => r.map(csvCell).join(","))].join("\n")
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
@@ -576,21 +571,59 @@ function DataTable<TData>({
     URL.revokeObjectURL(url)
   }
 
-  async function exportExcel() {
+  function buildGenericExport() {
     const rows = getExportRows()
-    const data = rows.map((r) => r.original)
-    let headers: string[]
-    let dataRows: (string | number | null)[][]
-    if (exportBuilder) {
-      const built = exportBuilder(data)
-      headers = built.headers
-      dataRows = built.rows
-    } else {
-      const columns = getExportColumns()
-      headers = buildHeaders(columns)
-      dataRows = rows.map((row) => columns.map((col) => row.getValue(col.id)))
+    const columns = getExportColumns()
+    const headers = buildHeaders(columns)
+    const dataRows = rows.map((row) =>
+      columns.map((col) => row.getValue(col.id)),
+    ) as (string | number | null)[][]
+    return { headers, rows: dataRows }
+  }
+
+  function exportCSV() {
+    const { headers, rows } = buildGenericExport()
+    downloadCsv(headers, rows)
+  }
+
+  async function exportExcel() {
+    const { headers, rows } = buildGenericExport()
+    await exportToExcel(headers, rows, `${exportBaseName()}-${exportDate()}.xlsx`)
+  }
+
+  function openExport(format: "csv" | "excel") {
+    if (!exportBuilder) {
+      if (format === "csv") exportCSV()
+      else void exportExcel()
+      setExportOpen(false)
+      return
     }
-    await exportToExcel(headers, dataRows, `${exportBaseName()}-${exportDate()}.xlsx`)
+    const data = getExportRows().map((r) => r.original)
+    const built = exportBuilder(data)
+    setPendingExport({ format, columns: built.columns, rows: built.rows })
+    setSelectedExportKeys(built.columns.map((c) => c.key))
+    setExportColumnsOpen(true)
+    setExportOpen(false)
+  }
+
+  function toggleExportColumn(key: string) {
+    setSelectedExportKeys((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key],
+    )
+  }
+
+  function confirmExport() {
+    if (!pendingExport) return
+    const keys = selectedExportKeys
+    const indices = pendingExport.columns
+      .map((c, i) => (keys.includes(c.key) ? i : -1))
+      .filter((i) => i >= 0)
+    const headers = indices.map((i) => pendingExport.columns[i].header)
+    const rows = pendingExport.rows.map((r) => indices.map((i) => r[i]))
+    setExportColumnsOpen(false)
+    if (pendingExport.format === "csv") downloadCsv(headers, rows)
+    else void exportToExcel(headers, rows, `${exportBaseName()}-${exportDate()}.xlsx`)
+    setPendingExport(null)
   }
 
   return (
@@ -628,10 +661,7 @@ function DataTable<TData>({
                   </div>
                   <button
                     type="button"
-                    onClick={() => {
-                      exportCSV()
-                      setExportOpen(false)
-                    }}
+                    onClick={() => openExport("csv")}
                     className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/70"
                   >
                     <FileText className="size-4 text-muted-foreground/70" />
@@ -639,10 +669,7 @@ function DataTable<TData>({
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      exportExcel()
-                      setExportOpen(false)
-                    }}
+                    onClick={() => openExport("excel")}
                     className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/70"
                   >
                     <FileSpreadsheet className="size-4 text-muted-foreground/70" />
@@ -787,6 +814,61 @@ function DataTable<TData>({
       {enablePagination && !loading && (
         <DataTablePagination table={table} pageSizes={pageSizes} />
       )}
+
+      <ModalRoot
+        open={exportColumnsOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setExportColumnsOpen(false)
+            setPendingExport(null)
+          }
+        }}
+      >
+        <ModalPopup className="overflow-hidden p-0 sm:mx-4 sm:max-w-3xl">
+          <ModalClose />
+          <ModalHeader>
+            <ModalTitle>Colonnes à exporter</ModalTitle>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Sélectionnez les champs à inclure. L'ordre des colonnes est conservé.
+            </p>
+          </ModalHeader>
+          <ModalContent>
+            {pendingExport && (
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {pendingExport.columns.map((col) => {
+                  const checked = selectedExportKeys.includes(col.key)
+                  return (
+                    <label
+                      key={col.key}
+                      className={
+                        "flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors " +
+                        (checked ? "border-primary/50 bg-primary/5" : "border-border hover:bg-muted")
+                      }
+                    >
+                      <Checkbox checked={checked} onCheckedChange={() => toggleExportColumn(col.key)} />
+                      {col.header}
+                    </label>
+                  )
+                })}
+              </div>
+            )}
+          </ModalContent>
+          <ModalFooter>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setExportColumnsOpen(false)
+                setPendingExport(null)
+              }}
+            >
+              Annuler
+            </Button>
+            <Button onClick={confirmExport} disabled={selectedExportKeys.length === 0}>
+              Valider l'export
+            </Button>
+          </ModalFooter>
+        </ModalPopup>
+      </ModalRoot>
     </div>
   )
 }

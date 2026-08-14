@@ -303,28 +303,28 @@ export function ProductsPage() {
         LOT: "Par lot",
         SERIAL: "Par série",
       }
-      const headers = [
-        "SKU",
-        "Nom",
-        "Slug",
-        "Description",
-        "Type",
-        "Catégorie",
-        "Marque",
-        "Unité",
-        "Prix d'achat (Ar)",
-        "Prix de vente (Ar)",
-        "TVA (%)",
-        "Traçabilité",
-        "Poids (kg)",
-        "Longueur (cm)",
-        "Largeur (cm)",
-        "Hauteur (cm)",
-        "Statut",
-        "Codes-barres",
-        "Images",
-        "Image (URL)",
-        "Fournisseur(s)",
+      const columns = [
+        { key: "sku", header: "SKU" },
+        { key: "name", header: "Nom" },
+        { key: "slug", header: "Slug" },
+        { key: "description", header: "Description" },
+        { key: "type", header: "Type" },
+        { key: "category", header: "Catégorie" },
+        { key: "brand", header: "Marque" },
+        { key: "unit", header: "Unité" },
+        { key: "costPrice", header: "Prix d'achat (Ar)" },
+        { key: "salePrice", header: "Prix de vente (Ar)" },
+        { key: "taxRate", header: "TVA (%)" },
+        { key: "tracking", header: "Traçabilité" },
+        { key: "weight", header: "Poids (kg)" },
+        { key: "length", header: "Longueur (cm)" },
+        { key: "width", header: "Largeur (cm)" },
+        { key: "height", header: "Hauteur (cm)" },
+        { key: "status", header: "Statut" },
+        { key: "barcodes", header: "Codes-barres" },
+        { key: "images", header: "Images" },
+        { key: "imageUrl", header: "Image (URL)" },
+        { key: "suppliers", header: "Fournisseur(s)" },
       ]
       const rows: (string | number | null)[][] = items.map((p) => {
         const suppliers = (allProductSuppliers ?? []).filter((ps) => ps.productId === p.id)
@@ -359,7 +359,7 @@ export function ProductsPage() {
           suppliersText,
         ]
       })
-      return { headers, rows }
+      return { columns, rows }
     },
     [allProductSuppliers],
   )
