@@ -11,6 +11,7 @@ import { useBrandsQuery } from "@/hooks/use-brands"
 import { useUnitsOfMeasureQuery } from "@/hooks/use-units-of-measure"
 import { importProducts, type ImportProductRow, type ImportReport } from "@/api/product-import"
 import { downloadFile, parseCsv, toCsv } from "@/lib/csv"
+import { exportToExcel, parseExcelFile } from "@/lib/excel"
 import {
   AlertTriangle,
   ArrowLeft,
@@ -318,28 +319,41 @@ export default function ProductImportPage() {
     },
   })
 
-  function handleFile(file: File) {
-    file
-      .text()
-      .then((text) => {
+  async function handleFile(file: File) {
+    try {
+      const isExcel =
+        /\.xlsx$/i.test(file.name) ||
+        file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      let rows: string[][]
+      if (isExcel) {
+        rows = await parseExcelFile(file)
+      } else {
+        const text = await file.text()
         const cleaned = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text
-        const rows = parseCsv(cleaned)
-        if (rows.length === 0) {
-          toast.error("Le fichier est vide")
-          return
-        }
-        setFileName(file.name)
-        setRawRows(rows)
-        setMapping(autoMap(rows[0]))
-        setReport(null)
-        setStep(2)
-      })
-      .catch(() => toast.error("Impossible de lire le fichier"))
+        rows = parseCsv(cleaned)
+      }
+      if (rows.length === 0) {
+        toast.error("Le fichier est vide")
+        return
+      }
+      const filtered = rows.filter((r) => r.some((c) => c.trim() !== ""))
+      setFileName(file.name)
+      setRawRows(filtered)
+      setMapping(autoMap(filtered[0]))
+      setReport(null)
+      setStep(2)
+    } catch {
+      toast.error("Impossible de lire le fichier")
+    }
   }
 
   function downloadTemplate() {
     const csv = toCsv(TEMPLATE_HEADERS, [TEMPLATE_SAMPLE])
     downloadFile(csv, "modele-import-produits.csv", "text/csv;charset=utf-8")
+  }
+
+  function downloadExcelTemplate() {
+    void exportToExcel(TEMPLATE_HEADERS, [TEMPLATE_SAMPLE], "modele-import-produits.xlsx")
   }
 
   function downloadErrorReport() {
@@ -372,7 +386,7 @@ export default function ProductImportPage() {
       <div>
         <h1 className="font-heading text-2xl font-semibold">Import de produits</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Importez votre catalogue via un fichier CSV. L'import est idempotent : un produit existant (même SKU) est mis à jour.
+            Importez votre catalogue via un fichier CSV ou Excel (.xlsx). L'import est idempotent : un produit existant (même SKU) est mis à jour.
         </p>
       </div>
 
@@ -383,33 +397,39 @@ export default function ProductImportPage() {
           <CardHeader>
             <CardTitle>1. Préparez et déposez votre fichier</CardTitle>
             <CardDescription>
-              Téléchargez le modèle officiel, remplissez-le, puis importez-le. Format accepté : CSV (compatible Excel), séparateur virgule.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            <Button variant="outline" className="w-fit gap-1.5" onClick={downloadTemplate}>
-              <Download className="size-4" />
-              Télécharger le modèle CSV
-            </Button>
+               Téléchargez le modèle officiel, remplissez-le, puis importez-le. Formats acceptés : CSV ou Excel (.xlsx).
+             </CardDescription>
+           </CardHeader>
+           <CardContent className="flex flex-col gap-4">
+             <div className="flex flex-wrap gap-2">
+               <Button variant="outline" className="w-fit gap-1.5" onClick={downloadTemplate}>
+                 <Download className="size-4" />
+                 Télécharger le modèle CSV
+               </Button>
+               <Button variant="outline" className="w-fit gap-1.5" onClick={downloadExcelTemplate}>
+                 <FileSpreadsheet className="size-4" />
+                 Télécharger le modèle Excel
+               </Button>
+             </div>
 
-            <label
-              htmlFor="import-file"
-              className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/60 bg-muted/30 p-10 text-center transition-colors hover:border-primary/50 hover:bg-muted/50"
-            >
-              <Upload className="size-7 text-muted-foreground" />
-              <span className="text-sm font-medium">Cliquez pour choisir un fichier CSV</span>
-              <span className="text-xs text-muted-foreground">ou glissez-déposez le fichier ici</span>
-              <input
-                id="import-file"
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,text/csv"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file) handleFile(file)
-                }}
-              />
+             <label
+               htmlFor="import-file"
+               className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/60 bg-muted/30 p-10 text-center transition-colors hover:border-primary/50 hover:bg-muted/50"
+             >
+               <Upload className="size-7 text-muted-foreground" />
+               <span className="text-sm font-medium">Cliquez pour choisir un fichier CSV ou Excel</span>
+               <span className="text-xs text-muted-foreground">ou glissez-déposez le fichier ici</span>
+               <input
+                 id="import-file"
+                 ref={fileInputRef}
+                 type="file"
+                 accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                 className="hidden"
+                 onChange={(e) => {
+                   const file = e.target.files?.[0]
+                   if (file) void handleFile(file)
+                 }}
+               />
             </label>
           </CardContent>
         </Card>

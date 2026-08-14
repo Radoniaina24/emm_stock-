@@ -51,3 +51,30 @@ export async function exportToExcel(
   a.click()
   URL.revokeObjectURL(url)
 }
+
+function cellToString(value: unknown): string {
+  if (value == null) return ""
+  if (value instanceof Date) return value.toISOString().slice(0, 10)
+  if (typeof value === "object" && "text" in (value as Record<string, unknown>)) {
+    return String((value as { text: unknown }).text)
+  }
+  return String(value)
+}
+
+export async function parseExcelFile(file: File): Promise<string[][]> {
+  const ExcelJS = (await import("exceljs")).default
+  const buffer = await file.arrayBuffer()
+  const workbook = new ExcelJS.Workbook()
+  await workbook.xlsx.load(buffer)
+  const sheet = workbook.worksheets[0]
+  if (!sheet) return []
+  const rows: string[][] = []
+  for (let r = 1; r <= sheet.rowCount; r++) {
+    const cells: string[] = []
+    for (let c = 1; c <= sheet.columnCount; c++) {
+      cells.push(cellToString(sheet.getCell(r, c).value))
+    }
+    rows.push(cells)
+  }
+  return rows
+}
