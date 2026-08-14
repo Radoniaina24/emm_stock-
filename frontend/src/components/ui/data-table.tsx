@@ -407,6 +407,8 @@ interface DataTableProps<TData> {
   renderActions?: (row: TData) => React.ReactNode
   filters?: React.ReactNode
   className?: string
+  /** Export personnalisé (toutes les colonnes + données liées). Remplace l'export générique par colonnes quand il est fourni. */
+  exportBuilder?: (rows: TData[]) => { headers: string[]; rows: (string | number | null)[][] }
 }
 
 function DataTable<TData>({
@@ -427,6 +429,7 @@ function DataTable<TData>({
   renderActions,
   filters,
   className,
+  exportBuilder,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -534,19 +537,36 @@ function DataTable<TData>({
 
   function exportCSV() {
     const rows = getExportRows()
-    const columns = getExportColumns()
-    const headers = buildHeaders(columns)
-    const csvRows = rows.map((row) =>
-      columns
-        .map((col) => {
-          const val = row.getValue(col.id)
-          if (val == null) return ""
-          const str = String(val)
-          return str.includes(",") || str.includes('"') ? `"${str.replace(/"/g, '""')}"` : str
-        })
-        .join(","),
-    )
-    const csv = [headers.join(","), ...csvRows].join("\n")
+    const data = rows.map((r) => r.original)
+    let headers: string[]
+    let lineRows: string[]
+    if (exportBuilder) {
+      const built = exportBuilder(data)
+      headers = built.headers
+      lineRows = built.rows.map((row) =>
+        row
+          .map((val) => {
+            if (val == null) return ""
+            const str = String(val)
+            return str.includes(",") || str.includes('"') ? `"${str.replace(/"/g, '""')}"` : str
+          })
+          .join(","),
+      )
+    } else {
+      const columns = getExportColumns()
+      headers = buildHeaders(columns)
+      lineRows = rows.map((row) =>
+        columns
+          .map((col) => {
+            const val = row.getValue(col.id)
+            if (val == null) return ""
+            const str = String(val)
+            return str.includes(",") || str.includes('"') ? `"${str.replace(/"/g, '""')}"` : str
+          })
+          .join(","),
+      )
+    }
+    const csv = [headers.join(","), ...lineRows].join("\n")
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
@@ -558,9 +578,18 @@ function DataTable<TData>({
 
   async function exportExcel() {
     const rows = getExportRows()
-    const columns = getExportColumns()
-    const headers = buildHeaders(columns)
-    const dataRows = rows.map((row) => columns.map((col) => row.getValue(col.id)))
+    const data = rows.map((r) => r.original)
+    let headers: string[]
+    let dataRows: (string | number | null)[][]
+    if (exportBuilder) {
+      const built = exportBuilder(data)
+      headers = built.headers
+      dataRows = built.rows
+    } else {
+      const columns = getExportColumns()
+      headers = buildHeaders(columns)
+      dataRows = rows.map((row) => columns.map((col) => row.getValue(col.id)))
+    }
     await exportToExcel(headers, dataRows, `${exportBaseName()}-${exportDate()}.xlsx`)
   }
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import {
   AlertTriangle,
@@ -291,6 +291,77 @@ export function ProductsPage() {
 
   const activeCount = all.filter((p) => p.isActive).length
 
+  const exportBuilder = useCallback(
+    (items: Product[]) => {
+      const typeLabel: Record<string, string> = {
+        STORABLE: "Stockable",
+        CONSUMABLE: "Consommable",
+        SERVICE: "Service",
+      }
+      const trackingLabel: Record<string, string> = {
+        NONE: "Aucune",
+        LOT: "Par lot",
+        SERIAL: "Par série",
+      }
+      const headers = [
+        "SKU",
+        "Nom",
+        "Slug",
+        "Description",
+        "Type",
+        "Catégorie",
+        "Marque",
+        "Unité",
+        "Prix d'achat (Ar)",
+        "Prix de vente (Ar)",
+        "TVA (%)",
+        "Traçabilité",
+        "Poids (kg)",
+        "Longueur (cm)",
+        "Largeur (cm)",
+        "Hauteur (cm)",
+        "Statut",
+        "Codes-barres",
+        "Images",
+        "Fournisseur(s)",
+      ]
+      const rows: (string | number | null)[][] = items.map((p) => {
+        const suppliers = (allProductSuppliers ?? []).filter((ps) => ps.productId === p.id)
+        const suppliersText = suppliers
+          .map((ps) => {
+            const name = ps.supplier?.name ?? "Fournisseur supprimé"
+            const price = ps.price != null ? `${Number(ps.price).toLocaleString("fr-FR")} Ar` : ""
+            return price ? `${name} (${price})` : name
+          })
+          .join("\n")
+        return [
+          p.sku,
+          p.name,
+          p.slug ?? "",
+          p.description ?? "",
+          typeLabel[p.type] ?? p.type,
+          p.category?.name ?? "",
+          p.brand?.name ?? "",
+          p.unit?.symbol ?? p.unit?.code ?? "",
+          p.costPrice != null ? Number(p.costPrice) : "",
+          p.salePrice != null ? Number(p.salePrice) : "",
+          p.taxRate != null ? Number(p.taxRate) : "",
+          trackingLabel[p.tracking] ?? p.tracking,
+          p.weight != null ? Number(p.weight) : "",
+          p.length != null ? Number(p.length) : "",
+          p.width != null ? Number(p.width) : "",
+          p.height != null ? Number(p.height) : "",
+          p.isActive ? "Actif" : "Inactif",
+          p._count?.barcodes ?? 0,
+          p._count?.images ?? 0,
+          suppliersText,
+        ]
+      })
+      return { headers, rows }
+    },
+    [allProductSuppliers],
+  )
+
   const galleryImages = selectedProduct?.images ?? []
   const galleryTotal = galleryImages.length
   const safeImageIndex = Math.min(detailImageIndex, Math.max(galleryTotal - 1, 0))
@@ -444,6 +515,7 @@ export function ProductsPage() {
         searchPlaceholder="Rechercher par nom, SKU, catégorie, marque…"
         loading={isLoading}
         exportFilename="produits.csv"
+        exportBuilder={exportBuilder}
         emptyMessage="Aucun produit trouvé."
         filters={filters}
         renderActions={(row) => (
