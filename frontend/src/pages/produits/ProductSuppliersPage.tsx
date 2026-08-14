@@ -386,8 +386,8 @@ export function ProductSuppliersPage() {
               <Package className="size-4" />
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-foreground">{row.original.product.name}</p>
-              <p className="truncate font-mono text-xs text-muted-foreground/60">{row.original.product.sku}</p>
+              <p className="truncate text-sm font-medium text-foreground">{row.original.product?.name ?? "Produit supprimé"}</p>
+              <p className="truncate font-mono text-xs text-muted-foreground/60">{row.original.product?.sku}</p>
             </div>
           </div>
         ),
@@ -398,7 +398,7 @@ export function ProductSuppliersPage() {
         cell: ({ row }) => (
           <div className="flex items-center gap-2 text-sm text-foreground/80">
             <Truck className="size-3.5 shrink-0 text-muted-foreground/50" />
-            {row.original.supplier.name}
+            {row.original.supplier?.name ?? "Fournisseur supprimé"}
           </div>
         ),
       },
@@ -531,7 +531,7 @@ export function ProductSuppliersPage() {
         columns={columns}
         data={filtered}
         loading={isLoading}
-        searchAccessor={(l) => [l.product.name, l.product.sku, l.supplier.name, l.supplierSku].filter(Boolean).join(" ")}
+        searchAccessor={(l) => [l.product?.name, l.product?.sku, l.supplier?.name, l.supplierSku].filter(Boolean).join(" ")}
         searchPlaceholder="Rechercher par produit, fournisseur ou référence…"
         exportFilename="fournisseurs-produits.csv"
         emptyMessage="Aucune association produit/fournisseur trouvée."
@@ -629,7 +629,7 @@ export function ProductSuppliersPage() {
               <div>
                 <ModalTitle>Modifier l'association</ModalTitle>
                 <p className="mt-0.5 text-sm text-muted-foreground">
-                  {editing?.product.name} · {editing?.supplier.name}
+                  {editing?.product?.name ?? "Produit supprimé"} · {editing?.supplier?.name ?? "Fournisseur supprimé"}
                 </p>
               </div>
             </div>
@@ -680,7 +680,7 @@ export function ProductSuppliersPage() {
               <div>
                 <ModalTitle>Retirer le fournisseur</ModalTitle>
                 <p className="mt-0.5 text-sm text-muted-foreground">
-                  {linkToDelete?.product.name} · {linkToDelete?.supplier.name}
+                  {linkToDelete?.product?.name ?? "Produit supprimé"} · {linkToDelete?.supplier?.name ?? "Fournisseur supprimé"}
                 </p>
               </div>
             </div>
@@ -688,8 +688,8 @@ export function ProductSuppliersPage() {
           <ModalContent>
             <p className="text-sm text-foreground/80">
               Cette action est <span className="font-semibold text-destructive">irréversible</span>.
-              L'association entre <span className="font-semibold">{linkToDelete?.product.name}</span> et{" "}
-              <span className="font-semibold">{linkToDelete?.supplier.name}</span> sera supprimée.
+              L'association entre <span className="font-semibold">{linkToDelete?.product?.name ?? "Produit supprimé"}</span> et{" "}
+              <span className="font-semibold">{linkToDelete?.supplier?.name ?? "Fournisseur supprimé"}</span> sera supprimée.
             </p>
           </ModalContent>
           <ModalFooter>

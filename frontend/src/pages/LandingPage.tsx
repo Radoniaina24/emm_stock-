@@ -196,11 +196,11 @@ export function LandingPage() {
               meilleures décisions, en toute simplicité.
             </p>
             <div className="mt-9 flex flex-wrap justify-center gap-3">
-              <Button size="lg" render={<Link to="/dashboard" />}>
+              <Button size="lg" nativeButton={false} render={<Link to="/dashboard" />}>
                 Accéder au backoffice
                 <ArrowRight className="size-4" />
               </Button>
-              <Button size="lg" variant="outline" render={<a href="#fonctionnalites" />}>
+              <Button size="lg" variant="outline" nativeButton={false} render={<a href="#fonctionnalites" />}>
                 Découvrir
               </Button>
             </div>
@@ -339,6 +339,7 @@ export function LandingPage() {
                 <Button
                   className="mt-6 w-full"
                   variant={plan.highlighted ? "default" : "outline"}
+                  nativeButton={false}
                   render={<Link to="/dashboard" />}
                 >
                   {plan.cta}

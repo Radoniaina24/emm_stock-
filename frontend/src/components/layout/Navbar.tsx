@@ -35,10 +35,10 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" render={<Link to="/dashboard" />}>
+          <Button variant="ghost" size="sm" nativeButton={false} render={<Link to="/dashboard" />}>
             Espace admin
           </Button>
-          <Button size="sm" render={<Link to="/dashboard" />}>
+          <Button size="sm" nativeButton={false} render={<Link to="/dashboard" />}>
             Démarrer
           </Button>
         </div>

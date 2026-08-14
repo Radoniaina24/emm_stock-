@@ -11,8 +11,8 @@ export type ProductSupplier = {
   isPreferred: boolean
   createdAt: string
   updatedAt: string
-  product: { id: number; name: string; sku: string }
-  supplier: { id: string; name: string }
+  product: { id: number; name: string; sku: string } | null
+  supplier: { id: string; name: string } | null
 }
 
 export type CreateProductSupplierPayload = {

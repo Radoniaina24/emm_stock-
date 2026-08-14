@@ -608,15 +608,23 @@ export function SuppliersPage() {
                   <p className="text-sm text-muted-foreground">Chargement des produits…</p>
                 ) : supplierProducts.data && supplierProducts.data.length > 0 ? (
                   <div className="divide-y divide-border/10 overflow-hidden rounded-xl border border-border/20">
-                    {supplierProducts.data.map((ps) => (
-                      <div key={ps.id} className="flex items-center justify-between gap-3 px-3 py-2.5">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-foreground">{ps.product.name}</p>
-                          <p className="truncate font-mono text-xs text-muted-foreground/60">
-                            {ps.product.sku}
-                            {ps.supplierSku ? ` · ${ps.supplierSku}` : ""}
-                          </p>
-                        </div>
+                  {supplierProducts.data.map((ps) => {
+                    const product = ps.product
+                    return (
+                    <div key={ps.id} className="flex items-center justify-between gap-3 px-3 py-2.5">
+                      <div className="min-w-0">
+                        {product ? (
+                          <>
+                            <p className="truncate text-sm font-medium text-foreground">{product.name}</p>
+                            <p className="truncate font-mono text-xs text-muted-foreground/60">
+                              {product.sku}
+                              {ps.supplierSku ? ` · ${ps.supplierSku}` : ""}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="truncate text-sm font-medium text-muted-foreground/50">Produit supprimé</p>
+                        )}
+                      </div>
                         <div className="flex shrink-0 items-center gap-3">
                           <span className="font-mono text-sm text-foreground">
                             {Number(ps.price).toFixed(2)}
@@ -629,7 +637,8 @@ export function SuppliersPage() {
                           )}
                         </div>
                       </div>
-                    ))}
+                    )
+                  })}
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground/60">

@@ -840,7 +840,7 @@ export function ProductsPage() {
                                 className="flex items-center justify-between gap-2 rounded-xl border border-border/20 bg-muted/10 px-3.5 py-2.5 transition-colors hover:border-border/40"
                               >
                                 <div className="min-w-0">
-                                  <p className="truncate text-sm font-medium text-foreground">{ps.supplier.name}</p>
+                                  <p className="truncate text-sm font-medium text-foreground">{ps.supplier?.name ?? "Fournisseur supprimé"}</p>
                                   <p className="truncate font-mono text-xs text-muted-foreground/60">
                                     {ps.supplierSku ? `Réf. ${ps.supplierSku}` : "—"}
                                   </p>
