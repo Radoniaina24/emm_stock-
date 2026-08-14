@@ -6,6 +6,7 @@ import { SearchableSelect, type SearchableSelectOption } from "@/components/ui/s
 import { useProductsQuery } from "@/hooks/use-products"
 import { useCategoriesQuery } from "@/hooks/use-categories"
 import { downloadFile, toCsv } from "@/lib/csv"
+import { exportToExcel } from "@/lib/excel"
 import type { Product } from "@/api/products"
 import { FileText, FileSpreadsheet, File as FileIcon, Search } from "lucide-react"
 
@@ -52,7 +53,7 @@ const DEFAULT_COLUMNS: ColumnKey[] = ["sku", "name", "category", "brand", "unit"
 
 const FORMATS = [
   { id: "csv", label: "CSV", desc: "Pour Excel / ré-import", icon: FileText },
-  { id: "excel", label: "Excel", desc: "Feuille .xls formatée", icon: FileSpreadsheet },
+  { id: "excel", label: "Excel", desc: "Feuille .xlsx (ExcelJS)", icon: FileSpreadsheet },
   { id: "pdf", label: "PDF", desc: "Catalogue imprimable", icon: FileIcon },
 ] as const
 
@@ -130,7 +131,6 @@ export default function ProductExportPage() {
   }, [products, scope, search, categoryFilter, categoryDescendants])
 
   const orderedColumns = COLUMNS.filter((c) => selected.includes(c.key))
-  const timestamp = new Date().toISOString().slice(0, 10)
 
   function toggleColumn(key: ColumnKey) {
     setSelected((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]))
@@ -140,21 +140,15 @@ export default function ProductExportPage() {
     return filtered.map((p) => orderedColumns.map((c) => c.get(p)))
   }
 
-  function generate() {
+  async function generate() {
     if (orderedColumns.length === 0) return
     const headers = orderedColumns.map((c) => c.label)
     const rows = buildRows()
-    const filename = `produits-${timestamp}`
 
     if (format === "csv") {
-      downloadFile(toCsv(headers, rows), `${filename}.csv`, "text/csv;charset=utf-8")
+      downloadFile(toCsv(headers, rows), `produits-${new Date().toISOString().slice(0, 10)}.csv`, "text/csv;charset=utf-8")
     } else if (format === "excel") {
-      const thead = `<tr>${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("")}</tr>`
-      const tbody = rows
-        .map((r) => `<tr>${r.map((c) => `<td>${escapeHtml(String(c))}</td>`).join("")}</tr>`)
-        .join("")
-      const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body><table border="1">${thead}${tbody}</table></body></html>`
-      downloadFile(html, `${filename}.xls`, "application/vnd.ms-excel;charset=utf-8")
+      await exportToExcel(headers, rows, `produits-${new Date().toISOString().slice(0, 10)}.xlsx`)
     } else {
       const thead = headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("")
       const tbody = rows

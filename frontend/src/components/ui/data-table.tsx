@@ -31,6 +31,7 @@ import { Popover as BasePopover } from "@base-ui/react/popover"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { exportToExcel } from "@/lib/excel"
 
 function Checkbox({
   checked,
@@ -522,6 +523,15 @@ function DataTable<TData>({
     })
   }
 
+  function exportBaseName(): string {
+    const name = exportFilename ?? "export"
+    return name.replace(/\.[^.]+$/, "")
+  }
+
+  function exportDate(): string {
+    return new Date().toISOString().slice(0, 10)
+  }
+
   function exportCSV() {
     const rows = getExportRows()
     const columns = getExportColumns()
@@ -541,42 +551,17 @@ function DataTable<TData>({
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `${exportFilename ?? "export"}.csv`
+    a.download = `${exportBaseName()}-${exportDate()}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
 
-  function escapeHtml(value: string): string {
-    return value
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-  }
-
-  function exportExcel() {
+  async function exportExcel() {
     const rows = getExportRows()
     const columns = getExportColumns()
     const headers = buildHeaders(columns)
-    const headerRow = `<tr>${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("")}</tr>`
-    const bodyRows = rows
-      .map(
-        (row) =>
-          `<tr>${columns
-            .map((col) => {
-              const val = row.getValue(col.id)
-              return `<td>${escapeHtml(val == null ? "" : String(val))}</td>`
-            })
-            .join("")}</tr>`,
-      )
-      .join("")
-    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body><table border="1">${headerRow}${bodyRows}</table></body></html>`
-    const blob = new Blob([html], { type: "application/vnd.ms-excel;charset=utf-8;" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `${exportFilename ?? "export"}.xls`
-    a.click()
-    URL.revokeObjectURL(url)
+    const dataRows = rows.map((row) => columns.map((col) => row.getValue(col.id)))
+    await exportToExcel(headers, dataRows, `${exportBaseName()}-${exportDate()}.xlsx`)
   }
 
   return (
