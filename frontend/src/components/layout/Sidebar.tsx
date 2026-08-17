@@ -86,6 +86,7 @@ const produitsSubNav = [
 const stockSubNav = [
   { label: "Vue globale du stock", icon: Warehouse, to: "/dashboard/stock" },
   { label: "Mouvements", icon: History, to: "/dashboard/stock/mouvements" },
+  { label: "Réceptions", icon: PackageCheck, to: "/dashboard/stock/receptions" },
   { label: "Règles de réappro", icon: RefreshCw, to: "/dashboard/stock/reappro" },
   { label: "Stock faible", icon: AlertTriangle, to: "/dashboard/stock?statut=faible" },
 ]
@@ -99,10 +100,10 @@ const entrepotsSubNav = [
 ]
 
 const entreesSubNav = [
-  { label: "Nouvelle réception", icon: ArrowDownToLine, to: "/dashboard/entrees/nouvelle" },
-  { label: "Bons de réception", icon: FileText, to: "/dashboard/entrees/bons" },
-  { label: "Réceptions fournisseurs", icon: PackageCheck, to: "/dashboard/entrees/receptions-fournisseurs" },
-  { label: "Historique des entrées", icon: History, to: "/dashboard/entrees/historique" },
+  { label: "Nouvelle réception", icon: ArrowDownToLine, to: "/dashboard/stock/receptions" },
+  { label: "Bons de réception", icon: FileText, to: "/dashboard/stock/receptions" },
+  { label: "Réceptions fournisseurs", icon: PackageCheck, to: "/dashboard/stock/receptions" },
+  { label: "Historique des entrées", icon: History, to: "/dashboard/mouvements/entrees" },
   { label: "Contrôle qualité", icon: ShieldCheck, to: "/dashboard/entrees/controle-qualite" },
 ]
 
@@ -136,7 +137,7 @@ const achatsSubNav = [
   { label: "Commandes fournisseurs", icon: ShoppingCart, to: "/dashboard/achats/commandes-fournisseurs" },
   { label: "Demandes d'achat", icon: FilePlus, to: "/dashboard/achats/demandes-achat" },
   { label: "Bons de commande", icon: FileText, to: "/dashboard/achats/bons-commande" },
-  { label: "Réceptions", icon: PackageCheck, to: "/dashboard/achats/receptions" },
+  { label: "Réceptions", icon: PackageCheck, to: "/dashboard/stock/receptions" },
   { label: "Factures fournisseurs", icon: Receipt, to: "/dashboard/achats/factures-fournisseurs" },
 ]
 

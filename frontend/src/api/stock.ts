@@ -138,6 +138,59 @@ export type TransferStockPayload = {
   lines: TransferLinePayload[]
 }
 
+export type ReceptionLine = {
+  id: string
+  productId: number
+  product: { id: number; name: string; sku: string }
+  quantity: string
+  unitCost: string
+  lotNumber: string | null
+  expiryDate: string | null
+}
+
+export type Reception = {
+  id: string
+  reference: string
+  date: string
+  description: string | null
+  status: string
+  supplier: { id: string; name: string }
+  warehouse: { id: string; name: string }
+  lineCount: number
+  createdAt: string
+}
+
+export type ReceptionDetail = Reception & {
+  user: { id: string; username: string }
+  lines: ReceptionLine[]
+}
+
+export type ReceptionInputLine = {
+  productId: number
+  quantity: number
+  unitCost: number
+  lotNumber?: string
+  expiryDate?: string
+}
+
+export type ReceptionInput = {
+  warehouseId: string
+  supplierId: string
+  reference?: string
+  date?: string
+  description?: string
+  lines: ReceptionInputLine[]
+}
+
+export type ReceptionQuery = {
+  page?: number
+  limit?: number
+  warehouseId?: string
+  supplierId?: string
+  status?: string
+  search?: string
+}
+
 function buildQuery(params?: Record<string, unknown>): string {
   if (!params) return ""
   const usp = new URLSearchParams()
@@ -213,4 +266,19 @@ export function transferStock(payload: TransferStockPayload) {
     id: string
     lines: { productId: number; from: StockLevel; to: StockLevel }[]
   }>("/stock/transfers", { method: "POST", body: payload })
+}
+
+export function getReceptions(query?: ReceptionQuery) {
+  return api<Paginated<Reception>>(`/stock/receptions${buildQuery(query as any)}`)
+}
+
+export function getReception(id: string) {
+  return api<ReceptionDetail>(`/stock/receptions/${id}`)
+}
+
+export function createReception(payload: ReceptionInput) {
+  return api<ReceptionDetail>("/stock/receptions", {
+    method: "POST",
+    body: payload,
+  })
 }

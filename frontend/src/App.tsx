@@ -28,6 +28,7 @@ import { StockPage } from "@/pages/stock/StockPage"
 import { StockDetailPage } from "@/pages/stock/StockDetailPage"
 import { StockMovesPage } from "@/pages/stock/StockMovesPage"
 import { ReorderRulesPage } from "@/pages/stock/ReorderRulesPage"
+import { ReceptionPage } from "@/pages/stock/ReceptionPage"
 import { TransferPage } from "@/pages/stock/TransferPage"
 import { CategoriesPage } from "@/pages/produits/CategoriesPage"
 import { BrandsPage } from "@/pages/produits/BrandsPage"
@@ -80,6 +81,7 @@ function App() {
             <Route path="stock/:stockId" element={<StockDetailPage />} />
             <Route path="stock/mouvements" element={<StockMovesPage />} />
             <Route path="stock/reappro" element={<ReorderRulesPage />} />
+          <Route path="stock/receptions" element={<ReceptionPage />} />
             <Route path="stock/par-entrepot" element={<div className="text-muted-foreground">Stock par entrepôt</div>} />
             <Route path="stock/disponible" element={<div className="text-muted-foreground">Stock disponible</div>} />
             <Route path="stock/reserve" element={<div className="text-muted-foreground">Stock réservé</div>} />
@@ -106,7 +108,7 @@ function App() {
             <Route path="sorties/retours" element={<div className="text-muted-foreground">Retours</div>} />
             <Route path="sorties/historique" element={<div className="text-muted-foreground">Historique des sorties</div>} />
             <Route path="mouvements" element={<StockMovesPage />} />
-            <Route path="mouvements/entrees" element={<div className="text-muted-foreground">Entrées</div>} />
+            <Route path="mouvements/entrees" element={<ReceptionPage />} />
             <Route path="mouvements/sorties" element={<div className="text-muted-foreground">Sorties</div>} />
             <Route path="mouvements/transferts" element={<div className="text-muted-foreground">Transferts</div>} />
             <Route path="mouvements/ajustements" element={<div className="text-muted-foreground">Ajustements</div>} />

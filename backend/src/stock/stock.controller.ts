@@ -24,6 +24,10 @@ import {
   UpdateReorderRuleDto,
 } from './dto/reorder-rule.dto.js';
 import { TransferStockDto } from './dto/transfer-stock.dto.js';
+import {
+  CreateReceptionDto,
+  ReceptionQueryDto,
+} from './dto/reception.dto.js';
 import { PaginatedStockLevelsDto } from './dto/response/paginated-stock-levels.dto.js';
 import { PaginatedStockMovesDto } from './dto/response/paginated-stock-moves.dto.js';
 import { PaginatedReorderRulesDto } from './dto/response/paginated-reorder-rules.dto.js';
@@ -72,6 +76,30 @@ export class StockController {
   @ApiOperation({ summary: 'Transférer du stock entre entrepôts / zones' })
   transfer(@Body() dto: TransferStockDto, @CurrentUser('id') userId: string) {
     return this.stock.transfer(dto, userId);
+  }
+
+  @Get('receptions')
+  @RequirePermission('stocks.view')
+  @ApiOperation({ summary: 'Liste des réceptions (entrées de stock)' })
+  findReceptions(@Query() query: ReceptionQueryDto) {
+    return this.stock.findReceptions(query);
+  }
+
+  @Post('receptions')
+  @RequirePermission('stocks.adjust')
+  @ApiOperation({ summary: 'Enregistrer une réception fournisseur (entrée de stock)' })
+  reception(
+    @Body() dto: CreateReceptionDto,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.stock.reception(dto, userId);
+  }
+
+  @Get('receptions/:id')
+  @RequirePermission('stocks.view')
+  @ApiOperation({ summary: 'Détail d’une réception' })
+  findReception(@Param('id') id: string) {
+    return this.stock.findReception(id);
   }
 
   @Get()

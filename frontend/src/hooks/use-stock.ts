@@ -10,6 +10,8 @@ export const stockKeys = {
   moves: (query?: stockApi.StockMoveQuery) => ["stock", "moves", query ?? {}] as const,
   reorderRules: (query?: stockApi.ReorderRuleQuery) => ["stock", "reorder-rules", query ?? {}] as const,
   reorderRule: (id: string) => ["stock", "reorder-rule", id] as const,
+  receptions: (query?: stockApi.ReceptionQuery) => ["stock", "receptions", query ?? {}] as const,
+  reception: (id: string) => ["stock", "reception", id] as const,
 }
 
 export function useStockLevelsQuery(query?: stockApi.StockQuery) {
@@ -110,6 +112,32 @@ export function useTransferStockMutation() {
   return useMutation({
     mutationFn: (payload: stockApi.TransferStockPayload) => stockApi.transferStock(payload),
     onSuccess: () => {
+      invalidateStockLists(queryClient)
+    },
+  })
+}
+
+export function useReceptionsQuery(query?: stockApi.ReceptionQuery) {
+  return useQuery({
+    queryKey: stockKeys.receptions(query),
+    queryFn: () => stockApi.getReceptions(query),
+  })
+}
+
+export function useReceptionQuery(id: string) {
+  return useQuery({
+    queryKey: stockKeys.reception(id),
+    queryFn: () => stockApi.getReception(id),
+    enabled: Boolean(id),
+  })
+}
+
+export function useReceiveStockMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: stockApi.ReceptionInput) => stockApi.createReception(payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: stockKeys.receptions() })
       invalidateStockLists(queryClient)
     },
   })

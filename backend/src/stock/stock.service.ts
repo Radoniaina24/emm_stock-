@@ -17,6 +17,10 @@ import { StockQueryDto } from './dto/stock-query.dto.js';
 import { StockMoveQueryDto } from './dto/stock-move-query.dto.js';
 import { TransferStockDto, TransferLineDto } from './dto/transfer-stock.dto.js';
 import {
+  CreateReceptionDto,
+  ReceptionQueryDto,
+} from './dto/reception.dto.js';
+import {
   buildMeta,
   Paginated,
   resolvePagination,
@@ -70,6 +74,33 @@ export type SerializedReorderRule = {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+};
+
+export type SerializedReception = {
+  id: string;
+  reference: string;
+  date: string;
+  description: string | null;
+  status: string;
+  supplier: { id: string; name: string };
+  warehouse: { id: string; name: string };
+  lineCount: number;
+  createdAt: string;
+};
+
+export type SerializedReceptionLine = {
+  id: string;
+  productId: number;
+  product: { id: number; name: string; sku: string };
+  quantity: string;
+  unitCost: string;
+  lotNumber: string | null;
+  expiryDate: string | null;
+};
+
+export type SerializedReceptionDetail = SerializedReception & {
+  user: { id: string; username: string };
+  lines: SerializedReceptionLine[];
 };
 
 @Injectable()
@@ -580,6 +611,214 @@ export class StockService {
       throw new NotFoundException('Règle de réapprovisionnement introuvable');
     await this.prisma.reorderRule.delete({ where: { id } });
     return { id, deleted: true };
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Réceptions (entrées de stock fournisseur)
+  // ─────────────────────────────────────────────────────────────
+
+  private stamp(): string {
+    const d = new Date();
+    const p = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}`;
+  }
+
+  async reception(dto: CreateReceptionDto, userId: string) {
+    if (!dto.lines?.length) {
+      throw new BadRequestException('La réception doit contenir au moins une ligne');
+    }
+
+    const productIds = [...new Set(dto.lines.map((l) => l.productId))];
+    const products = await this.prisma.product.findMany({
+      where: { id: { in: productIds } },
+      select: { id: true },
+    });
+    const knownProducts = new Set(products.map((p) => p.id));
+    for (const id of productIds) {
+      if (!knownProducts.has(Number(id)))
+        throw new NotFoundException(`Produit ${id} introuvable`);
+    }
+
+    const supplier = await this.prisma.supplier.findUnique({
+      where: { id: dto.supplierId },
+    });
+    if (!supplier) throw new NotFoundException('Fournisseur introuvable');
+
+    const warehouse = await this.prisma.warehouse.findUnique({
+      where: { id: dto.warehouseId },
+    });
+    if (!warehouse) throw new NotFoundException('Entrepôt introuvable');
+
+    const entryId = randomUUID();
+    const reference =
+      dto.reference?.trim() ||
+      `REC-${this.stamp()}-${entryId.slice(0, 4).toUpperCase()}`;
+    const date = dto.date ? new Date(dto.date) : new Date();
+
+    const tx: Prisma.PrismaPromise<unknown>[] = [
+      this.prisma.entry.create({
+        data: {
+          id: entryId,
+          reference,
+          date,
+          description: dto.description?.trim() || null,
+          status: 'DONE',
+          supplierId: dto.supplierId,
+          userId,
+          warehouseId: dto.warehouseId,
+        },
+      }),
+    ];
+
+    for (const line of dto.lines) {
+      const qty = new Prisma.Decimal(line.quantity);
+      const unitCost = new Prisma.Decimal(line.unitCost ?? 0);
+      const lotNumber = line.lotNumber?.trim() || null;
+      const expiryDate = line.expiryDate ? new Date(line.expiryDate) : null;
+
+      const existing = await this.prisma.stockLevel.findFirst({
+        where: {
+          productId: line.productId,
+          warehouseId: dto.warehouseId,
+          zoneId: null,
+        },
+      });
+
+      tx.push(
+        existing
+          ? this.prisma.stockLevel.update({
+              where: { id: existing.id },
+              data: { quantityOnHand: { increment: qty } },
+            })
+          : this.prisma.stockLevel.create({
+              data: {
+                id: randomUUID(),
+                productId: line.productId,
+                warehouseId: dto.warehouseId,
+                zoneId: null,
+                quantityOnHand: qty,
+                quantityReserved: new Prisma.Decimal(0),
+              },
+            }),
+      );
+
+      tx.push(
+        this.prisma.entryLine.create({
+          data: {
+            entryId,
+            productId: line.productId,
+            quantity: qty,
+            unitCost,
+            lotNumber,
+            expiryDate,
+          },
+        }),
+      );
+
+      tx.push(
+        this.prisma.stockMove.create({
+          data: {
+            productId: line.productId,
+            warehouseId: dto.warehouseId,
+            userId,
+            type: 'ENTRY' as const,
+            quantity: qty,
+            unitCost,
+            lotNumber,
+            expiryDate,
+            sourceType: 'entry',
+            sourceId: entryId,
+            date,
+          },
+        }),
+      );
+    }
+
+    await this.prisma.$transaction(tx);
+    return this.findReception(entryId);
+  }
+
+  async findReceptions(query: ReceptionQueryDto): Promise<
+    Paginated<SerializedReception>
+  > {
+    const where: Prisma.EntryWhereInput = {};
+    if (query.warehouseId) where.warehouseId = query.warehouseId;
+    if (query.supplierId) where.supplierId = query.supplierId;
+    if (query.status) where.status = query.status as Prisma.EntryWhereInput['status'];
+    if (query.search) {
+      where.OR = [
+        { reference: { contains: query.search } },
+        { description: { contains: query.search } },
+      ];
+    }
+
+    const total = await this.prisma.entry.count({ where });
+    const params = resolvePagination(query);
+    const entries = await this.prisma.entry.findMany({
+      where,
+      orderBy: { date: 'desc' },
+      skip: params.skip,
+      take: params.take,
+      include: {
+        supplier: { select: { id: true, name: true } },
+        warehouse: { select: { id: true, name: true } },
+        lines: { select: { id: true } },
+      },
+    });
+
+    return {
+      items: entries.map((e) => ({
+        id: e.id,
+        reference: e.reference,
+        date: e.date.toISOString(),
+        description: e.description,
+        status: e.status,
+        supplier: e.supplier,
+        warehouse: e.warehouse,
+        lineCount: e.lines.length,
+        createdAt: e.createdAt.toISOString(),
+      })),
+      meta: buildMeta(total, params),
+    };
+  }
+
+  async findReception(id: string): Promise<SerializedReceptionDetail> {
+    const entry = await this.prisma.entry.findUnique({
+      where: { id },
+      include: {
+        supplier: { select: { id: true, name: true } },
+        warehouse: { select: { id: true, name: true } },
+        user: { select: { id: true, username: true } },
+        lines: {
+          include: {
+            product: { select: { id: true, name: true, sku: true } },
+          },
+        },
+      },
+    });
+    if (!entry) throw new NotFoundException('Réception introuvable');
+
+    return {
+      id: entry.id,
+      reference: entry.reference,
+      date: entry.date.toISOString(),
+      description: entry.description,
+      status: entry.status,
+      supplier: entry.supplier,
+      warehouse: entry.warehouse,
+      user: entry.user,
+      createdAt: entry.createdAt.toISOString(),
+      lineCount: entry.lines.length,
+      lines: entry.lines.map((l) => ({
+        id: l.id,
+        productId: l.productId,
+        product: l.product,
+        quantity: l.quantity.toString(),
+        unitCost: l.unitCost.toString(),
+        lotNumber: l.lotNumber,
+        expiryDate: l.expiryDate ? l.expiryDate.toISOString() : null,
+      })),
+    };
   }
 
   // ─────────────────────────────────────────────────────────────
