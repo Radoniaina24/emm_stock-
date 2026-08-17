@@ -1,8 +1,8 @@
 import { differenceInDays, format, isValid } from "date-fns"
 import { fr } from "date-fns/locale"
 import { CalendarDays, ChevronDown, Eraser, X } from "lucide-react"
-import { useCallback, useState } from "react"
-import { Popover } from "@base-ui/react/popover"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import type { DateRange } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
@@ -67,6 +67,14 @@ export function DatePicker({
   ...calendarProps
 }: DatePickerProps) {
   const [open, setOpen] = useState(false)
+  const [panelPos, setPanelPos] = useState<{
+    top?: number
+    bottom?: number
+    left: number
+    width: number
+  } | null>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
 
   const selected =
     "selected" in calendarProps ? calendarProps.selected : undefined
@@ -100,170 +108,241 @@ export function DatePicker({
     [onSelect],
   )
 
-  return (
-    <Popover.Root open={open} onOpenChange={setOpen}>
-      <Popover.Trigger
-        render={
+  useEffect(() => {
+    if (!open) {
+      setPanelPos(null)
+      return
+    }
+
+    function measure() {
+      const el = triggerRef.current
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      const gap = 8
+      const spaceBelow = window.innerHeight - rect.bottom - gap
+      const spaceAbove = rect.top - gap
+      const up = spaceBelow < 340 && spaceAbove > spaceBelow
+      if (up) {
+        setPanelPos({
+          bottom: window.innerHeight - rect.top + gap,
+          left: rect.left,
+          width: rect.width,
+        })
+      } else {
+        setPanelPos({
+          top: rect.bottom + gap,
+          left: rect.left,
+          width: rect.width,
+        })
+      }
+    }
+
+    measure()
+    window.addEventListener("resize", measure)
+    window.addEventListener("scroll", measure, true)
+    return () => {
+      window.removeEventListener("resize", measure)
+      window.removeEventListener("scroll", measure, true)
+    }
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+
+    function handlePointerDown(event: MouseEvent | TouchEvent) {
+      const target = event.target as Node
+      if (
+        (triggerRef.current && triggerRef.current.contains(target)) ||
+        (panelRef.current && panelRef.current.contains(target))
+      ) {
+        return
+      }
+      setOpen(false)
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false)
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown)
+    document.addEventListener("keydown", handleKeyDown)
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown)
+      document.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [open])
+
+  const panel = (
+    <div
+      ref={panelRef}
+      style={{
+        position: "fixed",
+        top: panelPos?.top,
+        bottom: panelPos?.bottom,
+        left: panelPos?.left,
+        width: panelPos?.width,
+        zIndex: 60,
+      }}
+      className="overflow-hidden rounded-2xl border border-border/60 bg-popover text-popover-foreground shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
+    >
+      <div className="border-b border-border/50 bg-muted/30 px-4 py-3">
+        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          {isRange ? "Période" : "Calendrier"}
+        </p>
+        <p className="mt-0.5 text-sm font-semibold capitalize text-foreground">
+          {hasValue ? label : placeholder}
+        </p>
+      </div>
+
+      <div className="flex">
+        {isRange && presets && presets.length > 0 ? (
+          <div className="flex w-36 shrink-0 flex-col gap-0.5 border-r border-border/50 bg-muted/20 p-2">
+            <span className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+              Raccourcis
+            </span>
+            {presets.map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                onClick={() => applyPreset(preset)}
+                className="rounded-lg px-2.5 py-1.5 text-left text-sm text-muted-foreground transition-colors hover:bg-background hover:text-foreground hover:shadow-xs"
+              >
+                {preset.label}
+              </button>
+            ))}
+            {range?.from ? (
+              <button
+                type="button"
+                onClick={() => {
+                  clear()
+                  setOpen(false)
+                }}
+                className="mt-auto rounded-lg px-2.5 py-1.5 text-left text-sm text-muted-foreground/70 transition-colors hover:bg-background hover:text-foreground"
+              >
+                Effacer
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        <div className="p-2">
+          <Calendar
+            {...calendarProps}
+            locale={calendarProps.locale ?? fr}
+            onDayClick={(day, modifiers, e) => {
+              calendarProps.onDayClick?.(day, modifiers, e)
+              if (!isRange) setOpen(false)
+            }}
+            onSelect={(value, ...rest) => {
+              ;(
+                calendarProps as {
+                  onSelect?: (...args: unknown[]) => void
+                }
+              ).onSelect?.(value, ...rest)
+              if (
+                isRange &&
+                value &&
+                typeof value === "object" &&
+                "from" in (value as DateRange) &&
+                "to" in (value as DateRange)
+              ) {
+                const r = value as DateRange
+                if (r.from && r.to) setOpen(false)
+              }
+            }}
+          />
+        </div>
+      </div>
+
+      {!isRange && showFooterActions ? (
+        <div className="flex items-center justify-between gap-2 border-t border-border/50 bg-muted/20 px-3 py-2.5">
           <Button
             type="button"
-            variant="outline"
-            disabled={calendarProps.disabled === true}
-            className={cn(
-              "group h-10 w-full justify-start gap-2.5 rounded-xl border-border/70 bg-background px-3 font-normal shadow-none transition-all",
-              "hover:border-primary/30 hover:bg-muted/40",
-              "data-pressed:border-primary/40 data-pressed:ring-3 data-pressed:ring-primary/15",
-              !hasValue && "text-muted-foreground",
-              className,
-            )}
+            variant="ghost"
+            size="sm"
+            className="h-8 gap-1.5 text-muted-foreground"
+            onClick={() => {
+              clear()
+              setOpen(false)
+            }}
+            disabled={!singleDate}
           >
-            <span
-              className={cn(
-                "flex size-7 shrink-0 items-center justify-center rounded-lg transition-colors",
-                hasValue
-                  ? "bg-primary/10 text-primary"
-                  : "bg-muted text-muted-foreground",
-              )}
-            >
-              <CalendarDays className="size-3.5" />
-            </span>
-            <span className="flex min-w-0 flex-1 flex-col items-start text-left leading-tight">
-              <span className="w-full truncate text-sm font-medium capitalize">
-                {label}
-              </span>
-              {detail && hasValue ? (
-                <span className="truncate text-[11px] capitalize text-muted-foreground">
-                  {detail}
-                </span>
-              ) : null}
-            </span>
-            {hasValue ? (
-              <span
-                role="button"
-                tabIndex={-1}
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  clear()
-                }}
-                className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground/60 opacity-0 transition-all hover:bg-muted hover:text-foreground group-hover:opacity-100"
-                aria-label="Effacer la date"
-              >
-                <X className="size-3.5" />
-              </span>
-            ) : null}
-            <ChevronDown className="size-3.5 shrink-0 text-muted-foreground/50 transition-transform duration-200 [[data-popup-open]_&]:rotate-180" />
+            <Eraser className="size-3.5" />
+            Effacer
           </Button>
-        }
-      />
-
-      <Popover.Portal>
-        <Popover.Positioner sideOffset={8} align="start">
-          <Popover.Popup
-            className={cn(
-              "z-50 origin-[var(--transform-origin)] overflow-hidden rounded-2xl border border-border/60 bg-popover text-popover-foreground shadow-[0_8px_30px_rgba(0,0,0,0.08)] outline-none",
-              "transition-[transform,opacity] duration-150 ease-out",
-              "data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
-            )}
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="h-8"
+            onClick={selectToday}
           >
-            <div className="border-b border-border/50 bg-muted/30 px-4 py-3">
-              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                {isRange ? "Période" : "Calendrier"}
-              </p>
-              <p className="mt-0.5 text-sm font-semibold capitalize text-foreground">
-                {hasValue ? label : placeholder}
-              </p>
-            </div>
+            Aujourd&apos;hui
+          </Button>
+        </div>
+      ) : null}
+    </div>
+  )
 
-            <div className="flex">
-              {isRange && presets && presets.length > 0 ? (
-                <div className="flex w-36 shrink-0 flex-col gap-0.5 border-r border-border/50 bg-muted/20 p-2">
-                  <span className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
-                    Raccourcis
-                  </span>
-                  {presets.map((preset) => (
-                    <button
-                      key={preset.label}
-                      type="button"
-                      onClick={() => applyPreset(preset)}
-                      className="rounded-lg px-2.5 py-1.5 text-left text-sm text-muted-foreground transition-colors hover:bg-background hover:text-foreground hover:shadow-xs"
-                    >
-                      {preset.label}
-                    </button>
-                  ))}
-                  {range?.from ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        clear()
-                        setOpen(false)
-                      }}
-                      className="mt-auto rounded-lg px-2.5 py-1.5 text-left text-sm text-muted-foreground/70 transition-colors hover:bg-background hover:text-foreground"
-                    >
-                      Effacer
-                    </button>
-                  ) : null}
-                </div>
-              ) : null}
+  return (
+    <>
+      <Button
+        ref={triggerRef}
+        type="button"
+        variant="outline"
+        disabled={calendarProps.disabled === true}
+        onClick={() => setOpen((prev) => !prev)}
+        className={cn(
+          "group h-10 w-full justify-start gap-2.5 rounded-xl border-border/70 bg-background px-3 font-normal shadow-none transition-all",
+          "hover:border-primary/30 hover:bg-muted/40",
+          "data-pressed:border-primary/40 data-pressed:ring-3 data-pressed:ring-primary/15",
+          !hasValue && "text-muted-foreground",
+          className,
+        )}
+      >
+        <span
+          className={cn(
+            "flex size-7 shrink-0 items-center justify-center rounded-lg transition-colors",
+            hasValue
+              ? "bg-primary/10 text-primary"
+              : "bg-muted text-muted-foreground",
+          )}
+        >
+          <CalendarDays className="size-3.5" />
+        </span>
+        <span className="flex min-w-0 flex-1 flex-col items-start text-left leading-tight">
+          <span className="w-full truncate text-sm font-medium capitalize">
+            {label}
+          </span>
+          {detail && hasValue ? (
+            <span className="truncate text-[11px] capitalize text-muted-foreground">
+              {detail}
+            </span>
+          ) : null}
+        </span>
+        {hasValue ? (
+          <span
+            role="button"
+            tabIndex={-1}
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              clear()
+            }}
+            className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground/60 opacity-0 transition-all hover:bg-muted hover:text-foreground group-hover:opacity-100"
+            aria-label="Effacer la date"
+          >
+            <X className="size-3.5" />
+          </span>
+        ) : null}
+        <ChevronDown
+          className={cn(
+            "size-3.5 shrink-0 text-muted-foreground/50 transition-transform duration-200",
+            open && "rotate-180",
+          )}
+        />
+      </Button>
 
-              <div className="p-2">
-                <Calendar
-                  {...calendarProps}
-                  locale={calendarProps.locale ?? fr}
-                  onDayClick={(day, modifiers, e) => {
-                    calendarProps.onDayClick?.(day, modifiers, e)
-                    if (!isRange) setOpen(false)
-                  }}
-                  onSelect={(value, ...rest) => {
-                    ;(
-                      calendarProps as {
-                        onSelect?: (...args: unknown[]) => void
-                      }
-                    ).onSelect?.(value, ...rest)
-                    if (
-                      isRange &&
-                      value &&
-                      typeof value === "object" &&
-                      "from" in (value as DateRange) &&
-                      "to" in (value as DateRange)
-                    ) {
-                      const r = value as DateRange
-                      if (r.from && r.to) setOpen(false)
-                    }
-                  }}
-                />
-              </div>
-            </div>
-
-            {!isRange && showFooterActions ? (
-              <div className="flex items-center justify-between gap-2 border-t border-border/50 bg-muted/20 px-3 py-2.5">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 gap-1.5 text-muted-foreground"
-                  onClick={() => {
-                    clear()
-                    setOpen(false)
-                  }}
-                  disabled={!singleDate}
-                >
-                  <Eraser className="size-3.5" />
-                  Effacer
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  className="h-8"
-                  onClick={selectToday}
-                >
-                  Aujourd&apos;hui
-                </Button>
-              </div>
-            ) : null}
-          </Popover.Popup>
-        </Popover.Positioner>
-      </Popover.Portal>
-    </Popover.Root>
+      {open && panelPos && createPortal(panel, document.body)}
+    </>
   )
 }
