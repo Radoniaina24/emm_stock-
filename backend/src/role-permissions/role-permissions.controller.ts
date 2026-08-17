@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Put,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, Put, Body, UseGuards } from '@nestjs/common';
 import {
   ApiCookieAuth,
   ApiOkResponse,
@@ -33,10 +26,7 @@ export class RolePermissionsController {
   @Put()
   @ApiOperation({ summary: 'Synchroniser les permissions du rôle' })
   @ApiOkResponse({ description: 'Permissions synchronisées' })
-  sync(
-    @Param('roleId') roleId: string,
-    @Body() dto: SyncRolePermissionsDto,
-  ) {
+  sync(@Param('roleId') roleId: string, @Body() dto: SyncRolePermissionsDto) {
     return this.service.sync(roleId, dto.permissionIds);
   }
 }

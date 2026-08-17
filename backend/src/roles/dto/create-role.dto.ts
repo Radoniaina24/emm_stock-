@@ -12,7 +12,9 @@ export class CreateRoleDto {
   @MinLength(2)
   code: string;
 
-  @ApiPropertyOptional({ example: 'Accès complet à toutes les fonctionnalités' })
+  @ApiPropertyOptional({
+    example: 'Accès complet à toutes les fonctionnalités',
+  })
   @IsOptional()
   @IsString()
   description?: string;

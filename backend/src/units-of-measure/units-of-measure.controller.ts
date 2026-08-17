@@ -28,7 +28,7 @@ export class UnitsOfMeasureController {
   constructor(private readonly units: UnitsOfMeasureService) {}
 
   @Post()
-  @ApiOperation({ summary: "Créer une unité de mesure" })
+  @ApiOperation({ summary: 'Créer une unité de mesure' })
   @ApiOkResponse({ description: 'Unité de mesure créée' })
   create(@Body() dto: CreateUnitOfMeasureDto) {
     return this.units.create(dto);
@@ -49,7 +49,7 @@ export class UnitsOfMeasureController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: "Modifier une unité de mesure" })
+  @ApiOperation({ summary: 'Modifier une unité de mesure' })
   @ApiOkResponse({ description: 'Unité de mesure modifiée' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -59,7 +59,7 @@ export class UnitsOfMeasureController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: "Supprimer une unité de mesure" })
+  @ApiOperation({ summary: 'Supprimer une unité de mesure' })
   @ApiOkResponse({ description: 'Unité de mesure supprimée' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.units.remove(id);

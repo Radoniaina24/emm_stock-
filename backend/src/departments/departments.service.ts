@@ -15,7 +15,8 @@ export class DepartmentsService {
     const existing = await this.prisma.department.findUnique({
       where: { code: dto.code },
     });
-    if (existing) throw new ConflictException('Ce code département existe déjà');
+    if (existing)
+      throw new ConflictException('Ce code département existe déjà');
 
     return this.prisma.department.create({ data: dto });
   }
@@ -44,7 +45,8 @@ export class DepartmentsService {
       const existing = await this.prisma.department.findUnique({
         where: { code: dto.code },
       });
-      if (existing) throw new ConflictException('Ce code département existe déjà');
+      if (existing)
+        throw new ConflictException('Ce code département existe déjà');
     }
 
     return this.prisma.department.update({ where: { id }, data: dto });

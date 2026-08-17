@@ -44,7 +44,8 @@ export class PermissionsService {
       const existing = await this.prisma.permission.findUnique({
         where: { code: dto.code },
       });
-      if (existing) throw new ConflictException('Ce code permission existe déjà');
+      if (existing)
+        throw new ConflictException('Ce code permission existe déjà');
     }
 
     return this.prisma.permission.update({ where: { id }, data: dto });

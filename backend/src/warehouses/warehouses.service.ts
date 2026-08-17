@@ -48,7 +48,7 @@ export class WarehousesService {
 
     if (warehouse._count.zones > 0 || warehouse._count.inventories > 0) {
       throw new BadRequestException(
-        'Impossible de supprimer un entrepôt avec des zones ou inventaires associés'
+        'Impossible de supprimer un entrepôt avec des zones ou inventaires associés',
       );
     }
 

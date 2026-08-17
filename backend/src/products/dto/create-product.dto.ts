@@ -110,7 +110,10 @@ export class CreateProductDto {
   @Min(0)
   costPrice?: number;
 
-  @ApiPropertyOptional({ example: 39.99, description: 'Prix de vente unitaire' })
+  @ApiPropertyOptional({
+    example: 39.99,
+    description: 'Prix de vente unitaire',
+  })
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 4 })
   @Min(0)
@@ -127,12 +130,18 @@ export class CreateProductDto {
   @IsIn(TRACKING_TYPES, { message: 'Type de traçabilité invalide' })
   tracking?: TrackingType;
 
-  @ApiPropertyOptional({ example: false, description: 'Produit à date de péremption' })
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Produit à date de péremption',
+  })
   @IsOptional()
   @IsBoolean()
   hasExpiry?: boolean;
 
-  @ApiPropertyOptional({ example: 365, description: 'Durée de conservation en jours' })
+  @ApiPropertyOptional({
+    example: 365,
+    description: 'Durée de conservation en jours',
+  })
   @IsOptional()
   @IsInt()
   @Min(1)

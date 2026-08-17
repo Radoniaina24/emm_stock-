@@ -49,7 +49,7 @@ export class ProductBarcodesController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: "Modifier un code-barres" })
+  @ApiOperation({ summary: 'Modifier un code-barres' })
   @ApiOkResponse({ description: 'Code-barres modifié' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -59,7 +59,7 @@ export class ProductBarcodesController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: "Supprimer un code-barres" })
+  @ApiOperation({ summary: 'Supprimer un code-barres' })
   @ApiOkResponse({ description: 'Code-barres supprimé' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.barcodes.remove(id);

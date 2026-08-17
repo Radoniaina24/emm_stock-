@@ -16,7 +16,10 @@ export class CreateProductSupplierDto {
   @Min(1)
   productId: number;
 
-  @ApiProperty({ example: 'clx123abc', description: 'Identifiant du fournisseur' })
+  @ApiProperty({
+    example: 'clx123abc',
+    description: 'Identifiant du fournisseur',
+  })
   @IsString()
   @IsNotEmpty({ message: 'Le fournisseur est obligatoire' })
   supplierId: string;
@@ -32,19 +35,28 @@ export class CreateProductSupplierDto {
   @Min(0, { message: 'Le prix ne peut être négatif' })
   price: number;
 
-  @ApiPropertyOptional({ example: 1, description: 'Quantité minimale de commande' })
+  @ApiPropertyOptional({
+    example: 1,
+    description: 'Quantité minimale de commande',
+  })
   @IsOptional()
   @IsNumber()
   @Min(0, { message: 'La quantité minimale ne peut être négative' })
   minQty?: number;
 
-  @ApiPropertyOptional({ example: 14, description: 'Délai de livraison (jours)' })
+  @ApiPropertyOptional({
+    example: 14,
+    description: 'Délai de livraison (jours)',
+  })
   @IsOptional()
   @IsInt()
   @Min(0, { message: 'Le délai de livraison ne peut être négatif' })
   leadTimeDays?: number;
 
-  @ApiPropertyOptional({ example: true, description: 'Fournisseur préféré pour ce produit' })
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Fournisseur préféré pour ce produit',
+  })
   @IsOptional()
   @IsBoolean()
   isPreferred?: boolean;

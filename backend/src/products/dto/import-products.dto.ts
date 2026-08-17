@@ -1,4 +1,4 @@
-import { Type } from "class-transformer"
+import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
@@ -9,83 +9,83 @@ import {
   IsOptional,
   IsString,
   ValidateNested,
-} from "class-validator"
+} from 'class-validator';
 
 export class ImportProductRowDto {
   @IsString()
-  sku: string
+  sku: string;
 
   @IsString()
-  name: string
-
-  @IsOptional()
-  @IsString()
-  slug?: string
+  name: string;
 
   @IsOptional()
   @IsString()
-  description?: string
+  slug?: string;
 
   @IsOptional()
-  @IsEnum(["STORABLE", "CONSUMABLE", "SERVICE"])
-  type?: "STORABLE" | "CONSUMABLE" | "SERVICE"
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsEnum(['STORABLE', 'CONSUMABLE', 'SERVICE'])
+  type?: 'STORABLE' | 'CONSUMABLE' | 'SERVICE';
 
   @IsOptional()
   @IsInt()
-  brandId?: number
+  brandId?: number;
 
   @IsOptional()
   @IsInt()
-  categoryId?: number
+  categoryId?: number;
 
   @IsInt()
-  unitId: number
+  unitId: number;
 
   @IsOptional()
   @IsNumber()
-  costPrice?: number
+  costPrice?: number;
 
   @IsOptional()
   @IsNumber()
-  salePrice?: number
+  salePrice?: number;
 
   @IsOptional()
   @IsNumber()
-  taxRate?: number
+  taxRate?: number;
 
   @IsOptional()
-  @IsEnum(["NONE", "LOT", "SERIAL"])
-  tracking?: "NONE" | "LOT" | "SERIAL"
+  @IsEnum(['NONE', 'LOT', 'SERIAL'])
+  tracking?: 'NONE' | 'LOT' | 'SERIAL';
 
   @IsOptional()
   @IsBoolean()
-  hasExpiry?: boolean
+  hasExpiry?: boolean;
 
   @IsOptional()
   @IsNumber()
-  weight?: number
+  weight?: number;
 
   @IsOptional()
   @IsNumber()
-  length?: number
+  length?: number;
 
   @IsOptional()
   @IsNumber()
-  width?: number
+  width?: number;
 
   @IsOptional()
   @IsNumber()
-  height?: number
+  height?: number;
 
   @IsOptional()
   @IsBoolean()
-  isActive?: boolean
+  isActive?: boolean;
 }
 
 export class ImportProductsDto {
   @IsArray()
-  @ArrayMinSize(1, { message: "Aucune ligne à importer" })
+  @ArrayMinSize(1, { message: 'Aucune ligne à importer' })
   @ValidateNested({ each: true })
   @Type(() => ImportProductRowDto)
-  rows: ImportProductRowDto[]
+  rows: ImportProductRowDto[];
 }

@@ -30,7 +30,8 @@ export class CreateUserDto {
   @MinLength(4)
   @MaxLength(50)
   @Matches(/^[a-zA-Z0-9_.]+$/, {
-    message: "Le nom d'utilisateur ne peut contenir que des lettres, chiffres, _ et .",
+    message:
+      "Le nom d'utilisateur ne peut contenir que des lettres, chiffres, _ et .",
   })
   username: string;
 
@@ -42,15 +43,24 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(8)
-  @Matches(/[A-Z]/, { message: 'Le mot de passe doit contenir au moins une majuscule' })
-  @Matches(/[a-z]/, { message: 'Le mot de passe doit contenir au moins une minuscule' })
-  @Matches(/[0-9]/, { message: 'Le mot de passe doit contenir au moins un chiffre' })
+  @Matches(/[A-Z]/, {
+    message: 'Le mot de passe doit contenir au moins une majuscule',
+  })
+  @Matches(/[a-z]/, {
+    message: 'Le mot de passe doit contenir au moins une minuscule',
+  })
+  @Matches(/[0-9]/, {
+    message: 'Le mot de passe doit contenir au moins un chiffre',
+  })
   @Matches(/[!@#$%^&*(),.?":{}|<>]/, {
     message: 'Le mot de passe doit contenir au moins un caractère spécial',
   })
   password: string;
 
-  @ApiProperty({ example: 'EMP-2026-0001', description: 'Généré automatiquement si non fourni' })
+  @ApiProperty({
+    example: 'EMP-2026-0001',
+    description: 'Généré automatiquement si non fourni',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(30)

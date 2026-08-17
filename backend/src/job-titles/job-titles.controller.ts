@@ -41,7 +41,7 @@ export class JobTitlesController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Détail d\'un titre' })
+  @ApiOperation({ summary: "Détail d'un titre" })
   @ApiOkResponse({ description: 'Titre trouvé' })
   findOne(@Param('id') id: string) {
     return this.jobTitles.findOne(id);

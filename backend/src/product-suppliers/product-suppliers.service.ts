@@ -29,7 +29,9 @@ let _cuidCounter = 0;
 function cuid(): string {
   const timestamp = Date.now().toString(36).padStart(8, '0');
   const random = Math.random().toString(36).substring(2, 12).padEnd(10, '0');
-  const counter = (_cuidCounter = _cuidCounter + 1).toString(36).padStart(4, '0');
+  const counter = (_cuidCounter = _cuidCounter + 1)
+    .toString(36)
+    .padStart(4, '0');
   return `c${timestamp}${random}${counter}`;
 }
 
@@ -79,7 +81,8 @@ export class ProductSuppliersService {
       where: { id },
       include: this.include(),
     });
-    if (!link) throw new NotFoundException('Lien produit/fournisseur introuvable');
+    if (!link)
+      throw new NotFoundException('Lien produit/fournisseur introuvable');
     return this.serialize(link);
   }
 
@@ -116,7 +119,9 @@ export class ProductSuppliersService {
       supplierSku: dto.supplierSku?.trim() || null,
       price: new Prisma.Decimal(dto.price),
       minQty:
-        dto.minQty !== undefined ? new Prisma.Decimal(dto.minQty) : new Prisma.Decimal(1),
+        dto.minQty !== undefined
+          ? new Prisma.Decimal(dto.minQty)
+          : new Prisma.Decimal(1),
       leadTimeDays: dto.leadTimeDays ?? null,
       isPreferred,
     };
@@ -156,7 +161,8 @@ export class ProductSuppliersService {
       where: { id },
       select: { id: true, productId: true },
     });
-    if (!existing) throw new NotFoundException('Lien produit/fournisseur introuvable');
+    if (!existing)
+      throw new NotFoundException('Lien produit/fournisseur introuvable');
 
     const data: Prisma.ProductSupplierUpdateInput = {};
     if (dto.supplierSku !== undefined) {
@@ -193,7 +199,8 @@ export class ProductSuppliersService {
       where: { id },
       select: { id: true },
     });
-    if (!existing) throw new NotFoundException('Lien produit/fournisseur introuvable');
+    if (!existing)
+      throw new NotFoundException('Lien produit/fournisseur introuvable');
 
     await this.prisma.productSupplier.delete({ where: { id } });
     return { id };

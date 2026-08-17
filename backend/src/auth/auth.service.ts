@@ -32,7 +32,9 @@ export class AuthService {
     const names = splitDisplayName(dto.name);
     const employeeCode = await generateEmployeeCode(this.prisma);
     const username = dto.email.split('@')[0];
-    const defaultRole = await this.prisma.role.findFirst({ where: { code: 'VIEWER' } });
+    const defaultRole = await this.prisma.role.findFirst({
+      where: { code: 'VIEWER' },
+    });
 
     const user = await this.prisma.user.create({
       data: {

@@ -12,7 +12,7 @@ export class CreateJobTitleDto {
   @MinLength(2)
   code: string;
 
-  @ApiPropertyOptional({ example: 'Gère la comptabilité de l\'entreprise' })
+  @ApiPropertyOptional({ example: "Gère la comptabilité de l'entreprise" })
   @IsOptional()
   @IsString()
   description?: string;

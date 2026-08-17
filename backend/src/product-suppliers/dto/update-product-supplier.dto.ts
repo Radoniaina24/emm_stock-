@@ -39,7 +39,10 @@ export class UpdateProductSupplierDto {
   @Min(0, { message: 'Le délai de livraison ne peut être négatif' })
   leadTimeDays?: number;
 
-  @ApiPropertyOptional({ example: true, description: 'Définir comme fournisseur préféré' })
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Définir comme fournisseur préféré',
+  })
   @IsOptional()
   @IsBoolean()
   isPreferred?: boolean;

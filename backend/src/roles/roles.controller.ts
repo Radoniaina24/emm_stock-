@@ -41,7 +41,7 @@ export class RolesController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Détail d\'un rôle' })
+  @ApiOperation({ summary: "Détail d'un rôle" })
   @ApiOkResponse({ description: 'Rôle trouvé' })
   findOne(@Param('id') id: string) {
     return this.roles.findOne(id);

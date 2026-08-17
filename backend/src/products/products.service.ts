@@ -26,7 +26,9 @@ export class ProductsService {
       category: { select: { id: true, name: true, slug: true } },
       brand: { select: { id: true, name: true, slug: true } },
       unit: { select: { id: true, name: true, code: true, symbol: true } },
-      purchaseUnit: { select: { id: true, name: true, code: true, symbol: true } },
+      purchaseUnit: {
+        select: { id: true, name: true, code: true, symbol: true },
+      },
       saleUnit: { select: { id: true, name: true, code: true, symbol: true } },
       images: {
         where: { isPrimary: true },
@@ -37,9 +39,16 @@ export class ProductsService {
     };
   }
 
-  private withImage<T extends { images?: Array<{ isPrimary?: boolean; id: number; url: string; alt: string | null }> }>(
-    item: T,
-  ) {
+  private withImage<
+    T extends {
+      images?: Array<{
+        isPrimary?: boolean;
+        id: number;
+        url: string;
+        alt: string | null;
+      }>;
+    },
+  >(item: T) {
     const { images, ...rest } = item;
     const image = images?.find((i) => i.isPrimary) ?? images?.[0] ?? null;
     return { ...rest, image };
@@ -60,7 +69,10 @@ export class ProductsService {
     }
   }
 
-  private async assertSkuAvailable(sku: string, ignoreId?: number): Promise<void> {
+  private async assertSkuAvailable(
+    sku: string,
+    ignoreId?: number,
+  ): Promise<void> {
     const existing = await this.prisma.product.findUnique({
       where: { sku },
       select: { id: true },
@@ -79,27 +91,47 @@ export class ProductsService {
       {
         id: dto.brandId,
         message: "La marque sélectionnée n'existe pas",
-        check: () => this.prisma.brand.findUnique({ where: { id: dto.brandId! }, select: { id: true } }),
+        check: () =>
+          this.prisma.brand.findUnique({
+            where: { id: dto.brandId! },
+            select: { id: true },
+          }),
       },
       {
         id: dto.categoryId,
         message: "La catégorie sélectionnée n'existe pas",
-        check: () => this.prisma.category.findUnique({ where: { id: dto.categoryId! }, select: { id: true } }),
+        check: () =>
+          this.prisma.category.findUnique({
+            where: { id: dto.categoryId! },
+            select: { id: true },
+          }),
       },
       {
         id: dto.unitId,
         message: "L'unité de mesure sélectionnée n'existe pas",
-        check: () => this.prisma.unitOfMeasure.findUnique({ where: { id: dto.unitId! }, select: { id: true } }),
+        check: () =>
+          this.prisma.unitOfMeasure.findUnique({
+            where: { id: dto.unitId! },
+            select: { id: true },
+          }),
       },
       {
         id: dto.purchaseUnitId,
         message: "L'unité d'achat sélectionnée n'existe pas",
-        check: () => this.prisma.unitOfMeasure.findUnique({ where: { id: dto.purchaseUnitId! }, select: { id: true } }),
+        check: () =>
+          this.prisma.unitOfMeasure.findUnique({
+            where: { id: dto.purchaseUnitId! },
+            select: { id: true },
+          }),
       },
       {
         id: dto.saleUnitId,
         message: "L'unité de vente sélectionnée n'existe pas",
-        check: () => this.prisma.unitOfMeasure.findUnique({ where: { id: dto.saleUnitId! }, select: { id: true } }),
+        check: () =>
+          this.prisma.unitOfMeasure.findUnique({
+            where: { id: dto.saleUnitId! },
+            select: { id: true },
+          }),
       },
     ];
 
@@ -157,9 +189,7 @@ export class ProductsService {
     return products.map((product) => this.withImage(product));
   }
 
-  async importProducts(
-    rows: ImportProductRowDto[],
-  ): Promise<{
+  async importProducts(rows: ImportProductRowDto[]): Promise<{
     total: number;
     created: number;
     updated: number;
@@ -341,14 +371,17 @@ export class ProductsService {
     if (dto.name !== undefined) data.name = dto.name;
     if (slug !== undefined) data.slug = slug;
     if (dto.description !== undefined) data.description = dto.description;
-    if (dto.descriptionPurchase !== undefined) data.descriptionPurchase = dto.descriptionPurchase;
-    if (dto.descriptionSale !== undefined) data.descriptionSale = dto.descriptionSale;
+    if (dto.descriptionPurchase !== undefined)
+      data.descriptionPurchase = dto.descriptionPurchase;
+    if (dto.descriptionSale !== undefined)
+      data.descriptionSale = dto.descriptionSale;
     if (dto.internalNotes !== undefined) data.internalNotes = dto.internalNotes;
     if (dto.type !== undefined) data.type = dto.type;
     if (dto.brandId !== undefined) data.brandId = dto.brandId;
     if (dto.categoryId !== undefined) data.categoryId = dto.categoryId;
     if (dto.unitId !== undefined) data.unitId = dto.unitId;
-    if (dto.purchaseUnitId !== undefined) data.purchaseUnitId = dto.purchaseUnitId;
+    if (dto.purchaseUnitId !== undefined)
+      data.purchaseUnitId = dto.purchaseUnitId;
     if (dto.saleUnitId !== undefined) data.saleUnitId = dto.saleUnitId;
     if (dto.costPrice !== undefined) data.costPrice = dto.costPrice;
     if (dto.salePrice !== undefined) data.salePrice = dto.salePrice;
@@ -395,7 +428,9 @@ export class ProductsService {
   }
 
   async uploadImage(productId: number, file: Express.Multer.File) {
-    const product = await this.prisma.product.findUnique({ where: { id: productId } });
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+    });
     if (!product) throw new NotFoundException('Produit introuvable');
     if (!file) throw new BadRequestException('Aucun fichier fourni');
     if (!ALLOWED_MIME.has(file.mimetype)) {
@@ -436,7 +471,9 @@ export class ProductsService {
   }
 
   async updateImage(imageId: number, dto: UpdateProductImageDto) {
-    const image = await this.prisma.productImage.findUnique({ where: { id: imageId } });
+    const image = await this.prisma.productImage.findUnique({
+      where: { id: imageId },
+    });
     if (!image) throw new NotFoundException('Image introuvable');
 
     const data: Record<string, unknown> = {};
@@ -445,7 +482,11 @@ export class ProductsService {
 
     if (dto.isPrimary) {
       await this.prisma.productImage.updateMany({
-        where: { productId: image.productId, isPrimary: true, NOT: { id: imageId } },
+        where: {
+          productId: image.productId,
+          isPrimary: true,
+          NOT: { id: imageId },
+        },
         data: { isPrimary: false },
       });
     }
@@ -457,7 +498,9 @@ export class ProductsService {
   }
 
   async deleteImage(imageId: number) {
-    const image = await this.prisma.productImage.findUnique({ where: { id: imageId } });
+    const image = await this.prisma.productImage.findUnique({
+      where: { id: imageId },
+    });
     if (!image) throw new NotFoundException('Image introuvable');
 
     this.removeImageFile(image.url, image.storageKey);
@@ -487,7 +530,7 @@ export class ProductsService {
   private removeImageFile(url: string, storageKey: string | null | undefined) {
     const filename = storageKey?.startsWith('/')
       ? storageKey.replace(/^\//, '')
-      : storageKey ?? url.replace('/uploads/products/', '');
+      : (storageKey ?? url.replace('/uploads/products/', ''));
     if (!/^[a-zA-Z0-9._-]+$/.test(filename)) return;
     const full = join(IMAGES_DIR, filename);
     if (existsSync(full)) {

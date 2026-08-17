@@ -51,7 +51,7 @@ export class ProductsController {
 
   @Post('import')
   @ApiOperation({ summary: 'Importer des produits (upsert par SKU)' })
-  @ApiOkResponse({ description: 'Rapport d\'import' })
+  @ApiOkResponse({ description: "Rapport d'import" })
   importProducts(@Body() body: ImportProductsDto) {
     return this.products.importProducts(body.rows);
   }
@@ -64,17 +64,14 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: "Modifier un produit" })
+  @ApiOperation({ summary: 'Modifier un produit' })
   @ApiOkResponse({ description: 'Produit modifié' })
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateProductDto,
-  ) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProductDto) {
     return this.products.update(id, dto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: "Supprimer un produit" })
+  @ApiOperation({ summary: 'Supprimer un produit' })
   @ApiOkResponse({ description: 'Produit supprimé' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.products.remove(id);
@@ -111,7 +108,7 @@ export class ProductsController {
   }
 
   @Patch('images/:imageId')
-  @ApiOperation({ summary: "Modifier une image (principale, alt)" })
+  @ApiOperation({ summary: 'Modifier une image (principale, alt)' })
   @ApiOkResponse({ description: 'Image mise à jour' })
   updateImage(
     @Param('imageId', ParseIntPipe) imageId: number,

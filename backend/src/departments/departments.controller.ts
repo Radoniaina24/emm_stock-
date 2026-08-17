@@ -41,7 +41,7 @@ export class DepartmentsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Détail d\'un département' })
+  @ApiOperation({ summary: "Détail d'un département" })
   @ApiOkResponse({ description: 'Département trouvé' })
   findOne(@Param('id') id: string) {
     return this.departments.findOne(id);

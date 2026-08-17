@@ -11,20 +11,19 @@ export class AdjustStockDto {
   @ApiProperty({
     enum: StockAdjustmentType,
     example: StockAdjustmentType.INCREMENT,
-    description: 'SET = fixe la quantité, INCREMENT = ajout, DECREMENT = retrait',
+    description:
+      'SET = fixe la quantité, INCREMENT = ajout, DECREMENT = retrait',
   })
   @IsEnum(StockAdjustmentType)
   type: StockAdjustmentType;
 
-  @ApiProperty({ example: 10, description: 'Quantité concernée par l’ajustement (>= 0)' })
+  @ApiProperty({
+    example: 10,
+    description: 'Quantité concernée par l’ajustement (>= 0)',
+  })
   @IsNumber({ maxDecimalPlaces: 3 })
   @Min(0)
   quantity: number;
-
-  @ApiPropertyOptional({ example: 'Inventaire physique du 13/08' })
-  @IsOptional()
-  @IsString()
-  reason?: string;
 
   @ApiPropertyOptional({ example: 'LOT-2025-014' })
   @IsOptional()
@@ -36,7 +35,10 @@ export class AdjustStockDto {
   @IsString()
   expiryDate?: string;
 
-  @ApiPropertyOptional({ example: 12.5, description: 'Coût unitaire (optionnel)' })
+  @ApiPropertyOptional({
+    example: 12.5,
+    description: 'Coût unitaire (optionnel)',
+  })
   @IsOptional()
   @IsNumber()
   unitCost?: number;

@@ -41,7 +41,7 @@ export class PermissionsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Détail d\'une permission' })
+  @ApiOperation({ summary: "Détail d'une permission" })
   @ApiOkResponse({ description: 'Permission trouvée' })
   findOne(@Param('id') id: string) {
     return this.permissions.findOne(id);

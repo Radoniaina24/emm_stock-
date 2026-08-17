@@ -51,9 +51,7 @@ export class RolePermissionsService {
     const newIds = new Set<string>(permissionIds);
 
     const toAdd = permissionIds.filter((id) => !existingIds.has(id));
-    const toRemove = Array.from(existingIds).filter(
-      (id) => !newIds.has(id),
-    );
+    const toRemove = Array.from(existingIds).filter((id) => !newIds.has(id));
 
     const operations: Promise<unknown>[] = [];
 

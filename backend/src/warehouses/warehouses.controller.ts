@@ -41,7 +41,7 @@ export class WarehousesController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Détail d\'un entrepôt' })
+  @ApiOperation({ summary: "Détail d'un entrepôt" })
   @ApiOkResponse({ description: 'Entrepôt trouvé' })
   findOne(@Param('id') id: string) {
     return this.warehouses.findOne(id);

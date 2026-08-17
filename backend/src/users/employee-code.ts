@@ -12,7 +12,9 @@ export async function generateEmployeeCode(
     select: { employeeCode: true },
   });
 
-  const seq = last ? Number.parseInt(last.employeeCode.slice(prefix.length), 10) || 0 : 0;
+  const seq = last
+    ? Number.parseInt(last.employeeCode.slice(prefix.length), 10) || 0
+    : 0;
 
   return `${prefix}${String(seq + 1).padStart(4, '0')}`;
 }

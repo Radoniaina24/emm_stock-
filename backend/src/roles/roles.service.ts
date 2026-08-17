@@ -36,7 +36,10 @@ export class RolesService {
       },
       orderBy: { createdAt: 'desc' },
     });
-    return roles.map(({ _count, ...role }) => ({ ...role, userCount: _count.users }));
+    return roles.map(({ _count, ...role }) => ({
+      ...role,
+      userCount: _count.users,
+    }));
   }
 
   async findOne(id: string) {
@@ -65,7 +68,8 @@ export class RolesService {
   async remove(id: string) {
     const role = await this.prisma.role.findUnique({ where: { id } });
     if (!role) throw new NotFoundException('Rôle introuvable');
-    if (role.isSystem) throw new BadRequestException('Impossible de supprimer un rôle système');
+    if (role.isSystem)
+      throw new BadRequestException('Impossible de supprimer un rôle système');
 
     await this.prisma.role.delete({ where: { id } });
   }

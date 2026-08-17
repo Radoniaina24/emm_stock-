@@ -57,10 +57,7 @@ export class BrandsController {
   @Patch(':id')
   @ApiOperation({ summary: 'Modifier une marque' })
   @ApiOkResponse({ description: 'Marque modifiée' })
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateBrandDto,
-  ) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateBrandDto) {
     return this.brands.update(id, dto);
   }
 
