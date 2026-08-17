@@ -114,7 +114,7 @@ export function TransferPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-6">
+    <div className="w-full space-y-6">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Transfert entre entrepôts</h1>
         <p className="text-sm text-muted-foreground">
