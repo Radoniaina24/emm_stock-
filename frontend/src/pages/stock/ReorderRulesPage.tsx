@@ -1,18 +1,10 @@
 import { useEffect, useMemo, useState } from "react"
-import { Pencil, Plus, RefreshCw, Trash2 } from "lucide-react"
+import { Pencil, Plus, RefreshCw, RotateCcw, Trash2 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
-import {
-  SelectRoot,
-  SelectTrigger,
-  SelectValue,
-  SelectPopup,
-  SelectList,
-  SelectItem,
-} from "@/components/ui/select"
-import { SearchableSelect } from "@/components/ui/searchable-select"
+import { SearchableSelect, type SearchableSelectOption } from "@/components/ui/searchable-select"
 import { toast } from "@/components/ui/toast"
 import { ReorderRuleModal } from "@/components/stock/ReorderRuleModal"
 import { ServerPagination } from "@/components/stock/ServerPagination"
@@ -25,9 +17,9 @@ import type { ReorderRule, ReorderRuleQuery } from "@/api/stock"
 
 export function ReorderRulesPage() {
   const { can } = usePermissions()
-  const [productId, setProductId] = useState("")
-  const [warehouseId, setWarehouseId] = useState("")
-  const [active, setActive] = useState<string>("")
+  const [productId, setProductId] = useState("all")
+  const [warehouseId, setWarehouseId] = useState("all")
+  const [active, setActive] = useState<string>("all")
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(15)
 
@@ -47,9 +39,9 @@ export function ReorderRulesPage() {
     () => ({
       page,
       limit,
-      productId: productId ? Number(productId) : undefined,
-      warehouseId: warehouseId || undefined,
-      isActive: active ? active === "true" : undefined,
+      productId: productId === "all" ? undefined : Number(productId),
+      warehouseId: warehouseId === "all" ? undefined : warehouseId,
+      isActive: active === "all" ? undefined : active === "true",
     }),
     [page, limit, productId, warehouseId, active],
   )
@@ -58,14 +50,26 @@ export function ReorderRulesPage() {
   const items = data?.items ?? []
   const meta = data?.meta
 
-  const productOptions = useMemo(
-    () => (products ?? []).map((p) => ({ value: String(p.id), label: `${p.name} (${p.sku})` })),
+  const productOptions = useMemo<SearchableSelectOption[]>(
+    () => [
+      { value: "all", label: "Tous les produits" },
+      ...(products ?? []).map((p) => ({ value: String(p.id), label: `${p.name} (${p.sku})` })),
+    ],
     [products],
   )
-  const warehouseOptions = useMemo(
-    () => (warehouses ?? []).map((w) => ({ value: w.id, label: w.name })),
+  const warehouseOptions = useMemo<SearchableSelectOption[]>(
+    () => [
+      { value: "all", label: "Tous les entrepôts" },
+      ...(warehouses ?? []).map((w) => ({ value: w.id, label: w.name })),
+    ],
     [warehouses],
   )
+
+  const activeOptions: SearchableSelectOption[] = [
+    { value: "all", label: "Tous les statuts" },
+    { value: "true", label: "Active" },
+    { value: "false", label: "Inactive" },
+  ]
 
   const productMap = useMemo(() => new Map((products ?? []).map((p) => [p.id, p])), [products])
   const warehouseMap = useMemo(() => new Map((warehouses ?? []).map((w) => [w.id, w])), [warehouses])
@@ -85,42 +89,48 @@ export function ReorderRulesPage() {
     <div className="flex flex-wrap items-center gap-3">
       <div className="w-64">
         <SearchableSelect
+          variant="inline"
           value={productId}
-          placeholder="Tous les produits"
+          placeholder="Produit"
           options={productOptions}
-          onSelect={(v) => setProductId((v ?? "") === productId ? "" : (v ?? ""))}
+          onSelect={(v) => setProductId(v)}
+          triggerClassName="h-10 w-full bg-background"
         />
       </div>
-      <SelectRoot
-        value={warehouseId || "__all__"}
-        onValueChange={(v) => setWarehouseId(v === "__all__" || v == null ? "" : v)}
-      >
-        <SelectTrigger className="w-52">
-          <SelectValue placeholder="Tous les entrepôts" />
-        </SelectTrigger>
-        <SelectPopup>
-          <SelectList>
-            <SelectItem value="__all__">Tous les entrepôts</SelectItem>
-            {warehouseOptions.map((o) => (
-              <SelectItem key={o.value} value={o.value}>
-                {o.label}
-              </SelectItem>
-            ))}
-          </SelectList>
-        </SelectPopup>
-      </SelectRoot>
-      <SelectRoot value={active || "__all__"} onValueChange={(v) => setActive(v === "__all__" || v == null ? "" : v)}>
-        <SelectTrigger className="w-44">
-          <SelectValue placeholder="Tous les statuts" />
-        </SelectTrigger>
-        <SelectPopup>
-          <SelectList>
-            <SelectItem value="__all__">Tous les statuts</SelectItem>
-            <SelectItem value="true">Active</SelectItem>
-            <SelectItem value="false">Inactive</SelectItem>
-          </SelectList>
-        </SelectPopup>
-      </SelectRoot>
+      <div className="w-52">
+        <SearchableSelect
+          variant="inline"
+          value={warehouseId}
+          placeholder="Entrepôt"
+          options={warehouseOptions}
+          onSelect={(v) => setWarehouseId(v)}
+          triggerClassName="h-10 w-full bg-background"
+        />
+      </div>
+      <div className="w-44">
+        <SearchableSelect
+          variant="inline"
+          value={active}
+          placeholder="Statut"
+          options={activeOptions}
+          onSelect={(v) => setActive(v)}
+          triggerClassName="h-10 w-full bg-background"
+        />
+      </div>
+      {(productId !== "all" || warehouseId !== "all" || active !== "all") && (
+        <Button
+          size="sm"
+          onClick={() => {
+            setProductId("all")
+            setWarehouseId("all")
+            setActive("all")
+          }}
+          className="gap-1.5 border-amber-400/50 bg-amber-400 text-amber-950 hover:bg-amber-300"
+        >
+          <RotateCcw className="size-3.5" />
+          Réinitialiser
+        </Button>
+      )}
     </div>
   )
 

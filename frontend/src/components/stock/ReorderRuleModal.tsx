@@ -11,14 +11,7 @@ import {
   ModalRoot,
   ModalTitle,
 } from "@/components/ui/modal"
-import {
-  SelectRoot,
-  SelectTrigger,
-  SelectValue,
-  SelectPopup,
-  SelectList,
-  SelectItem,
-} from "@/components/ui/select"
+import { SearchableSelect } from "@/components/ui/searchable-select"
 import { toast } from "@/components/ui/toast"
 import { ApiError } from "@/lib/api"
 import {
@@ -156,45 +149,27 @@ export function ReorderRuleModal({
                   <label className="text-sm font-medium text-foreground/80" htmlFor="rr-product">
                     Produit
                   </label>
-                  <SelectRoot
+                  <SearchableSelect
+                    variant="inline"
                     value={form.productId}
-                    onValueChange={(v) => setForm((f) => ({ ...f, productId: v ?? "" }))}
-                  >
-                    <SelectTrigger id="rr-product">
-                      <SelectValue placeholder="Choisir un produit" />
-                    </SelectTrigger>
-                    <SelectPopup>
-                      <SelectList>
-                        {productOptions.map((o) => (
-                          <SelectItem key={o.value} value={o.value}>
-                            {o.label}
-                          </SelectItem>
-                        ))}
-                      </SelectList>
-                    </SelectPopup>
-                  </SelectRoot>
+                    placeholder="Choisir un produit"
+                    options={productOptions}
+                    onSelect={(v) => setForm((f) => ({ ...f, productId: v }))}
+                    triggerClassName="h-10 w-full bg-background"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground/80" htmlFor="rr-warehouse">
                     Entrepôt
                   </label>
-                  <SelectRoot
+                  <SearchableSelect
+                    variant="inline"
                     value={form.warehouseId}
-                    onValueChange={(v) => setForm((f) => ({ ...f, warehouseId: v ?? "" }))}
-                  >
-                    <SelectTrigger id="rr-warehouse">
-                      <SelectValue placeholder="Choisir un entrepôt" />
-                    </SelectTrigger>
-                    <SelectPopup>
-                      <SelectList>
-                        {warehouseOptions.map((o) => (
-                          <SelectItem key={o.value} value={o.value}>
-                            {o.label}
-                          </SelectItem>
-                        ))}
-                      </SelectList>
-                    </SelectPopup>
-                  </SelectRoot>
+                    placeholder="Choisir un entrepôt"
+                    options={warehouseOptions}
+                    onSelect={(v) => setForm((f) => ({ ...f, warehouseId: v }))}
+                    triggerClassName="h-10 w-full bg-background"
+                  />
                 </div>
               </div>
 
@@ -231,16 +206,18 @@ export function ReorderRuleModal({
                 </div>
               </div>
 
-              <label className="flex cursor-pointer items-center gap-3">
-                <input
-                  type="checkbox"
-                  checked={form.isActive}
-                  onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
-                  className="peer sr-only"
-                />
-                <div className="h-5 w-9 rounded-full bg-muted-foreground/30 after:absolute after:left-0.5 after:top-0.5 after:size-4 after:rounded-full after:bg-white after:shadow-sm after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full" />
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex cursor-pointer items-center">
+                  <input
+                    type="checkbox"
+                    checked={form.isActive}
+                    onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
+                    className="peer sr-only"
+                  />
+                  <div className="h-5 w-9 rounded-full bg-muted-foreground/30 after:absolute after:left-0.5 after:top-0.5 after:size-4 after:rounded-full after:bg-white after:shadow-sm after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full" />
+                </label>
                 <span className="text-sm text-foreground/80">Règle active</span>
-              </label>
+              </div>
 
               {error && (
                 <div className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/5 px-3.5 py-2.5 text-sm text-destructive">

@@ -1,19 +1,15 @@
 import { useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowDownToLine, ArrowUpFromLine, RefreshCw, ArrowRightLeft } from "lucide-react"
+import { ArrowDownToLine, ArrowUpFromLine, RefreshCw, ArrowRightLeft, RotateCcw } from "lucide-react"
+import { format, isValid, parseISO } from "date-fns"
+import { fr } from "date-fns/locale"
 
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
-import {
-  SelectRoot,
-  SelectTrigger,
-  SelectValue,
-  SelectPopup,
-  SelectList,
-  SelectItem,
-} from "@/components/ui/select"
-import { SearchableSelect } from "@/components/ui/searchable-select"
+import { DatePicker } from "@/components/ui/date-picker"
+import { SearchableSelect, type SearchableSelectOption } from "@/components/ui/searchable-select"
 import { ServerPagination } from "@/components/stock/ServerPagination"
 import { useStockMovesQuery } from "@/hooks/use-stock"
 import { useWarehousesQuery } from "@/hooks/use-warehouses"
@@ -27,13 +23,24 @@ const typeMeta: Record<string, { label: string; variant: "success" | "warning" |
   TRANSFER: { label: "Transfert", variant: "secondary", icon: <ArrowRightLeft className="size-3" /> },
 }
 
+function toDate(value: string): Date | undefined {
+  if (!value?.trim()) return undefined
+  const parsed = parseISO(value.trim())
+  return isValid(parsed) ? parsed : undefined
+}
+
+function toDateString(date: Date | undefined): string {
+  if (!date || !isValid(date)) return ""
+  return format(date, "yyyy-MM-dd")
+}
+
 export function StockMovesPage() {
   const [searchParams] = useSearchParams()
   const initialProduct = searchParams.get("produit")
 
-  const [type, setType] = useState<string>("")
-  const [warehouseId, setWarehouseId] = useState<string>("")
-  const [productId, setProductId] = useState<string>(initialProduct ?? "")
+  const [type, setType] = useState<string>("all")
+  const [warehouseId, setWarehouseId] = useState<string>("all")
+  const [productId, setProductId] = useState<string>(initialProduct ?? "all")
   const [dateFrom, setDateFrom] = useState("")
   const [dateTo, setDateTo] = useState("")
   const [page, setPage] = useState(1)
@@ -50,9 +57,9 @@ export function StockMovesPage() {
     () => ({
       page,
       limit,
-      type: (type || undefined) as StockMoveQuery["type"],
-      warehouseId: warehouseId || undefined,
-      productId: productId ? Number(productId) : undefined,
+      type: (type === "all" ? undefined : (type as StockMoveQuery["type"])),
+      warehouseId: warehouseId === "all" ? undefined : warehouseId,
+      productId: productId === "all" ? undefined : Number(productId),
       dateFrom: dateFrom || undefined,
       dateTo: dateTo || undefined,
       sortBy: "date",
@@ -65,14 +72,32 @@ export function StockMovesPage() {
   const items = data?.items ?? []
   const meta = data?.meta
 
-  const productOptions = useMemo(
-    () =>
-      (products ?? []).map((p) => ({
+  const productOptions = useMemo<SearchableSelectOption[]>(
+    () => [
+      { value: "all", label: "Tous les produits" },
+      ...(products ?? []).map((p) => ({
         value: String(p.id),
         label: `${p.name} (${p.sku})`,
       })),
+    ],
     [products],
   )
+
+  const warehouseOptions = useMemo<SearchableSelectOption[]>(
+    () => [
+      { value: "all", label: "Tous les entrepôts" },
+      ...(warehouses ?? []).map((w) => ({ value: w.id, label: w.name })),
+    ],
+    [warehouses],
+  )
+
+  const typeOptions: SearchableSelectOption[] = [
+    { value: "all", label: "Tous les types" },
+    { value: "ENTRY", label: "Entrée" },
+    { value: "EXIT", label: "Sortie" },
+    { value: "INVENTORY_ADJUSTMENT", label: "Ajustement" },
+    { value: "TRANSFER", label: "Transfert" },
+  ]
 
   const columns: ColumnDef<StockMove>[] = useMemo(
     () => [
@@ -158,56 +183,86 @@ export function StockMovesPage() {
     <div className="flex flex-wrap items-center gap-3">
       <div className="w-64">
         <SearchableSelect
+          variant="inline"
           value={productId}
-          placeholder="Tous les produits"
+          placeholder="Produit"
           options={productOptions}
-          onSelect={(v) => setProductId((v ?? "") === productId ? "" : (v ?? ""))}
+          onSelect={(v) => {
+            setProductId(v)
+            setPage(1)
+          }}
+          triggerClassName="h-10 w-full bg-background"
         />
       </div>
-      <SelectRoot
-        value={warehouseId || "__all__"}
-        onValueChange={(v) => setWarehouseId(v === "__all__" || v == null ? "" : v)}
-      >
-        <SelectTrigger className="w-52">
-          <SelectValue placeholder="Tous les entrepôts" />
-        </SelectTrigger>
-        <SelectPopup>
-          <SelectList>
-            <SelectItem value="__all__">Tous les entrepôts</SelectItem>
-            {(warehouses ?? []).map((w) => (
-              <SelectItem key={w.id} value={w.id}>
-                {w.name}
-              </SelectItem>
-            ))}
-          </SelectList>
-        </SelectPopup>
-      </SelectRoot>
-      <SelectRoot value={type || "__all__"} onValueChange={(v) => setType(v === "__all__" || v == null ? "" : v)}>
-        <SelectTrigger className="w-44">
-          <SelectValue placeholder="Tous les types" />
-        </SelectTrigger>
-        <SelectPopup>
-          <SelectList>
-            <SelectItem value="__all__">Tous les types</SelectItem>
-            <SelectItem value="ENTRY">Entrée</SelectItem>
-            <SelectItem value="EXIT">Sortie</SelectItem>
-            <SelectItem value="INVENTORY_ADJUSTMENT">Ajustement</SelectItem>
-            <SelectItem value="TRANSFER">Transfert</SelectItem>
-          </SelectList>
-        </SelectPopup>
-      </SelectRoot>
-      <input
-        type="date"
-        value={dateFrom}
-        onChange={(e) => setDateFrom(e.target.value)}
-        className="h-9 rounded-lg border border-border/60 bg-muted/30 px-3 text-sm outline-none focus:border-ring/80"
-      />
-      <input
-        type="date"
-        value={dateTo}
-        onChange={(e) => setDateTo(e.target.value)}
-        className="h-9 rounded-lg border border-border/60 bg-muted/30 px-3 text-sm outline-none focus:border-ring/80"
-      />
+      <div className="w-52">
+        <SearchableSelect
+          variant="inline"
+          value={warehouseId}
+          placeholder="Entrepôt"
+          options={warehouseOptions}
+          onSelect={(v) => {
+            setWarehouseId(v)
+            setPage(1)
+          }}
+          triggerClassName="h-10 w-full bg-background"
+        />
+      </div>
+      <div className="w-44">
+        <SearchableSelect
+          variant="inline"
+          value={type}
+          placeholder="Type"
+          options={typeOptions}
+          onSelect={(v) => {
+            setType(v)
+            setPage(1)
+          }}
+          triggerClassName="h-10 w-full bg-background"
+        />
+      </div>
+      <div className="w-48">
+        <DatePicker
+          mode="single"
+          locale={fr}
+          selected={toDate(dateFrom)}
+          onSelect={(selected) => {
+            setDateFrom(toDateString(selected as Date | undefined))
+            setPage(1)
+          }}
+          placeholder="Date de début"
+          disabled={isLoading}
+        />
+      </div>
+      <div className="w-48">
+        <DatePicker
+          mode="single"
+          locale={fr}
+          selected={toDate(dateTo)}
+          onSelect={(selected) => {
+            setDateTo(toDateString(selected as Date | undefined))
+            setPage(1)
+          }}
+          placeholder="Date de fin"
+          disabled={isLoading}
+        />
+      </div>
+      {(productId !== "all" || warehouseId !== "all" || type !== "all" || dateFrom || dateTo) && (
+        <Button
+          size="sm"
+          onClick={() => {
+            setProductId("all")
+            setWarehouseId("all")
+            setType("all")
+            setDateFrom("")
+            setDateTo("")
+            setPage(1)
+          }}
+          className="gap-1.5 border-amber-400/50 bg-amber-400 text-amber-950 hover:bg-amber-300"
+        >
+          <RotateCcw className="size-3.5" />
+          Réinitialiser
+        </Button>
+      )}
     </div>
   )
 

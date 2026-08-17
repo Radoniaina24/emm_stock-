@@ -4,15 +4,7 @@ import { ArrowRightLeft, Plus, Trash2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  SelectRoot,
-  SelectTrigger,
-  SelectValue,
-  SelectPopup,
-  SelectList,
-  SelectItem,
-} from "@/components/ui/select"
-import { SearchableSelect } from "@/components/ui/searchable-select"
+import { SearchableSelect, type SearchableSelectOption } from "@/components/ui/searchable-select"
 import { toast } from "@/components/ui/toast"
 import { useTransferStockMutation } from "@/hooks/use-stock"
 import { useWarehousesQuery } from "@/hooks/use-warehouses"
@@ -46,6 +38,11 @@ export function TransferPage() {
   const productOptions = useMemo(
     () => (products ?? []).map((p) => ({ value: String(p.id), label: `${p.name} (${p.sku})` })),
     [products],
+  )
+
+  const warehouseOptions = useMemo<SearchableSelectOption[]>(
+    () => (warehouses ?? []).map((w) => ({ value: w.id, label: w.name })),
+    [warehouses],
   )
 
   function updateLine(index: number, patch: Partial<Line>) {
@@ -133,41 +130,27 @@ export function TransferPage() {
                 <label className="text-sm font-medium text-foreground/80" htmlFor="from-wh">
                   Entrepôt source
                 </label>
-                <SelectRoot value={fromWarehouseId} onValueChange={(v) => setFromWarehouseId(v ?? "")}>
-                  <SelectTrigger id="from-wh">
-                    <SelectValue placeholder="Sélectionner la source" />
-                  </SelectTrigger>
-                  <SelectPopup>
-                    <SelectList>
-                      {(warehouses ?? []).map((w) => (
-                        <SelectItem key={w.id} value={w.id}>
-                          {w.name}
-                        </SelectItem>
-                      ))}
-                    </SelectList>
-                  </SelectPopup>
-                </SelectRoot>
+                <SearchableSelect
+                  variant="inline"
+                  value={fromWarehouseId}
+                  placeholder="Sélectionner la source"
+                  options={warehouseOptions}
+                  onSelect={(v) => setFromWarehouseId(v)}
+                  triggerClassName="h-10 w-full bg-background"
+                />
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-foreground/80" htmlFor="to-wh">
                   Entrepôt destination
                 </label>
-                <SelectRoot value={toWarehouseId} onValueChange={(v) => setToWarehouseId(v ?? "")}>
-                  <SelectTrigger id="to-wh">
-                    <SelectValue placeholder="Sélectionner la destination" />
-                  </SelectTrigger>
-                  <SelectPopup>
-                    <SelectList>
-                      {(warehouses ?? [])
-                        .filter((w) => w.id !== fromWarehouseId)
-                        .map((w) => (
-                          <SelectItem key={w.id} value={w.id}>
-                            {w.name}
-                          </SelectItem>
-                        ))}
-                    </SelectList>
-                  </SelectPopup>
-                </SelectRoot>
+                <SearchableSelect
+                  variant="inline"
+                  value={toWarehouseId}
+                  placeholder="Sélectionner la destination"
+                  options={warehouseOptions.filter((w) => w.value !== fromWarehouseId)}
+                  onSelect={(v) => setToWarehouseId(v)}
+                  triggerClassName="h-10 w-full bg-background"
+                />
               </div>
             </div>
 

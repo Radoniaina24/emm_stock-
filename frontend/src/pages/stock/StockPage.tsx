@@ -9,6 +9,7 @@ import {
   Layers,
   Package,
   RefreshCw,
+  RotateCcw,
   SlidersHorizontal,
   Warehouse,
 } from "lucide-react"
@@ -17,14 +18,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { DataTable } from "@/components/ui/data-table"
-import {
-  SelectRoot,
-  SelectTrigger,
-  SelectValue,
-  SelectPopup,
-  SelectList,
-  SelectItem,
-} from "@/components/ui/select"
+import { SearchableSelect, type SearchableSelectOption } from "@/components/ui/searchable-select"
 import { AdjustStockModal } from "@/components/stock/AdjustStockModal"
 import { ServerPagination } from "@/components/stock/ServerPagination"
 import { useStockLevelsQuery, useStockSummaryQuery } from "@/hooks/use-stock"
@@ -40,7 +34,7 @@ export function StockPage() {
 
   const initialLow = searchParams.get("statut") === "faible"
   const [status, setStatus] = useState<"all" | "low">(initialLow ? "low" : "all")
-  const [warehouseId, setWarehouseId] = useState<string>("")
+  const [warehouseId, setWarehouseId] = useState<string>("all")
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(15)
   const [searchInput, setSearchInput] = useState("")
@@ -63,7 +57,7 @@ export function StockPage() {
       page,
       limit,
       search: search || undefined,
-      warehouseId: warehouseId || undefined,
+      warehouseId: warehouseId === "all" ? undefined : warehouseId,
       lowStock: status === "low" ? true : undefined,
       sortBy: "productName",
       sortOrder: "asc",
@@ -167,6 +161,19 @@ export function StockPage() {
     [],
   )
 
+  const warehouseOptions = useMemo<SearchableSelectOption[]>(
+    () => [
+      { value: "all", label: "Tous les entrepôts" },
+      ...(warehouses ?? []).map((w) => ({ value: w.id, label: w.name })),
+    ],
+    [warehouses],
+  )
+
+  const statusOptions: SearchableSelectOption[] = [
+    { value: "all", label: "Tous les statuts" },
+    { value: "low", label: "Stock faible" },
+  ]
+
   const filters = (
     <div className="flex flex-wrap items-center gap-3">
       <div className="relative min-w-56 max-w-sm flex-1">
@@ -179,45 +186,50 @@ export function StockPage() {
         />
       </div>
 
-      <SelectRoot
-        value={warehouseId || "__all__"}
-        onValueChange={(value) => {
-          setWarehouseId(value === "__all__" || value == null ? "" : value)
-          setPage(1)
-        }}
-      >
-        <SelectTrigger className="w-52">
-          <SelectValue placeholder="Tous les entrepôts" />
-        </SelectTrigger>
-        <SelectPopup>
-          <SelectList>
-            <SelectItem value="__all__">Tous les entrepôts</SelectItem>
-            {(warehouses ?? []).map((w) => (
-              <SelectItem key={w.id} value={w.id}>
-                {w.name}
-              </SelectItem>
-            ))}
-          </SelectList>
-        </SelectPopup>
-      </SelectRoot>
+      <div className="w-52">
+        <SearchableSelect
+          variant="inline"
+          value={warehouseId}
+          placeholder="Entrepôt"
+          options={warehouseOptions}
+          onSelect={(v) => {
+            setWarehouseId(v)
+            setPage(1)
+          }}
+          triggerClassName="h-10 w-full bg-background"
+        />
+      </div>
 
-      <SelectRoot
-        value={status}
-        onValueChange={(value) => {
-          setStatus(value as "all" | "low")
-          setPage(1)
-        }}
-      >
-        <SelectTrigger className="w-44">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectPopup>
-          <SelectList>
-            <SelectItem value="all">Tous les statuts</SelectItem>
-            <SelectItem value="low">Stock faible</SelectItem>
-          </SelectList>
-        </SelectPopup>
-      </SelectRoot>
+      <div className="w-44">
+        <SearchableSelect
+          variant="inline"
+          value={status}
+          placeholder="Statut"
+          options={statusOptions}
+          onSelect={(v) => {
+            setStatus(v as "all" | "low")
+            setPage(1)
+          }}
+          triggerClassName="h-10 w-full bg-background"
+        />
+      </div>
+
+      {(warehouseId !== "all" || status !== "all" || search) && (
+        <Button
+          size="sm"
+          onClick={() => {
+            setWarehouseId("all")
+            setStatus("all")
+            setSearchInput("")
+            setSearch("")
+            setPage(1)
+          }}
+          className="gap-1.5 border-amber-400/50 bg-amber-400 text-amber-950 hover:bg-amber-300"
+        >
+          <RotateCcw className="size-3.5" />
+          Réinitialiser
+        </Button>
+      )}
     </div>
   )
 
