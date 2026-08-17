@@ -43,6 +43,8 @@ export type StockMove = {
   sourceId: string
   date: string
   user: { id: string; username: string }
+  product: { id: number; name: string; sku: string }
+  warehouse: { id: string; name: string }
 }
 
 export type ReorderRule = {

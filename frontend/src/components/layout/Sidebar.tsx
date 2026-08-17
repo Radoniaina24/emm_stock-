@@ -12,7 +12,6 @@ import {
   Boxes,
   Building2,
   Calendar,
-  CheckCircle,
   ChevronDown,
   ChevronRight,
   ClipboardCheck,
@@ -33,12 +32,10 @@ import {
   Grid3x3,
   HardDrive,
   History,
-  Layers,
   LayoutDashboard,
   LifeBuoy,
   Link2,
   List,
-  Lock,
   MapPin,
   Package,
   PackageCheck,
@@ -88,13 +85,9 @@ const produitsSubNav = [
 
 const stockSubNav = [
   { label: "Vue globale du stock", icon: Warehouse, to: "/dashboard/stock" },
-  { label: "Stock par entrepôt", icon: Layers, to: "/dashboard/stock/par-entrepot" },
-  { label: "Stock disponible", icon: CheckCircle, to: "/dashboard/stock/disponible" },
-  { label: "Stock réservé", icon: Lock, to: "/dashboard/stock/reserve" },
-  { label: "Stock en transit", icon: ArrowRightLeft, to: "/dashboard/stock/en-transit" },
-  { label: "Stock faible", icon: AlertTriangle, to: "/dashboard/stock/faible" },
-  { label: "Valorisation du stock", icon: TrendingUp, to: "/dashboard/stock/valorisation" },
-  { label: "Historique des mouvements", icon: History, to: "/dashboard/stock/historique" },
+  { label: "Mouvements", icon: History, to: "/dashboard/stock/mouvements" },
+  { label: "Règles de réappro", icon: RefreshCw, to: "/dashboard/stock/reappro" },
+  { label: "Stock faible", icon: AlertTriangle, to: "/dashboard/stock?statut=faible" },
 ]
 
 const entrepotsSubNav = [
@@ -123,7 +116,7 @@ const sortiesSubNav = [
 ]
 
 const mouvementsSubNav = [
-  { label: "Tous les mouvements", icon: List, to: "/dashboard/mouvements" },
+  { label: "Tous les mouvements", icon: List, to: "/dashboard/stock/mouvements" },
   { label: "Entrées", icon: ArrowDownToLine, to: "/dashboard/mouvements/entrees" },
   { label: "Sorties", icon: ArrowUpFromLine, to: "/dashboard/mouvements/sorties" },
   { label: "Transferts", icon: ArrowRightLeft, to: "/dashboard/mouvements/transferts" },
@@ -386,7 +379,7 @@ function MenuSection({
 }
 
 export function Sidebar() {
-  const { collapsed, mobileOpen, toggleMobile, closeMobile } = useSidebar()
+  const { collapsed, mobileOpen, closeMobile } = useSidebar()
   const location = useLocation()
   const [produitsOpen, setProduitsOpen] = useState(
     location.pathname.startsWith("/dashboard/produits")

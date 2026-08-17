@@ -57,6 +57,8 @@ export type SerializedStockMove = {
   sourceId: string;
   date: string;
   user: { id: string; username: string };
+  product: { id: number; name: string; sku: string };
+  warehouse: { id: string; name: string };
 };
 
 export type SerializedReorderRule = {
@@ -166,6 +168,8 @@ export class StockService {
       sourceId: m.sourceId,
       date: m.date.toISOString(),
       user: m.user,
+      product: m.product,
+      warehouse: m.warehouse,
     };
   }
 
@@ -340,6 +344,8 @@ export class StockService {
         expiryDate: true,
         date: true,
         user: { select: { id: true, username: true } },
+        product: { select: { id: true, name: true, sku: true } },
+        warehouse: { select: { id: true, name: true } },
       },
     });
 
@@ -464,6 +470,8 @@ export class StockService {
         sourceId: true,
         date: true,
         user: { select: { id: true, username: true } },
+        product: { select: { id: true, name: true, sku: true } },
+        warehouse: { select: { id: true, name: true } },
       },
     });
 

@@ -36,4 +36,10 @@ export class StockMoveResponseDto {
 
   @ApiProperty()
   user: { id: string; username: string };
+
+  @ApiProperty({ description: "Produit concerné" })
+  product: { id: number; name: string; sku: string };
+
+  @ApiProperty({ description: "Entrepôt concerné" })
+  warehouse: { id: string; name: string };
 }

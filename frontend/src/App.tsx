@@ -24,6 +24,11 @@ import { ConfigurationPage } from "@/pages/parametres/ConfigurationPage"
 import { DepartementsPage } from "@/pages/parametres/DepartementsPage"
 import { JobTitlesPage } from "@/pages/parametres/JobTitlesPage"
 import { WarehousesPage } from "@/pages/entrepots/WarehousesPage"
+import { StockPage } from "@/pages/stock/StockPage"
+import { StockDetailPage } from "@/pages/stock/StockDetailPage"
+import { StockMovesPage } from "@/pages/stock/StockMovesPage"
+import { ReorderRulesPage } from "@/pages/stock/ReorderRulesPage"
+import { TransferPage } from "@/pages/stock/TransferPage"
 import { CategoriesPage } from "@/pages/produits/CategoriesPage"
 import { BrandsPage } from "@/pages/produits/BrandsPage"
 import { UnitsOfMeasurePage } from "@/pages/produits/UnitsOfMeasurePage"
@@ -71,7 +76,10 @@ function App() {
             <Route path="produits/fournisseurs" element={<ProductSuppliersPage />} />
             <Route path="produits/import" element={<ProductImportPage />} />
             <Route path="produits/export" element={<ProductExportPage />} />
-            <Route path="stock" element={<div className="text-muted-foreground">Vue globale du stock</div>} />
+            <Route path="stock" element={<StockPage />} />
+            <Route path="stock/:stockId" element={<StockDetailPage />} />
+            <Route path="stock/mouvements" element={<StockMovesPage />} />
+            <Route path="stock/reappro" element={<ReorderRulesPage />} />
             <Route path="stock/par-entrepot" element={<div className="text-muted-foreground">Stock par entrepôt</div>} />
             <Route path="stock/disponible" element={<div className="text-muted-foreground">Stock disponible</div>} />
             <Route path="stock/reserve" element={<div className="text-muted-foreground">Stock réservé</div>} />
@@ -82,7 +90,7 @@ function App() {
             <Route path="entrepots" element={<WarehousesPage />} />
             <Route path="entrepots/zones" element={<div className="text-muted-foreground">Zones de stockage</div>} />
             <Route path="entrepots/emplacements" element={<div className="text-muted-foreground">Emplacements</div>} />
-            <Route path="entrepots/transferts" element={<div className="text-muted-foreground">Transferts entre entrepôts</div>} />
+            <Route path="entrepots/transferts" element={<TransferPage />} />
             <Route path="entrepots/capacite" element={<div className="text-muted-foreground">Capacité de stockage</div>} />
             <Route path="entrees" element={<div className="text-muted-foreground">Liste des réceptions</div>} />
             <Route path="entrees/nouvelle" element={<div className="text-muted-foreground">Nouvelle réception</div>} />
@@ -97,7 +105,7 @@ function App() {
             <Route path="sorties/consommation-interne" element={<div className="text-muted-foreground">Consommation interne</div>} />
             <Route path="sorties/retours" element={<div className="text-muted-foreground">Retours</div>} />
             <Route path="sorties/historique" element={<div className="text-muted-foreground">Historique des sorties</div>} />
-            <Route path="mouvements" element={<div className="text-muted-foreground">Tous les mouvements</div>} />
+            <Route path="mouvements" element={<StockMovesPage />} />
             <Route path="mouvements/entrees" element={<div className="text-muted-foreground">Entrées</div>} />
             <Route path="mouvements/sorties" element={<div className="text-muted-foreground">Sorties</div>} />
             <Route path="mouvements/transferts" element={<div className="text-muted-foreground">Transferts</div>} />

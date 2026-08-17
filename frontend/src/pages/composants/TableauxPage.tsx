@@ -104,6 +104,7 @@ const products: Product[] = Array.from({ length: 120 }, (_, i) => {
     lot: `LOT-${2025}-${String(randInt(1, 200)).padStart(4, "0")}`,
     dateReception: `2025-${String(randInt(1, 12)).padStart(2, "0")}-${String(randInt(1, 28)).padStart(2, "0")}`,
     datePeremption: i % 3 === 0 ? `2026-${String(randInt(1, 12)).padStart(2, "0")}-${String(randInt(1, 28)).padStart(2, "0")}` : "-",
+    status,
   }
 })
 
