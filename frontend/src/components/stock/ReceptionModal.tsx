@@ -130,7 +130,7 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
 
   return (
     <ModalRoot open={open} onOpenChange={(o) => (o ? undefined : close())}>
-      <ModalPopup className="max-w-2xl">
+      <ModalPopup size="xl" className="max-h-[90vh] flex flex-col">
         <ModalClose />
         <ModalHeader>
           <div className="flex items-center gap-3">
@@ -146,8 +146,8 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
           </div>
         </ModalHeader>
 
-        <form onSubmit={handleSubmit}>
-          <ModalContent>
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <ModalContent className="flex-1 overflow-y-auto">
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="space-y-1.5">
@@ -218,9 +218,9 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
                   {lines.map((line, index) => (
                     <div
                       key={index}
-                      className="grid grid-cols-12 items-end gap-2 rounded-xl border border-border/60 bg-muted/20 p-3"
+                      className="flex flex-wrap items-end gap-2 rounded-xl border border-border/60 bg-muted/20 p-3"
                     >
-                      <div className="col-span-12 space-y-1.5 sm:col-span-5">
+                      <div className="min-w-[180px] flex-1 space-y-1.5">
                         <label className="text-xs text-muted-foreground">Produit</label>
                         <SearchableSelect
                           variant="inline"
@@ -231,7 +231,7 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
                           triggerClassName="h-9 w-full bg-background"
                         />
                       </div>
-                      <div className="col-span-4 space-y-1.5 sm:col-span-2">
+                      <div className="w-24 space-y-1.5">
                         <label className="text-xs text-muted-foreground">Quantité</label>
                         <input
                           type="number"
@@ -243,7 +243,7 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
                           className="h-9 w-full rounded-lg border border-border/60 bg-background px-2.5 text-sm outline-none transition-all placeholder:text-muted-foreground/30 hover:border-border focus:border-ring/80 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.08)]"
                         />
                       </div>
-                      <div className="col-span-4 space-y-1.5 sm:col-span-2">
+                      <div className="w-28 space-y-1.5">
                         <label className="text-xs text-muted-foreground">Coût unit.</label>
                         <input
                           type="number"
@@ -255,7 +255,7 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
                           className="h-9 w-full rounded-lg border border-border/60 bg-background px-2.5 text-sm outline-none transition-all placeholder:text-muted-foreground/30 hover:border-border focus:border-ring/80 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.08)]"
                         />
                       </div>
-                      <div className="col-span-4 space-y-1.5 sm:col-span-2">
+                      <div className="w-32 space-y-1.5">
                         <label className="text-xs text-muted-foreground">Lot</label>
                         <input
                           value={line.lotNumber}
@@ -264,25 +264,39 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
                           className="h-9 w-full rounded-lg border border-border/60 bg-background px-2.5 text-sm outline-none transition-all placeholder:text-muted-foreground/30 hover:border-border focus:border-ring/80 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.08)]"
                         />
                       </div>
-                      <div className="col-span-11 space-y-1.5 sm:col-span-1">
+                      <div className="w-52 space-y-1.5">
                         <label className="text-xs text-muted-foreground">Péremption</label>
-                        <div className="w-full">
-                          <DatePicker
-                            mode="single"
-                            locale={fr}
-                            selected={line.expiryDate ? parseISO(line.expiryDate) : undefined}
-                            onSelect={(selected) =>
-                              updateLine(index, {
-                                expiryDate: selected
-                                  ? format(selected as Date, "yyyy-MM-dd")
-                                  : undefined,
-                              })
-                            }
-                            placeholder=""
-                          />
+                        <div className="flex items-center gap-1">
+                          <div className="flex-1">
+                            <DatePicker
+                              mode="single"
+                              locale={fr}
+                              selected={line.expiryDate ? parseISO(line.expiryDate) : undefined}
+                              onSelect={(selected) =>
+                                updateLine(index, {
+                                  expiryDate: selected
+                                    ? format(selected as Date, "yyyy-MM-dd")
+                                    : undefined,
+                                })
+                              }
+                              placeholder=""
+                            />
+                          </div>
+                          {line.expiryDate && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => updateLine(index, { expiryDate: undefined })}
+                              aria-label="Supprimer la péremption"
+                              className="shrink-0 text-muted-foreground hover:text-destructive"
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
+                          )}
                         </div>
                       </div>
-                      <div className="col-span-1 flex justify-end">
+                      <div className="flex justify-end">
                         <Button
                           type="button"
                           variant="ghost"

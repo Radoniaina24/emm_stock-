@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover"
 import { Check, ChevronDown, FolderTree, Search } from "lucide-react"
 
@@ -37,8 +38,16 @@ export function SearchableSelect({
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
   const [placement, setPlacement] = useState({ up: false, maxHeight: 240 })
+  const [panelPos, setPanelPos] = useState<{
+    top?: number
+    bottom?: number
+    left: number
+    width: number
+  } | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const rootRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (open && inputRef.current) {
@@ -46,6 +55,7 @@ export function SearchableSelect({
     }
     if (!open) {
       setQuery("")
+      setPanelPos(null)
     }
   }, [open])
 
@@ -59,10 +69,17 @@ export function SearchableSelect({
       const gap = 16
       const spaceBelow = window.innerHeight - rect.bottom - gap
       const spaceAbove = rect.top - gap
+      const up = spaceBelow < 200 && spaceAbove > spaceBelow
       setPlacement({
-        up: spaceBelow < 200 && spaceAbove > spaceBelow,
+        up,
         maxHeight: Math.max(96, Math.min(240, Math.floor(Math.max(spaceBelow, spaceAbove)))),
       })
+      const offset = 6
+      setPanelPos(
+        up
+          ? { bottom: window.innerHeight - rect.top + offset, left: rect.left, width: rect.width }
+          : { top: rect.bottom + offset, left: rect.left, width: rect.width },
+      )
     }
 
     measure()
@@ -79,9 +96,13 @@ export function SearchableSelect({
 
     function handlePointerDown(event: MouseEvent | TouchEvent) {
       const target = event.target as Node
-      if (rootRef.current && !rootRef.current.contains(target)) {
-        setOpen(false)
+      if (
+        (rootRef.current && rootRef.current.contains(target)) ||
+        (panelRef.current && panelRef.current.contains(target))
+      ) {
+        return
       }
+      setOpen(false)
     }
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") setOpen(false)
@@ -214,19 +235,31 @@ export function SearchableSelect({
     return (
       <div ref={rootRef} className="relative">
         <button
+          ref={triggerRef}
           type="button"
           onClick={() => setOpen((prev) => !prev)}
           className={triggerClasses(open)}
         >
           {triggerContent}
         </button>
-        {open && (
-          <div
-            className={`absolute left-0 right-0 z-50 ${placement.up ? "bottom-full mb-1.5" : "top-full mt-1.5"}`}
-          >
-            {panel}
-          </div>
-        )}
+        {open &&
+          panelPos &&
+          createPortal(
+            <div
+              ref={panelRef}
+              style={{
+                position: "fixed",
+                top: panelPos.top,
+                bottom: panelPos.bottom,
+                left: panelPos.left,
+                width: panelPos.width,
+                zIndex: 60,
+              }}
+            >
+              {panel}
+            </div>,
+            document.body,
+          )}
       </div>
     )
   }

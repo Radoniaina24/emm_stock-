@@ -101,8 +101,8 @@ const entrepotsSubNav = [
 
 const entreesSubNav = [
   { label: "Nouvelle réception", icon: ArrowDownToLine, to: "/dashboard/stock/receptions" },
-  { label: "Bons de réception", icon: FileText, to: "/dashboard/stock/receptions" },
-  { label: "Réceptions fournisseurs", icon: PackageCheck, to: "/dashboard/stock/receptions" },
+  { label: "Bons de réception", icon: FileText, to: "/dashboard/stock/receptions#bons" },
+  { label: "Réceptions fournisseurs", icon: PackageCheck, to: "/dashboard/stock/receptions#fournisseurs" },
   { label: "Historique des entrées", icon: History, to: "/dashboard/mouvements/entrees" },
   { label: "Contrôle qualité", icon: ShieldCheck, to: "/dashboard/entrees/controle-qualite" },
 ]
