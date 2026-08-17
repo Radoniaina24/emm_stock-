@@ -20,6 +20,7 @@ import {
   CreateReceptionDto,
   ReceptionQueryDto,
 } from './dto/reception.dto.js';
+import { CreateExitDto, ExitQueryDto } from './dto/exit.dto.js';
 import {
   buildMeta,
   Paginated,
@@ -101,6 +102,32 @@ export type SerializedReceptionLine = {
 export type SerializedReceptionDetail = SerializedReception & {
   user: { id: string; username: string };
   lines: SerializedReceptionLine[];
+};
+
+export type SerializedExit = {
+  id: string;
+  reference: string;
+  date: string;
+  type: string;
+  description: string | null;
+  status: string;
+  warehouse: { id: string; name: string };
+  lineCount: number;
+  createdAt: string;
+};
+
+export type SerializedExitLine = {
+  id: string;
+  productId: number;
+  product: { id: number; name: string; sku: string };
+  quantity: string;
+  unitPrice: string;
+  lotNumber: string | null;
+};
+
+export type SerializedExitDetail = SerializedExit & {
+  user: { id: string; username: string };
+  lines: SerializedExitLine[];
 };
 
 @Injectable()
@@ -817,6 +844,200 @@ export class StockService {
         unitCost: l.unitCost.toString(),
         lotNumber: l.lotNumber,
         expiryDate: l.expiryDate ? l.expiryDate.toISOString() : null,
+      })),
+    };
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Sorties de stock (livraisons, consommation interne, retours)
+  // ─────────────────────────────────────────────────────────────
+
+  async exit(dto: CreateExitDto, userId: string) {
+    if (!dto.lines?.length) {
+      throw new BadRequestException('La sortie doit contenir au moins une ligne');
+    }
+
+    const productIds = [...new Set(dto.lines.map((l) => l.productId))];
+    const products = await this.prisma.product.findMany({
+      where: { id: { in: productIds } },
+      select: { id: true },
+    });
+    const knownProducts = new Set(products.map((p) => p.id));
+    for (const id of productIds) {
+      if (!knownProducts.has(Number(id)))
+        throw new NotFoundException(`Produit ${id} introuvable`);
+    }
+
+    const warehouse = await this.prisma.warehouse.findUnique({
+      where: { id: dto.warehouseId },
+    });
+    if (!warehouse) throw new NotFoundException('Entrepôt introuvable');
+
+    const stockLevels = await this.prisma.stockLevel.findMany({
+      where: {
+        productId: { in: productIds },
+        warehouseId: dto.warehouseId,
+        zoneId: null,
+      },
+    });
+    const levelByProduct = new Map<number, (typeof stockLevels)[number]>();
+    for (const lvl of stockLevels) levelByProduct.set(lvl.productId, lvl);
+
+    const exitId = randomUUID();
+    const reference =
+      dto.reference?.trim() ||
+      `SORTIE-${this.stamp()}-${exitId.slice(0, 4).toUpperCase()}`;
+    const date = dto.date ? new Date(dto.date) : new Date();
+    const type = dto.type?.trim() || 'vente';
+
+    const tx: Prisma.PrismaPromise<unknown>[] = [
+      this.prisma.exit.create({
+        data: {
+          id: exitId,
+          reference,
+          date,
+          type,
+          description: dto.description?.trim() || null,
+          status: 'DONE',
+          userId,
+          warehouseId: dto.warehouseId,
+        },
+      }),
+    ];
+
+    for (const line of dto.lines) {
+      const qty = new Prisma.Decimal(line.quantity);
+      const unitPrice = new Prisma.Decimal(line.unitPrice ?? 0);
+      const lotNumber = line.lotNumber?.trim() || null;
+
+      const level = levelByProduct.get(line.productId);
+      const onHand = level
+        ? (level.quantityOnHand as Prisma.Decimal)
+        : new Prisma.Decimal(0);
+      if (onHand.lessThan(qty)) {
+        const product = products.find((p) => p.id === line.productId);
+        throw new BadRequestException(
+          `Stock insuffisant pour le produit ${product?.id ?? line.productId} : ` +
+            `${onHand.toString()} disponible(s), ${qty.toString()} demandée(s)`,
+        );
+      }
+
+      tx.push(
+        this.prisma.stockLevel.update({
+          where: { id: level!.id },
+          data: { quantityOnHand: { decrement: qty } },
+        }),
+      );
+
+      tx.push(
+        this.prisma.exitLine.create({
+          data: {
+            exitId,
+            productId: line.productId,
+            quantity: qty,
+            unitPrice,
+            lotNumber,
+          },
+        }),
+      );
+
+      tx.push(
+        this.prisma.stockMove.create({
+          data: {
+            productId: line.productId,
+            warehouseId: dto.warehouseId,
+            userId,
+            type: 'EXIT' as const,
+            quantity: qty.negated(),
+            unitCost: unitPrice,
+            lotNumber,
+            expiryDate: null,
+            sourceType: 'exit',
+            sourceId: exitId,
+            date,
+          },
+        }),
+      );
+    }
+
+    await this.prisma.$transaction(tx);
+    return this.findExit(exitId);
+  }
+
+  async findExits(query: ExitQueryDto): Promise<Paginated<SerializedExit>> {
+    const where: Prisma.ExitWhereInput = {};
+    if (query.warehouseId) where.warehouseId = query.warehouseId;
+    if (query.type) where.type = query.type;
+    if (query.status) where.status = query.status as Prisma.ExitWhereInput['status'];
+    if (query.search) {
+      where.OR = [
+        { reference: { contains: query.search } },
+        { description: { contains: query.search } },
+      ];
+    }
+
+    const total = await this.prisma.exit.count({ where });
+    const params = resolvePagination(query);
+    const exits = await this.prisma.exit.findMany({
+      where,
+      orderBy: { date: 'desc' },
+      skip: params.skip,
+      take: params.take,
+      include: {
+        warehouse: { select: { id: true, name: true } },
+        lines: { select: { id: true } },
+      },
+    });
+
+    return {
+      items: exits.map((e) => ({
+        id: e.id,
+        reference: e.reference,
+        date: e.date.toISOString(),
+        type: e.type,
+        description: e.description,
+        status: e.status,
+        warehouse: e.warehouse,
+        lineCount: e.lines.length,
+        createdAt: e.createdAt.toISOString(),
+      })),
+      meta: buildMeta(total, params),
+    };
+  }
+
+  async findExit(id: string): Promise<SerializedExitDetail> {
+    const exit = await this.prisma.exit.findUnique({
+      where: { id },
+      include: {
+        warehouse: { select: { id: true, name: true } },
+        user: { select: { id: true, username: true } },
+        lines: {
+          include: {
+            product: { select: { id: true, name: true, sku: true } },
+          },
+        },
+      },
+    });
+    if (!exit) throw new NotFoundException('Sortie introuvable');
+
+    return {
+      id: exit.id,
+      reference: exit.reference,
+      date: exit.date.toISOString(),
+      type: exit.type,
+      description: exit.description,
+      status: exit.status,
+      warehouse: exit.warehouse,
+      user: exit.user,
+      createdAt: exit.createdAt.toISOString(),
+      lineCount: exit.lines.length,
+      lines: exit.lines.map((l) => ({
+        id: l.id,
+        productId: l.productId,
+        product: l.product,
+        quantity: l.quantity.toString(),
+        unitPrice: l.unitPrice.toString(),
+        lotNumber: l.lotNumber,
       })),
     };
   }

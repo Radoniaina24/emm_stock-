@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react"
-import { format, parseISO } from "date-fns"
+import { format } from "date-fns"
 import { fr } from "date-fns/locale"
-import { PackagePlus, Plus, Trash2 } from "lucide-react"
+import { ArrowUpFromLine, Plus, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -17,34 +17,38 @@ import { SearchableSelect, type SearchableSelectOption } from "@/components/ui/s
 import { DatePicker } from "@/components/ui/date-picker"
 import { toast } from "@/components/ui/toast"
 import { ApiError } from "@/lib/api"
-import { useReceiveStockMutation } from "@/hooks/use-stock"
+import { useExitStockMutation } from "@/hooks/use-stock"
 import { useWarehousesQuery } from "@/hooks/use-warehouses"
-import { useSuppliersQuery } from "@/hooks/use-suppliers"
 import { useProductsQuery } from "@/hooks/use-products"
 
 type Line = {
   productId: string
   quantity: string
-  unitCost: string
+  unitPrice: string
   lotNumber: string
-  expiryDate?: string
 }
 
-type ReceptionModalProps = {
+type ExitModalProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   defaultWarehouseId?: string
 }
 
+const EXIT_TYPES: SearchableSelectOption[] = [
+  { value: "vente", label: "Vente" },
+  { value: "consommation_interne", label: "Consommation interne" },
+  { value: "retour", label: "Retour / perte" },
+  { value: "transfert", label: "Transfert interne" },
+]
+
 const EMPTY_LINE: Line = {
   productId: "",
   quantity: "",
-  unitCost: "",
+  unitPrice: "",
   lotNumber: "",
-  expiryDate: undefined,
 }
 
-function buildReceptionReference(date: Date): string {
+function buildExitReference(date: Date): string {
   const p = (n: number) => String(n).padStart(2, "0")
   const stamp = `${date.getFullYear()}${p(date.getMonth() + 1)}${p(date.getDate())}`
   const suffix = crypto
@@ -52,17 +56,16 @@ function buildReceptionReference(date: Date): string {
     .replace(/-/g, "")
     .slice(0, 4)
     .toUpperCase()
-  return `REC-${stamp}-${suffix}`
+  return `SORTIE-${stamp}-${suffix}`
 }
 
-export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: ReceptionModalProps) {
-  const receive = useReceiveStockMutation()
+export function ExitModal({ open, onOpenChange, defaultWarehouseId }: ExitModalProps) {
+  const exit = useExitStockMutation()
   const { data: warehouses } = useWarehousesQuery()
-  const { data: suppliers } = useSuppliersQuery()
   const { data: products } = useProductsQuery()
 
   const [warehouseId, setWarehouseId] = useState("")
-  const [supplierId, setSupplierId] = useState("")
+  const [type, setType] = useState("vente")
   const [reference, setReference] = useState("")
   const [date, setDate] = useState<Date>(new Date())
   const [description, setDescription] = useState("")
@@ -73,8 +76,8 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
     if (!open) return
     const today = new Date()
     setWarehouseId(defaultWarehouseId ?? "")
-    setSupplierId("")
-    setReference(buildReceptionReference(today))
+    setType("vente")
+    setReference(buildExitReference(today))
     setDate(today)
     setDescription("")
     setLines([{ ...EMPTY_LINE }])
@@ -84,10 +87,6 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
   const warehouseOptions = useMemo<SearchableSelectOption[]>(
     () => (warehouses ?? []).map((w) => ({ value: w.id, label: w.name })),
     [warehouses],
-  )
-  const supplierOptions = useMemo<SearchableSelectOption[]>(
-    () => (suppliers ?? []).map((s) => ({ value: s.id, label: s.name })),
-    [suppliers],
   )
   const productOptions = useMemo<SearchableSelectOption[]>(
     () => (products ?? []).map((p) => ({ value: String(p.id), label: `${p.name} (${p.sku})` })),
@@ -108,37 +107,35 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
     setError(null)
 
     if (!warehouseId) return setError("Veuillez sélectionner un entrepôt.")
-    if (!supplierId) return setError("Veuillez sélectionner un fournisseur.")
 
     const cleaned = lines
       .map((l) => ({
         productId: Number(l.productId),
         quantity: Number(l.quantity),
-        unitCost: Number(l.unitCost || 0),
+        unitPrice: Number(l.unitPrice || 0),
         lotNumber: l.lotNumber.trim() || undefined,
-        expiryDate: l.expiryDate || undefined,
       }))
       .filter((l) => l.productId && Number.isFinite(l.quantity) && l.quantity > 0)
 
     if (!cleaned.length) return setError("Ajoutez au moins une ligne avec un produit et une quantité.")
 
     try {
-      await receive.mutateAsync({
+      await exit.mutateAsync({
         warehouseId,
-        supplierId,
+        type,
         reference: reference.trim() || undefined,
         date: date ? format(date, "yyyy-MM-dd") : undefined,
         description: description.trim() || undefined,
         lines: cleaned,
       })
-      toast.success("Réception enregistrée")
+      toast.success("Sortie enregistrée")
       close()
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Une erreur est survenue.")
     }
   }
 
-  const pending = receive.isPending
+  const pending = exit.isPending
 
   return (
     <ModalRoot open={open} onOpenChange={(o) => (o ? undefined : close())}>
@@ -146,13 +143,13 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
         <ModalClose />
         <ModalHeader>
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20">
-              <PackagePlus className="size-5" />
+            <div className="flex size-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 ring-1 ring-amber-500/20">
+              <ArrowUpFromLine className="size-5" />
             </div>
             <div>
-              <ModalTitle>Nouvelle réception</ModalTitle>
+              <ModalTitle>Nouvelle sortie</ModalTitle>
               <p className="mt-0.5 text-sm text-muted-foreground">
-                Entrée de stock fournisseur (bon de réception).
+                Sortie de stock (livraison, consommation interne, retour…).
               </p>
             </div>
           </div>
@@ -174,13 +171,13 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-foreground/80">Fournisseur</label>
+                  <label className="text-sm font-medium text-foreground/80">Type de sortie</label>
                   <SearchableSelect
                     variant="inline"
-                    value={supplierId}
-                    placeholder="Choisir un fournisseur"
-                    options={supplierOptions}
-                    onSelect={(v) => setSupplierId(v)}
+                    value={type}
+                    placeholder="Choisir un type"
+                    options={EXIT_TYPES}
+                    onSelect={(v) => setType(v)}
                     triggerClassName="h-10 w-full bg-background"
                   />
                 </div>
@@ -189,7 +186,7 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
                   <input
                     value={reference}
                     onChange={(e) => setReference(e.target.value)}
-                    placeholder="Auto si vide (ex. REC-20260101-AB12)"
+                    placeholder="Auto si vide (ex. SORTIE-20260101-AB12)"
                     className="h-10 w-full rounded-lg border border-border/60 bg-background px-3 text-sm outline-none transition-all placeholder:text-muted-foreground/30 hover:border-border focus:border-ring/80 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.08)]"
                   />
                 </div>
@@ -201,7 +198,7 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
                       locale={fr}
                       selected={date}
                       onSelect={(selected) => setDate((selected as Date | undefined) ?? new Date())}
-                      placeholder="Date de réception"
+                      placeholder="Date de sortie"
                     />
                   </div>
                 </div>
@@ -213,14 +210,14 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={2}
-                  placeholder="Bon de commande, observations…"
+                  placeholder="Destination, observations…"
                   className="w-full resize-y rounded-lg border border-border/60 bg-background px-3 py-2 text-sm outline-none transition-all placeholder:text-muted-foreground/30 hover:border-border focus:border-ring/80 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.08)]"
                 />
               </div>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-foreground/80">Lignes de réception</h2>
+                  <h2 className="text-sm font-semibold text-foreground/80">Lignes de sortie</h2>
                   <Button type="button" variant="outline" size="sm" onClick={addLine}>
                     <Plus className="size-4" /> Ajouter une ligne
                   </Button>
@@ -232,7 +229,7 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
                       key={index}
                       className="flex flex-wrap items-end gap-2 rounded-xl border border-border/60 bg-muted/20 p-3"
                     >
-                      <div className="min-w-[180px] flex-1 space-y-1.5">
+                      <div className="min-w-[200px] flex-1 space-y-1.5">
                         <label className="text-xs text-muted-foreground">Produit</label>
                         <SearchableSelect
                           variant="inline"
@@ -256,13 +253,13 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
                         />
                       </div>
                       <div className="w-28 space-y-1.5">
-                        <label className="text-xs text-muted-foreground">Coût unit.</label>
+                        <label className="text-xs text-muted-foreground">Prix unit.</label>
                         <input
                           type="number"
                           min={0}
                           step="any"
-                          value={line.unitCost}
-                          onChange={(e) => updateLine(index, { unitCost: e.target.value })}
+                          value={line.unitPrice}
+                          onChange={(e) => updateLine(index, { unitPrice: e.target.value })}
                           placeholder="0"
                           className="h-9 w-full rounded-lg border border-border/60 bg-background px-2.5 text-sm outline-none transition-all placeholder:text-muted-foreground/30 hover:border-border focus:border-ring/80 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.08)]"
                         />
@@ -275,38 +272,6 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
                           placeholder="Optionnel"
                           className="h-9 w-full rounded-lg border border-border/60 bg-background px-2.5 text-sm outline-none transition-all placeholder:text-muted-foreground/30 hover:border-border focus:border-ring/80 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.08)]"
                         />
-                      </div>
-                      <div className="w-52 space-y-1.5">
-                        <label className="text-xs text-muted-foreground">Péremption</label>
-                        <div className="flex items-center gap-1">
-                          <div className="flex-1">
-                            <DatePicker
-                              mode="single"
-                              locale={fr}
-                              selected={line.expiryDate ? parseISO(line.expiryDate) : undefined}
-                              onSelect={(selected) =>
-                                updateLine(index, {
-                                  expiryDate: selected
-                                    ? format(selected as Date, "yyyy-MM-dd")
-                                    : undefined,
-                                })
-                              }
-                              placeholder=""
-                            />
-                          </div>
-                          {line.expiryDate && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() => updateLine(index, { expiryDate: undefined })}
-                              aria-label="Supprimer la péremption"
-                              className="shrink-0 text-muted-foreground hover:text-destructive"
-                            >
-                              <Trash2 className="size-4" />
-                            </Button>
-                          )}
-                        </div>
                       </div>
                       <div className="flex justify-end">
                         <Button
@@ -346,7 +311,7 @@ export function ReceptionModal({ open, onOpenChange, defaultWarehouseId }: Recep
                   Enregistrement…
                 </span>
               ) : (
-                "Enregistrer la réception"
+                "Enregistrer la sortie"
               )}
             </Button>
           </ModalFooter>

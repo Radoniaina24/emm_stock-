@@ -191,6 +191,57 @@ export type ReceptionQuery = {
   search?: string
 }
 
+export type ExitLine = {
+  id: string
+  productId: number
+  product: { id: number; name: string; sku: string }
+  quantity: string
+  unitPrice: string
+  lotNumber: string | null
+}
+
+export type Exit = {
+  id: string
+  reference: string
+  date: string
+  type: string
+  description: string | null
+  status: string
+  warehouse: { id: string; name: string }
+  lineCount: number
+  createdAt: string
+}
+
+export type ExitDetail = Exit & {
+  user: { id: string; username: string }
+  lines: ExitLine[]
+}
+
+export type ExitInputLine = {
+  productId: number
+  quantity: number
+  unitPrice?: number
+  lotNumber?: string
+}
+
+export type ExitInput = {
+  warehouseId: string
+  type?: string
+  reference?: string
+  date?: string
+  description?: string
+  lines: ExitInputLine[]
+}
+
+export type ExitQuery = {
+  page?: number
+  limit?: number
+  warehouseId?: string
+  type?: string
+  status?: string
+  search?: string
+}
+
 function buildQuery(params?: Record<string, unknown>): string {
   if (!params) return ""
   const usp = new URLSearchParams()
@@ -278,6 +329,21 @@ export function getReception(id: string) {
 
 export function createReception(payload: ReceptionInput) {
   return api<ReceptionDetail>("/stock/receptions", {
+    method: "POST",
+    body: payload,
+  })
+}
+
+export function getExits(query?: ExitQuery) {
+  return api<Paginated<Exit>>(`/stock/exits${buildQuery(query as any)}`)
+}
+
+export function getExit(id: string) {
+  return api<ExitDetail>(`/stock/exits/${id}`)
+}
+
+export function createExit(payload: ExitInput) {
+  return api<ExitDetail>("/stock/exits", {
     method: "POST",
     body: payload,
   })

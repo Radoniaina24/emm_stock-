@@ -29,6 +29,7 @@ import { StockDetailPage } from "@/pages/stock/StockDetailPage"
 import { StockMovesPage } from "@/pages/stock/StockMovesPage"
 import { ReorderRulesPage } from "@/pages/stock/ReorderRulesPage"
 import { ReceptionPage } from "@/pages/stock/ReceptionPage"
+import { ExitPage } from "@/pages/stock/ExitPage"
 import { TransferPage } from "@/pages/stock/TransferPage"
 import { CategoriesPage } from "@/pages/produits/CategoriesPage"
 import { BrandsPage } from "@/pages/produits/BrandsPage"
@@ -82,6 +83,7 @@ function App() {
             <Route path="stock/mouvements" element={<StockMovesPage />} />
             <Route path="stock/reappro" element={<ReorderRulesPage />} />
           <Route path="stock/receptions" element={<ReceptionPage />} />
+          <Route path="stock/sorties" element={<ExitPage />} />
             <Route path="stock/par-entrepot" element={<div className="text-muted-foreground">Stock par entrepôt</div>} />
             <Route path="stock/disponible" element={<div className="text-muted-foreground">Stock disponible</div>} />
             <Route path="stock/reserve" element={<div className="text-muted-foreground">Stock réservé</div>} />
@@ -100,8 +102,8 @@ function App() {
             <Route path="entrees/receptions-fournisseurs" element={<div className="text-muted-foreground">Réceptions fournisseurs</div>} />
             <Route path="entrees/historique" element={<div className="text-muted-foreground">Historique des entrées</div>} />
             <Route path="entrees/controle-qualite" element={<div className="text-muted-foreground">Contrôle qualité</div>} />
-            <Route path="sorties" element={<div className="text-muted-foreground">Liste des sorties</div>} />
-            <Route path="sorties/nouvelle" element={<div className="text-muted-foreground">Nouvelle sortie</div>} />
+            <Route path="sorties" element={<ExitPage />} />
+            <Route path="sorties/nouvelle" element={<ExitPage />} />
             <Route path="sorties/bons" element={<div className="text-muted-foreground">Bons de sortie</div>} />
             <Route path="sorties/ventes" element={<div className="text-muted-foreground">Ventes</div>} />
             <Route path="sorties/consommation-interne" element={<div className="text-muted-foreground">Consommation interne</div>} />
@@ -109,7 +111,7 @@ function App() {
             <Route path="sorties/historique" element={<div className="text-muted-foreground">Historique des sorties</div>} />
             <Route path="mouvements" element={<StockMovesPage />} />
             <Route path="mouvements/entrees" element={<ReceptionPage />} />
-            <Route path="mouvements/sorties" element={<div className="text-muted-foreground">Sorties</div>} />
+            <Route path="mouvements/sorties" element={<ExitPage />} />
             <Route path="mouvements/transferts" element={<div className="text-muted-foreground">Transferts</div>} />
             <Route path="mouvements/ajustements" element={<div className="text-muted-foreground">Ajustements</div>} />
             <Route path="mouvements/historique" element={<div className="text-muted-foreground">Historique complet</div>} />

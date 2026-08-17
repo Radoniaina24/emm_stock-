@@ -12,6 +12,8 @@ export const stockKeys = {
   reorderRule: (id: string) => ["stock", "reorder-rule", id] as const,
   receptions: (query?: stockApi.ReceptionQuery) => ["stock", "receptions", query ?? {}] as const,
   reception: (id: string) => ["stock", "reception", id] as const,
+  exits: (query?: stockApi.ExitQuery) => ["stock", "exits", query ?? {}] as const,
+  exit: (id: string) => ["stock", "exit", id] as const,
 }
 
 export function useStockLevelsQuery(query?: stockApi.StockQuery) {
@@ -138,6 +140,32 @@ export function useReceiveStockMutation() {
     mutationFn: (payload: stockApi.ReceptionInput) => stockApi.createReception(payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: stockKeys.receptions() })
+      invalidateStockLists(queryClient)
+    },
+  })
+}
+
+export function useExitsQuery(query?: stockApi.ExitQuery) {
+  return useQuery({
+    queryKey: stockKeys.exits(query),
+    queryFn: () => stockApi.getExits(query),
+  })
+}
+
+export function useExitQuery(id: string) {
+  return useQuery({
+    queryKey: stockKeys.exit(id),
+    queryFn: () => stockApi.getExit(id),
+    enabled: Boolean(id),
+  })
+}
+
+export function useExitStockMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: stockApi.ExitInput) => stockApi.createExit(payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: stockKeys.exits() })
       invalidateStockLists(queryClient)
     },
   })

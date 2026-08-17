@@ -28,6 +28,7 @@ import {
   CreateReceptionDto,
   ReceptionQueryDto,
 } from './dto/reception.dto.js';
+import { CreateExitDto, ExitQueryDto } from './dto/exit.dto.js';
 import { PaginatedStockLevelsDto } from './dto/response/paginated-stock-levels.dto.js';
 import { PaginatedStockMovesDto } from './dto/response/paginated-stock-moves.dto.js';
 import { PaginatedReorderRulesDto } from './dto/response/paginated-reorder-rules.dto.js';
@@ -100,6 +101,27 @@ export class StockController {
   @ApiOperation({ summary: 'Détail d’une réception' })
   findReception(@Param('id') id: string) {
     return this.stock.findReception(id);
+  }
+
+  @Get('exits')
+  @RequirePermission('stocks.view')
+  @ApiOperation({ summary: 'Liste des sorties de stock' })
+  findExits(@Query() query: ExitQueryDto) {
+    return this.stock.findExits(query);
+  }
+
+  @Post('exits')
+  @RequirePermission('stocks.adjust')
+  @ApiOperation({ summary: 'Enregistrer une sortie de stock' })
+  exit(@Body() dto: CreateExitDto, @CurrentUser('id') userId: string) {
+    return this.stock.exit(dto, userId);
+  }
+
+  @Get('exits/:id')
+  @RequirePermission('stocks.view')
+  @ApiOperation({ summary: 'Détail d’une sortie' })
+  findExit(@Param('id') id: string) {
+    return this.stock.findExit(id);
   }
 
   @Get()

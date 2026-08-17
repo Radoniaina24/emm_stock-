@@ -87,6 +87,7 @@ const stockSubNav = [
   { label: "Vue globale du stock", icon: Warehouse, to: "/dashboard/stock" },
   { label: "Mouvements", icon: History, to: "/dashboard/stock/mouvements" },
   { label: "Réceptions", icon: PackageCheck, to: "/dashboard/stock/receptions" },
+  { label: "Sorties", icon: ArrowUpFromLine, to: "/dashboard/stock/sorties" },
   { label: "Règles de réappro", icon: RefreshCw, to: "/dashboard/stock/reappro" },
   { label: "Stock faible", icon: AlertTriangle, to: "/dashboard/stock?statut=faible" },
 ]
@@ -108,12 +109,12 @@ const entreesSubNav = [
 ]
 
 const sortiesSubNav = [
-  { label: "Nouvelle sortie", icon: ArrowUpFromLine, to: "/dashboard/sorties/nouvelle" },
-  { label: "Bons de sortie", icon: FileText, to: "/dashboard/sorties/bons" },
+  { label: "Nouvelle sortie", icon: ArrowUpFromLine, to: "/dashboard/stock/sorties" },
+  { label: "Bons de sortie", icon: FileText, to: "/dashboard/stock/sorties#bons" },
   { label: "Ventes", icon: Store, to: "/dashboard/sorties/ventes" },
   { label: "Consommation interne", icon: Factory, to: "/dashboard/sorties/consommation-interne" },
   { label: "Retours", icon: Undo2, to: "/dashboard/sorties/retours" },
-  { label: "Historique des sorties", icon: History, to: "/dashboard/sorties/historique" },
+  { label: "Historique des sorties", icon: History, to: "/dashboard/mouvements/sorties" },
 ]
 
 const mouvementsSubNav = [
