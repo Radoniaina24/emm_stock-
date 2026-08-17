@@ -20,7 +20,6 @@ import {
   Coins,
   Component,
   Download,
-  Factory,
   File,
   FileDigit,
   FilePlus,
@@ -51,7 +50,6 @@ import {
   ShoppingCart,
   SlidersHorizontal,
   Star,
-  Store,
   Tag,
   Tags,
   TrendingUp,
@@ -94,27 +92,11 @@ const stockSubNav = [
 
 const entrepotsSubNav = [
   { label: "Liste des entrepôts", icon: Building2, to: "/dashboard/entrepots" },
+  { label: "Carte des entrepôts", icon: MapPin, to: "/dashboard/entrepots/carte" },
   { label: "Zones de stockage", icon: Grid3x3, to: "/dashboard/entrepots/zones" },
   { label: "Emplacements", icon: MapPin, to: "/dashboard/entrepots/emplacements" },
   { label: "Transferts entre entrepôts", icon: GitCompare, to: "/dashboard/entrepots/transferts" },
   { label: "Capacité de stockage", icon: HardDrive, to: "/dashboard/entrepots/capacite" },
-]
-
-const entreesSubNav = [
-  { label: "Nouvelle réception", icon: ArrowDownToLine, to: "/dashboard/stock/receptions" },
-  { label: "Bons de réception", icon: FileText, to: "/dashboard/stock/receptions#bons" },
-  { label: "Réceptions fournisseurs", icon: PackageCheck, to: "/dashboard/stock/receptions#fournisseurs" },
-  { label: "Historique des entrées", icon: History, to: "/dashboard/mouvements/entrees" },
-  { label: "Contrôle qualité", icon: ShieldCheck, to: "/dashboard/entrees/controle-qualite" },
-]
-
-const sortiesSubNav = [
-  { label: "Nouvelle sortie", icon: ArrowUpFromLine, to: "/dashboard/stock/sorties" },
-  { label: "Bons de sortie", icon: FileText, to: "/dashboard/stock/sorties#bons" },
-  { label: "Ventes", icon: Store, to: "/dashboard/sorties/ventes" },
-  { label: "Consommation interne", icon: Factory, to: "/dashboard/sorties/consommation-interne" },
-  { label: "Retours", icon: Undo2, to: "/dashboard/sorties/retours" },
-  { label: "Historique des sorties", icon: History, to: "/dashboard/mouvements/sorties" },
 ]
 
 const mouvementsSubNav = [
@@ -392,12 +374,6 @@ export function Sidebar() {
   const [entrepotsOpen, setEntrepotsOpen] = useState(
     location.pathname.startsWith("/dashboard/entrepots")
   )
-  const [entreesOpen, setEntreesOpen] = useState(
-    location.pathname.startsWith("/dashboard/entrees")
-  )
-  const [sortiesOpen, setSortiesOpen] = useState(
-    location.pathname.startsWith("/dashboard/sorties")
-  )
   const [mouvementsOpen, setMouvementsOpen] = useState(
     location.pathname.startsWith("/dashboard/mouvements")
   )
@@ -438,12 +414,6 @@ export function Sidebar() {
   const isEntrepotsActive =
     location.pathname === "/dashboard/entrepots" ||
     location.pathname.startsWith("/dashboard/entrepots/")
-  const isEntreesActive =
-    location.pathname === "/dashboard/entrees" ||
-    location.pathname.startsWith("/dashboard/entrees/")
-  const isSortiesActive =
-    location.pathname === "/dashboard/sorties" ||
-    location.pathname.startsWith("/dashboard/sorties/")
   const isMouvementsActive =
     location.pathname === "/dashboard/mouvements" ||
     location.pathname.startsWith("/dashboard/mouvements/")
@@ -529,32 +499,6 @@ export function Sidebar() {
           collapsed={c}
         >
           {entrepotsSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
-          ))}
-        </MenuSection>
-
-        <MenuSection
-          label="Entrées"
-          icon={ArrowDownToLine}
-          open={entreesOpen}
-          onToggle={() => setEntreesOpen(!entreesOpen)}
-          isActive={isEntreesActive}
-          collapsed={c}
-        >
-          {entreesSubNav.map((item) => (
-            <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
-          ))}
-        </MenuSection>
-
-        <MenuSection
-          label="Sorties"
-          icon={ArrowUpFromLine}
-          open={sortiesOpen}
-          onToggle={() => setSortiesOpen(!sortiesOpen)}
-          isActive={isSortiesActive}
-          collapsed={c}
-        >
-          {sortiesSubNav.map((item) => (
             <SubNavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={navOnClick} />
           ))}
         </MenuSection>

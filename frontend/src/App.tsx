@@ -24,6 +24,7 @@ import { ConfigurationPage } from "@/pages/parametres/ConfigurationPage"
 import { DepartementsPage } from "@/pages/parametres/DepartementsPage"
 import { JobTitlesPage } from "@/pages/parametres/JobTitlesPage"
 import { WarehousesPage } from "@/pages/entrepots/WarehousesPage"
+import { WarehousesMapPage } from "@/pages/entrepots/WarehousesMapPage"
 import { StockPage } from "@/pages/stock/StockPage"
 import { StockDetailPage } from "@/pages/stock/StockDetailPage"
 import { StockMovesPage } from "@/pages/stock/StockMovesPage"
@@ -96,19 +97,7 @@ function App() {
             <Route path="entrepots/emplacements" element={<div className="text-muted-foreground">Emplacements</div>} />
             <Route path="entrepots/transferts" element={<TransferPage />} />
             <Route path="entrepots/capacite" element={<div className="text-muted-foreground">Capacité de stockage</div>} />
-            <Route path="entrees" element={<div className="text-muted-foreground">Liste des réceptions</div>} />
-            <Route path="entrees/nouvelle" element={<div className="text-muted-foreground">Nouvelle réception</div>} />
-            <Route path="entrees/bons" element={<div className="text-muted-foreground">Bons de réception</div>} />
-            <Route path="entrees/receptions-fournisseurs" element={<div className="text-muted-foreground">Réceptions fournisseurs</div>} />
-            <Route path="entrees/historique" element={<div className="text-muted-foreground">Historique des entrées</div>} />
-            <Route path="entrees/controle-qualite" element={<div className="text-muted-foreground">Contrôle qualité</div>} />
-            <Route path="sorties" element={<ExitPage />} />
-            <Route path="sorties/nouvelle" element={<ExitPage />} />
-            <Route path="sorties/bons" element={<div className="text-muted-foreground">Bons de sortie</div>} />
-            <Route path="sorties/ventes" element={<div className="text-muted-foreground">Ventes</div>} />
-            <Route path="sorties/consommation-interne" element={<div className="text-muted-foreground">Consommation interne</div>} />
-            <Route path="sorties/retours" element={<div className="text-muted-foreground">Retours</div>} />
-            <Route path="sorties/historique" element={<div className="text-muted-foreground">Historique des sorties</div>} />
+            <Route path="entrepots/carte" element={<WarehousesMapPage />} />
             <Route path="mouvements" element={<StockMovesPage />} />
             <Route path="mouvements/entrees" element={<ReceptionPage />} />
             <Route path="mouvements/sorties" element={<ExitPage />} />
