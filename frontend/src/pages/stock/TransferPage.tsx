@@ -33,7 +33,13 @@ export function TransferPage() {
   const [toWarehouseId, setToWarehouseId] = useState("")
   const [lines, setLines] = useState<Line[]>([{ ...emptyLine }])
   const [error, setError] = useState<string | null>(null)
-  const [resultId, setResultId] = useState<string | null>(null)
+  const [resultNames, setResultNames] = useState<string[]>([])
+
+  const productName = useMemo(() => {
+    const m = new Map<number, string>()
+    ;(products ?? []).forEach((p) => m.set(p.id, p.name))
+    return m
+  }, [products])
 
   const productOptions = useMemo(
     () => (products ?? []).map((p) => ({ value: String(p.id), label: `${p.name} (${p.sku})` })),
@@ -60,7 +66,7 @@ export function TransferPage() {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     setError(null)
-    setResultId(null)
+    setResultNames([])
 
     if (!can("stocks.transfer")) {
       setError("Vous n'avez pas la permission d'effectuer un transfert.")
@@ -104,7 +110,9 @@ export function TransferPage() {
     try {
       const result = await transfer.mutateAsync(payload)
       toast.success("Transfert effectué avec succès")
-      setResultId(result.id)
+      setResultNames(
+        result.lines.map((l) => productName.get(l.productId) ?? `Produit #${l.productId}`),
+      )
       setLines([{ ...emptyLine }])
       setFromWarehouseId("")
       setToWarehouseId("")
@@ -213,17 +221,25 @@ export function TransferPage() {
               </div>
             )}
 
-            {resultId && (
+            {resultNames.length > 0 && (
               <div className="flex items-center gap-2 rounded-lg border border-success/20 bg-success/5 px-3.5 py-2.5 text-sm text-success">
                 <Badge variant="success">OK</Badge>
-                Transfert <span className="font-mono font-medium">{resultId}</span> enregistré.
+                <span>
+                  Transfert enregistré&nbsp;:{" "}
+                  {resultNames.map((name, i) => (
+                    <span key={i} className="font-medium">
+                      {name}
+                      {i < resultNames.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+                </span>
               </div>
             )}
           </CardContent>
         </Card>
 
         <div className="mt-4 flex justify-end gap-2">
-          <Button type="button" variant="ghost" onClick={() => { setLines([{ ...emptyLine }]); setError(null) }}>
+            <Button type="button" variant="ghost" onClick={() => { setLines([{ ...emptyLine }]); setError(null); setResultNames([]) }}>
             Réinitialiser
           </Button>
           <Button type="submit" disabled={transfer.isPending}>

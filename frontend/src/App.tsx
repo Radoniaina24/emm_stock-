@@ -32,6 +32,7 @@ import { ReorderRulesPage } from "@/pages/stock/ReorderRulesPage"
 import { ReceptionPage } from "@/pages/stock/ReceptionPage"
 import { ExitPage } from "@/pages/stock/ExitPage"
 import { TransferPage } from "@/pages/stock/TransferPage"
+import { AjustementPage } from "@/pages/stock/AjustementPage"
 import { CategoriesPage } from "@/pages/produits/CategoriesPage"
 import { BrandsPage } from "@/pages/produits/BrandsPage"
 import { UnitsOfMeasurePage } from "@/pages/produits/UnitsOfMeasurePage"
@@ -101,9 +102,9 @@ function App() {
             <Route path="mouvements" element={<StockMovesPage />} />
             <Route path="mouvements/entrees" element={<ReceptionPage />} />
             <Route path="mouvements/sorties" element={<ExitPage />} />
-            <Route path="mouvements/transferts" element={<div className="text-muted-foreground">Transferts</div>} />
-            <Route path="mouvements/ajustements" element={<div className="text-muted-foreground">Ajustements</div>} />
-            <Route path="mouvements/historique" element={<div className="text-muted-foreground">Historique complet</div>} />
+            <Route path="mouvements/transferts" element={<TransferPage />} />
+            <Route path="mouvements/ajustements" element={<AjustementPage />} />
+            <Route path="mouvements/historique" element={<StockMovesPage />} />
             <Route path="inventaire" element={<div className="text-muted-foreground">Vue d'ensemble inventaire</div>} />
             <Route path="inventaire/nouveau" element={<div className="text-muted-foreground">Nouvel inventaire</div>} />
             <Route path="inventaire/en-cours" element={<div className="text-muted-foreground">Inventaires en cours</div>} />

@@ -1,11 +1,13 @@
 import { useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import {
+  Activity,
   AlertTriangle,
   ArrowDownToLine,
   ArrowRightLeft,
   ArrowUpFromLine,
   Boxes,
+  Building2,
   CircleDollarSign,
   Layers,
   Package,
@@ -13,7 +15,7 @@ import {
   Warehouse,
 } from "lucide-react"
 
-import { StatCard } from "@/components/dashboard/StatCard"
+import { DashboardSkeleton, KpiCard, type KpiAccent } from "@/components/dashboard/kpi-card"
 import { ChartCard, MovementBarChart, WarehouseBars } from "@/components/dashboard/charts"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -55,6 +57,13 @@ const dateFmt = new Intl.DateTimeFormat("fr-FR", {
   minute: "2-digit",
 })
 
+const longDateFmt = new Intl.DateTimeFormat("fr-FR", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+})
+
 function ymd(d: Date) {
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, "0")
@@ -90,6 +99,12 @@ export function HomePage() {
   const { data: warehouses } = useWarehousesQuery()
   const { data: receptions } = useReceptionsQuery({ limit: 1 })
   const { data: exits } = useExitsQuery({ limit: 1 })
+
+  const isLoading =
+    summary === undefined &&
+    levels === undefined &&
+    products === undefined &&
+    warehouses === undefined
 
   const costMap = useMemo(() => {
     const m = new Map<number, number>()
@@ -158,56 +173,63 @@ export function HomePage() {
   const recentMoves = useMemo(() => (moves?.items ?? []).slice(0, 8), [moves])
 
   const kpisRow1 = [
-    { label: "Produits", value: fmtNb(products?.length ?? 0), hint: "références suivies", icon: Boxes, trend: "up" as const },
-    { label: "Valeur du stock", value: fmtAr(stockValue), hint: "coût estimé", icon: CircleDollarSign, trend: "neutral" as const },
-    { label: "Quantité en stock", value: fmtNb(Number(summary?.totalOnHand ?? 0)), hint: "unités au total", icon: Package, trend: "up" as const },
-    { label: "Entrepôts", value: fmtNb(warehouses?.length ?? 0), hint: "sites actifs", icon: Warehouse, trend: "neutral" as const },
+    { label: "Produits", value: fmtNb(products?.length ?? 0), icon: Boxes, accent: "indigo" as KpiAccent, hint: "références suivies", trend: { dir: "up" as const, text: "actifs" } },
+    { label: "Valeur du stock", value: fmtAr(stockValue), icon: CircleDollarSign, accent: "emerald" as KpiAccent, hint: "coût d'achat estimé" },
+    { label: "Quantité en stock", value: fmtNb(Number(summary?.totalOnHand ?? 0)), icon: Package, accent: "sky" as KpiAccent, hint: "unités physiques" },
+    { label: "Entrepôts", value: fmtNb(warehouses?.length ?? 0), icon: Warehouse, accent: "amber" as KpiAccent, hint: "sites actifs" },
   ]
 
   const kpisRow2 = [
-    { label: "Ruptures", value: fmtNb(summary?.outOfStockCount ?? 0), hint: "en rupture de stock", icon: AlertTriangle, trend: "down" as const },
-    { label: "Stock faible", value: fmtNb(summary?.lowStockCount ?? 0), hint: "à réapprovisionner", icon: Layers, trend: "down" as const },
-    { label: "Réceptions", value: fmtNb(receptions?.meta?.total ?? 0), hint: "enregistrées", icon: ArrowDownToLine, trend: "up" as const },
-    { label: "Sorties", value: fmtNb(exits?.meta?.total ?? 0), hint: "enregistrées", icon: ArrowUpFromLine, trend: "up" as const },
+    { label: "Ruptures", value: fmtNb(summary?.outOfStockCount ?? 0), icon: AlertTriangle, accent: "rose" as KpiAccent, trend: { dir: "down" as const, text: "à traiter" } },
+    { label: "Stock faible", value: fmtNb(summary?.lowStockCount ?? 0), icon: Layers, accent: "amber" as KpiAccent, trend: { dir: "down" as const, text: "à réappro." } },
+    { label: "Réceptions", value: fmtNb(receptions?.meta?.total ?? 0), icon: ArrowDownToLine, accent: "emerald" as KpiAccent, trend: { dir: "up" as const, text: "enregistrées" } },
+    { label: "Sorties", value: fmtNb(exits?.meta?.total ?? 0), icon: ArrowUpFromLine, accent: "sky" as KpiAccent, trend: { dir: "up" as const, text: "enregistrées" } },
   ]
+
+  if (isLoading) return <DashboardSkeleton />
 
   return (
     <div className="w-full space-y-6">
-      <div className="flex flex-col gap-4 border-b border-border/60 pb-6 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Tableau de bord</h1>
-          <p className="text-sm text-muted-foreground">
-            Vue d'ensemble de votre inventaire et de vos mouvements en temps réel.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {can("stocks.adjust") && (
-            <Button onClick={() => navigate("/dashboard/stock/receptions")}>
-              <Plus className="size-4" /> Réception
-            </Button>
-          )}
-          {can("stocks.adjust") && (
-            <Button variant="outline" onClick={() => navigate("/dashboard/stock/sorties")}>
-              <ArrowUpFromLine className="size-4" /> Sortie
-            </Button>
-          )}
-          {can("stocks.transfer") && (
-            <Button variant="outline" onClick={() => navigate("/dashboard/entrepots/transferts")}>
-              <ArrowRightLeft className="size-4" /> Transfert
-            </Button>
-          )}
+      <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br from-primary/10 via-card to-card p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1.5">
+            <p className="text-sm font-medium text-primary">Tableau de bord</p>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              Bonjour, Admin
+            </h1>
+            <p className="text-sm capitalize text-muted-foreground">
+              {longDateFmt.format(new Date())} · Voici l'état de votre inventaire en temps réel.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {can("stocks.adjust") && (
+              <Button onClick={() => navigate("/dashboard/stock/receptions")}>
+                <Plus className="size-4" /> Réception
+              </Button>
+            )}
+            {can("stocks.adjust") && (
+              <Button variant="outline" onClick={() => navigate("/dashboard/stock/sorties")}>
+                <ArrowUpFromLine className="size-4" /> Sortie
+              </Button>
+            )}
+            {can("stocks.transfer") && (
+              <Button variant="outline" onClick={() => navigate("/dashboard/entrepots/transferts")}>
+                <ArrowRightLeft className="size-4" /> Transfert
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpisRow1.map((k) => (
-          <StatCard key={k.label} {...k} />
+          <KpiCard key={k.label} {...k} />
         ))}
       </section>
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpisRow2.map((k) => (
-          <StatCard key={k.label} {...k} />
+          <KpiCard key={k.label} {...k} />
         ))}
       </section>
 
@@ -216,6 +238,7 @@ export function HomePage() {
           <ChartCard
             title="Mouvements des 14 derniers jours"
             description="Volume d'entrées et de sorties de stock"
+            icon={Activity}
           >
             <MovementBarChart data={movementData} />
           </ChartCard>
@@ -223,6 +246,7 @@ export function HomePage() {
         <ChartCard
           title="Répartition par entrepôt"
           description="Quantité physique par site"
+          icon={Building2}
         >
           <WarehouseBars data={warehouseData} />
         </ChartCard>
@@ -240,44 +264,48 @@ export function HomePage() {
             </Button>
           </CardHeader>
           <CardContent className="px-0">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="pl-6">Produit</TableHead>
-                  <TableHead>Entrepôt</TableHead>
-                  <TableHead className="text-right">Quantité</TableHead>
-                  <TableHead>Statut</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {lowStock.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="pl-6 text-center text-sm text-muted-foreground">
-                      Aucun stock faible.
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="pl-6">Produit</TableHead>
+                    <TableHead>Entrepôt</TableHead>
+                    <TableHead className="text-right">Quantité</TableHead>
+                    <TableHead>Statut</TableHead>
                   </TableRow>
-                ) : (
-                  lowStock.map((l) => {
-                    const status = stockStatus(Number(l.quantityOnHand), l.isLowStock)
-                    return (
-                      <TableRow key={l.id}>
-                        <TableCell className="pl-6">
-                          <p className="truncate font-medium">{l.product.name}</p>
-                          <p className="font-mono text-xs text-muted-foreground">{l.product.sku}</p>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">{l.warehouse.name}</TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {fmtNb(Number(l.quantityOnHand))}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={status.variant}>{status.label}</Badge>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })
-                )}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {lowStock.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="pl-6 text-center text-sm text-muted-foreground">
+                        Aucun stock faible.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    lowStock.map((l) => {
+                      const status = stockStatus(Number(l.quantityOnHand), l.isLowStock)
+                      return (
+                        <TableRow key={l.id}>
+                          <TableCell className="pl-6">
+                            <p className="truncate font-medium">{l.product.name}</p>
+                            <p className="font-mono text-xs text-muted-foreground">{l.product.sku}</p>
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap text-muted-foreground">
+                            {l.warehouse.name}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {fmtNb(Number(l.quantityOnHand))}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={status.variant}>{status.label}</Badge>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
 
@@ -292,49 +320,51 @@ export function HomePage() {
             </Button>
           </CardHeader>
           <CardContent className="px-0">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="pl-6">Date</TableHead>
-                  <TableHead>Produit</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead className="text-right">Quantité</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentMoves.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="pl-6 text-center text-sm text-muted-foreground">
-                      Aucun mouvement récent.
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="pl-6">Date</TableHead>
+                    <TableHead>Produit</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead className="text-right">Quantité</TableHead>
                   </TableRow>
-                ) : (
-                  recentMoves.map((m) => {
-                    const meta = moveMeta(m.type)
-                    return (
-                      <TableRow key={m.id}>
-                        <TableCell className="pl-6 text-xs text-muted-foreground">
-                          {dateFmt.format(new Date(m.date))}
-                        </TableCell>
-                        <TableCell>
-                          <p className="truncate font-medium">{m.product.name}</p>
-                          <p className="font-mono text-xs text-muted-foreground">{m.product.sku}</p>
-                        </TableCell>
-                        <TableCell>
-                          <span className="flex items-center gap-1.5 text-xs font-medium">
-                            <span className={`inline-block size-2 rounded-full ${meta.dot}`} />
-                            {meta.label}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {fmtNb(Number(m.quantity))}
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })
-                )}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {recentMoves.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="pl-6 text-center text-sm text-muted-foreground">
+                        Aucun mouvement récent.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    recentMoves.map((m) => {
+                      const meta = moveMeta(m.type)
+                      return (
+                        <TableRow key={m.id}>
+                          <TableCell className="whitespace-nowrap pl-6 text-xs text-muted-foreground">
+                            {dateFmt.format(new Date(m.date))}
+                          </TableCell>
+                          <TableCell>
+                            <p className="truncate font-medium">{m.product.name}</p>
+                            <p className="font-mono text-xs text-muted-foreground">{m.product.sku}</p>
+                          </TableCell>
+                          <TableCell>
+                            <span className="flex items-center gap-1.5 text-xs font-medium">
+                              <span className={`inline-block size-2 rounded-full ${meta.dot}`} />
+                              {meta.label}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {fmtNb(Number(m.quantity))}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </section>

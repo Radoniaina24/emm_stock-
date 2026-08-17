@@ -100,7 +100,6 @@ const entrepotsSubNav = [
 ]
 
 const mouvementsSubNav = [
-  { label: "Tous les mouvements", icon: List, to: "/dashboard/stock/mouvements" },
   { label: "Entrées", icon: ArrowDownToLine, to: "/dashboard/mouvements/entrees" },
   { label: "Sorties", icon: ArrowUpFromLine, to: "/dashboard/mouvements/sorties" },
   { label: "Transferts", icon: ArrowRightLeft, to: "/dashboard/mouvements/transferts" },

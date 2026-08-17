@@ -1,4 +1,5 @@
-import { type ReactNode } from "react"
+import { type LucideIcon } from "lucide-react"
+import type { ReactNode } from "react"
 
 type SeriesPoint = {
   label: string
@@ -87,20 +88,29 @@ export function ChartCard({
   description,
   children,
   action,
+  icon: Icon,
 }: {
   title: string
   description?: string
   children: ReactNode
   action?: ReactNode
+  icon?: LucideIcon
 }) {
   return (
     <div className="rounded-xl border border-border/60 bg-card p-5 shadow-xs">
       <div className="mb-4 flex items-start justify-between gap-3">
-        <div className="space-y-1">
-          <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-          {description ? (
-            <p className="text-xs text-muted-foreground">{description}</p>
+        <div className="flex items-center gap-3">
+          {Icon ? (
+            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Icon className="size-4" />
+            </div>
           ) : null}
+          <div className="space-y-1">
+            <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+            {description ? (
+              <p className="text-xs text-muted-foreground">{description}</p>
+            ) : null}
+          </div>
         </div>
         {action}
       </div>
