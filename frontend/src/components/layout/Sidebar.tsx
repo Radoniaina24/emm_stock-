@@ -28,7 +28,6 @@ import {
   GitBranch,
   GitCompare,
   Globe,
-  Grid3x3,
   HardDrive,
   History,
   LayoutDashboard,
@@ -93,7 +92,6 @@ const stockSubNav = [
 const entrepotsSubNav = [
   { label: "Liste des entrepôts", icon: Building2, to: "/dashboard/entrepots" },
   { label: "Carte des entrepôts", icon: MapPin, to: "/dashboard/entrepots/carte" },
-  { label: "Zones de stockage", icon: Grid3x3, to: "/dashboard/entrepots/zones" },
   { label: "Emplacements", icon: MapPin, to: "/dashboard/entrepots/emplacements" },
   { label: "Transferts entre entrepôts", icon: GitCompare, to: "/dashboard/entrepots/transferts" },
   { label: "Capacité de stockage", icon: HardDrive, to: "/dashboard/entrepots/capacite" },

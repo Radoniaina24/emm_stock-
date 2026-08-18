@@ -10,6 +10,7 @@ import { RolePermissionsModule } from './role-permissions/role-permissions.modul
 import { DepartmentsModule } from './departments/departments.module.js';
 import { JobTitlesModule } from './job-titles/job-titles.module.js';
 import { WarehousesModule } from './warehouses/warehouses.module.js';
+import { LocationsModule } from './locations/locations.module.js';
 import { CategoriesModule } from './categories/categories.module.js';
 import { BrandsModule } from './brands/brands.module.js';
 import { UnitsOfMeasureModule } from './units-of-measure/units-of-measure.module.js';
@@ -30,6 +31,7 @@ import { ProductSuppliersModule } from './product-suppliers/product-suppliers.mo
     DepartmentsModule,
     JobTitlesModule,
     WarehousesModule,
+    LocationsModule,
     CategoriesModule,
     BrandsModule,
     UnitsOfMeasureModule,

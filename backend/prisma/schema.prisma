@@ -500,7 +500,9 @@ model Warehouse {
 model Zone {
   id          String   @id @default(cuid()) @db.VarChar(30)
   name        String   @db.VarChar(100)
+  code        String?  @db.VarChar(50)
   description String?  @db.VarChar(255)
+  isActive    Boolean  @default(true)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
@@ -508,9 +510,15 @@ model Zone {
 
   warehouse Warehouse @relation(fields: [warehouseId], references: [id])
 
+  // Hiérarchie récursive des emplacements (style Odoo : parent -> enfants, n niveaux)
+  parentId String? @map("parent_id") @db.VarChar(30)
+  parent   Zone?   @relation("ZoneTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Zone[]  @relation("ZoneTree")
+
   stockLevels StockLevel[]
 
   @@index([warehouseId])
+  @@index([parentId])
   @@map("zones")
 }
 
