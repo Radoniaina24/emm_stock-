@@ -22,6 +22,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RequirePermission } from '../common/decorators/require-permission.decorator.js';
 import { ProductsService } from './products.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
@@ -36,6 +37,7 @@ export class ProductsController {
   constructor(private readonly products: ProductsService) {}
 
   @Post()
+  @RequirePermission('products.create')
   @ApiOperation({ summary: 'Créer un produit' })
   @ApiOkResponse({ description: 'Produit créé' })
   create(@Body() dto: CreateProductDto) {
@@ -43,6 +45,7 @@ export class ProductsController {
   }
 
   @Get()
+  @RequirePermission('products.view')
   @ApiOperation({ summary: 'Liste des produits' })
   @ApiOkResponse({ description: 'Liste des produits' })
   findAll() {
@@ -50,6 +53,7 @@ export class ProductsController {
   }
 
   @Post('import')
+  @RequirePermission('products.import')
   @ApiOperation({ summary: 'Importer des produits (upsert par SKU)' })
   @ApiOkResponse({ description: "Rapport d'import" })
   importProducts(@Body() body: ImportProductsDto) {
@@ -57,6 +61,7 @@ export class ProductsController {
   }
 
   @Get(':id')
+  @RequirePermission('products.view')
   @ApiOperation({ summary: "Détail d'un produit" })
   @ApiOkResponse({ description: 'Produit trouvé' })
   findOne(@Param('id', ParseIntPipe) id: number) {
@@ -64,6 +69,7 @@ export class ProductsController {
   }
 
   @Patch(':id')
+  @RequirePermission('products.update')
   @ApiOperation({ summary: 'Modifier un produit' })
   @ApiOkResponse({ description: 'Produit modifié' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProductDto) {
@@ -71,6 +77,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @RequirePermission('products.delete')
   @ApiOperation({ summary: 'Supprimer un produit' })
   @ApiOkResponse({ description: 'Produit supprimé' })
   remove(@Param('id', ParseIntPipe) id: number) {
@@ -78,6 +85,7 @@ export class ProductsController {
   }
 
   @Post(':id/images')
+  @RequirePermission('products.update')
   @ApiOperation({ summary: 'Ajouter une image au produit' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -108,6 +116,7 @@ export class ProductsController {
   }
 
   @Patch('images/:imageId')
+  @RequirePermission('products.update')
   @ApiOperation({ summary: 'Modifier une image (principale, alt)' })
   @ApiOkResponse({ description: 'Image mise à jour' })
   updateImage(
@@ -118,6 +127,7 @@ export class ProductsController {
   }
 
   @Delete('images/:imageId')
+  @RequirePermission('products.delete')
   @ApiOperation({ summary: 'Supprimer une image du produit' })
   @ApiOkResponse({ description: 'Image supprimée' })
   deleteImage(@Param('imageId', ParseIntPipe) imageId: number) {

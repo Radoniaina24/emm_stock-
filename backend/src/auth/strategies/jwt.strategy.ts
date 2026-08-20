@@ -6,6 +6,11 @@ import { PrismaService } from '../../prisma/prisma.service.js';
 
 export type JwtPayload = { sub: string; email: string };
 
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly prisma: PrismaService) {
@@ -14,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         (req: Request) => req?.cookies?.token,
       ]),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET ?? 'default-secret',
+      secretOrKey: JWT_SECRET as string,
     });
   }
 

@@ -22,6 +22,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RequirePermission } from '../common/decorators/require-permission.decorator.js';
 import { BrandsService } from './brands.service.js';
 import { CreateBrandDto } from './dto/create-brand.dto.js';
 import { UpdateBrandDto } from './dto/update-brand.dto.js';
@@ -34,6 +35,7 @@ export class BrandsController {
   constructor(private readonly brands: BrandsService) {}
 
   @Post()
+  @RequirePermission('brands.create')
   @ApiOperation({ summary: 'Créer une marque' })
   @ApiOkResponse({ description: 'Marque créée' })
   create(@Body() dto: CreateBrandDto) {
@@ -41,6 +43,7 @@ export class BrandsController {
   }
 
   @Get()
+  @RequirePermission('brands.view')
   @ApiOperation({ summary: 'Liste des marques' })
   @ApiOkResponse({ description: 'Liste des marques' })
   findAll() {
@@ -48,6 +51,7 @@ export class BrandsController {
   }
 
   @Get(':id')
+  @RequirePermission('brands.view')
   @ApiOperation({ summary: 'Détail d’une marque' })
   @ApiOkResponse({ description: 'Marque trouvée' })
   findOne(@Param('id', ParseIntPipe) id: number) {
@@ -55,6 +59,7 @@ export class BrandsController {
   }
 
   @Patch(':id')
+  @RequirePermission('brands.update')
   @ApiOperation({ summary: 'Modifier une marque' })
   @ApiOkResponse({ description: 'Marque modifiée' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateBrandDto) {
@@ -62,6 +67,7 @@ export class BrandsController {
   }
 
   @Post(':id/logo')
+  @RequirePermission('brands.update')
   @ApiOperation({ summary: 'Uploader / remplacer le logo de la marque' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -92,6 +98,7 @@ export class BrandsController {
   }
 
   @Delete(':id/logo')
+  @RequirePermission('brands.delete')
   @ApiOperation({ summary: 'Supprimer le logo de la marque' })
   @ApiOkResponse({ description: 'Logo supprimé' })
   deleteLogo(@Param('id', ParseIntPipe) id: number) {
@@ -99,6 +106,7 @@ export class BrandsController {
   }
 
   @Delete(':id')
+  @RequirePermission('brands.delete')
   @ApiOperation({ summary: 'Supprimer une marque' })
   @ApiOkResponse({ description: 'Marque supprimée' })
   remove(@Param('id', ParseIntPipe) id: number) {

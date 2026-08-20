@@ -15,6 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RequirePermission } from '../common/decorators/require-permission.decorator.js';
 import { WarehousesService } from './warehouses.service.js';
 import { CreateWarehouseDto } from './dto/create-warehouse.dto.js';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto.js';
@@ -27,6 +28,7 @@ export class WarehousesController {
   constructor(private readonly warehouses: WarehousesService) {}
 
   @Post()
+  @RequirePermission('warehouses.create')
   @ApiOperation({ summary: 'Créer un entrepôt' })
   @ApiOkResponse({ description: 'Entrepôt créé' })
   create(@Body() dto: CreateWarehouseDto) {
@@ -34,6 +36,7 @@ export class WarehousesController {
   }
 
   @Get()
+  @RequirePermission('warehouses.view')
   @ApiOperation({ summary: 'Liste des entrepôts' })
   @ApiOkResponse({ description: 'Liste des entrepôts' })
   findAll() {
@@ -41,6 +44,7 @@ export class WarehousesController {
   }
 
   @Get(':id')
+  @RequirePermission('warehouses.view')
   @ApiOperation({ summary: "Détail d'un entrepôt" })
   @ApiOkResponse({ description: 'Entrepôt trouvé' })
   findOne(@Param('id') id: string) {
@@ -48,6 +52,7 @@ export class WarehousesController {
   }
 
   @Patch(':id')
+  @RequirePermission('warehouses.update')
   @ApiOperation({ summary: 'Modifier un entrepôt' })
   @ApiOkResponse({ description: 'Entrepôt modifié' })
   update(@Param('id') id: string, @Body() dto: UpdateWarehouseDto) {
@@ -55,6 +60,7 @@ export class WarehousesController {
   }
 
   @Delete(':id')
+  @RequirePermission('warehouses.delete')
   @ApiOperation({ summary: 'Supprimer un entrepôt' })
   @ApiOkResponse({ description: 'Entrepôt supprimé' })
   remove(@Param('id') id: string) {

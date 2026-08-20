@@ -15,6 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RequirePermission } from '../common/decorators/require-permission.decorator.js';
 import { CreateRoleDto } from './dto/create-role.dto.js';
 import { UpdateRoleDto } from './dto/update-role.dto.js';
 import { RolesService } from './roles.service.js';
@@ -27,6 +28,7 @@ export class RolesController {
   constructor(private readonly roles: RolesService) {}
 
   @Post()
+  @RequirePermission('roles.create')
   @ApiOperation({ summary: 'Créer un rôle' })
   @ApiOkResponse({ description: 'Rôle créé' })
   create(@Body() dto: CreateRoleDto) {
@@ -34,6 +36,7 @@ export class RolesController {
   }
 
   @Get()
+  @RequirePermission('roles.view')
   @ApiOperation({ summary: 'Liste des rôles' })
   @ApiOkResponse({ description: 'Liste des rôles' })
   findAll() {
@@ -41,6 +44,7 @@ export class RolesController {
   }
 
   @Get(':id')
+  @RequirePermission('roles.view')
   @ApiOperation({ summary: "Détail d'un rôle" })
   @ApiOkResponse({ description: 'Rôle trouvé' })
   findOne(@Param('id') id: string) {
@@ -48,6 +52,7 @@ export class RolesController {
   }
 
   @Patch(':id')
+  @RequirePermission('roles.update')
   @ApiOperation({ summary: 'Modifier un rôle' })
   @ApiOkResponse({ description: 'Rôle modifié' })
   update(@Param('id') id: string, @Body() dto: UpdateRoleDto) {
@@ -55,6 +60,7 @@ export class RolesController {
   }
 
   @Delete(':id')
+  @RequirePermission('roles.delete')
   @ApiOperation({ summary: 'Supprimer un rôle' })
   @ApiOkResponse({ description: 'Rôle supprimé' })
   remove(@Param('id') id: string) {

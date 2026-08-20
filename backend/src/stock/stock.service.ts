@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { Prisma } from '../../generated/prisma/client.js';
+import { Prisma, StockLevel } from '../../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { AdjustStockDto, StockAdjustmentType } from './dto/adjust-stock.dto.js';
 import {
@@ -682,6 +682,58 @@ export class StockService {
       `REC-${this.stamp()}-${entryId.slice(0, 4).toUpperCase()}`;
     const date = dto.date ? new Date(dto.date) : new Date();
 
+    // Regroupement des deltas de StockLevel par produit : si une réception
+    // contient plusieurs lignes pour le même produit, on ne doit créer qu'une
+    // seule ligne de StockLevel (sinon violation de la contrainte unique
+    // productId/warehouseId/zoneId). Les lignes d'entrée et les mouvements
+    // restent détaillés par ligne d'origine (gestion des lots).
+    const levelDeltas = new Map<number, Prisma.Decimal>();
+    const entryLines: Prisma.EntryLineCreateWithoutEntryInput[] = [];
+    const stockMoves: Prisma.StockMoveCreateManyInput[] = [];
+
+    for (const line of dto.lines) {
+      const qty = new Prisma.Decimal(line.quantity);
+      const unitCost = new Prisma.Decimal(line.unitCost ?? 0);
+      const lotNumber = line.lotNumber?.trim() || null;
+      const expiryDate = line.expiryDate ? new Date(line.expiryDate) : null;
+
+      levelDeltas.set(
+        line.productId,
+        (levelDeltas.get(line.productId) ?? new Prisma.Decimal(0)).add(qty),
+      );
+
+      entryLines.push({
+        product: { connect: { id: line.productId } },
+        quantity: qty,
+        unitCost,
+        lotNumber,
+        expiryDate,
+      });
+
+      stockMoves.push({
+        productId: line.productId,
+        warehouseId: dto.warehouseId,
+        userId,
+        type: 'ENTRY',
+        quantity: qty,
+        unitCost,
+        lotNumber,
+        expiryDate,
+        sourceType: 'entry',
+        sourceId: entryId,
+        date,
+      });
+    }
+
+    const existingLevels = (await this.prisma.stockLevel.findMany({
+      where: {
+        productId: { in: productIds },
+        warehouseId: dto.warehouseId,
+        zoneId: null,
+      },
+    })) as StockLevel[];
+    const existingByProduct = new Map(existingLevels.map((l) => [l.productId, l]));
+
     const tx: Prisma.PrismaPromise<unknown>[] = [
       this.prisma.entry.create({
         data: {
@@ -693,72 +745,34 @@ export class StockService {
           supplierId: dto.supplierId,
           userId,
           warehouseId: dto.warehouseId,
+          lines: { create: entryLines },
         },
       }),
     ];
 
-    for (const line of dto.lines) {
-      const qty = new Prisma.Decimal(line.quantity);
-      const unitCost = new Prisma.Decimal(line.unitCost ?? 0);
-      const lotNumber = line.lotNumber?.trim() || null;
-      const expiryDate = line.expiryDate ? new Date(line.expiryDate) : null;
-
-      const existing = await this.prisma.stockLevel.findFirst({
-        where: {
-          productId: line.productId,
-          warehouseId: dto.warehouseId,
-          zoneId: null,
-        },
-      });
-
+    for (const [productId, delta] of levelDeltas) {
+      const existing = existingByProduct.get(productId);
       tx.push(
         existing
           ? this.prisma.stockLevel.update({
               where: { id: existing.id },
-              data: { quantityOnHand: { increment: qty } },
+              data: { quantityOnHand: { increment: delta } },
             })
           : this.prisma.stockLevel.create({
               data: {
                 id: randomUUID(),
-                productId: line.productId,
+                productId,
                 warehouseId: dto.warehouseId,
                 zoneId: null,
-                quantityOnHand: qty,
+                quantityOnHand: delta,
                 quantityReserved: new Prisma.Decimal(0),
               },
             }),
       );
+    }
 
-      tx.push(
-        this.prisma.entryLine.create({
-          data: {
-            entryId,
-            productId: line.productId,
-            quantity: qty,
-            unitCost,
-            lotNumber,
-            expiryDate,
-          },
-        }),
-      );
-
-      tx.push(
-        this.prisma.stockMove.create({
-          data: {
-            productId: line.productId,
-            warehouseId: dto.warehouseId,
-            userId,
-            type: 'ENTRY' as const,
-            quantity: qty,
-            unitCost,
-            lotNumber,
-            expiryDate,
-            sourceType: 'entry',
-            sourceId: entryId,
-            date,
-          },
-        }),
-      );
+    for (const move of stockMoves) {
+      tx.push(this.prisma.stockMove.create({ data: move }));
     }
 
     await this.prisma.$transaction(tx);
@@ -1073,118 +1087,226 @@ export class StockService {
         throw new NotFoundException(`Produit ${id} introuvable`);
     }
 
-    const sourceLevels = await this.prisma.stockLevel.findMany({
-      where: {
-        productId: { in: productIds },
-        warehouseId: dto.fromWarehouseId,
-      },
-    });
+    // Agrégation des deltas par clé source / destination. Cela évite :
+    //  - la violation de contrainte unique si une même paire produit/zone est
+    //    présente plusieurs fois ;
+    //  - la perte de mise à jour (set absolu) quand plusieurs lignes touchent
+    //    le même StockLevel source.
+    const sourceKey = (productId: number, zoneId: string | null) =>
+      `${productId}|${zoneId ?? 'null'}`;
+    const destKey = (
+      productId: number,
+      warehouseId: string,
+      zoneId: string | null,
+    ) => `${productId}|${warehouseId}|${zoneId ?? 'null'}`;
 
+    const sourceDeltas = new Map<string, Prisma.Decimal>();
+    const destDeltas = new Map<string, Prisma.Decimal>();
+    const lineMoves: Array<{
+      productId: number;
+      qty: Prisma.Decimal;
+      unitCost: Prisma.Decimal | null;
+      lotNumber: string | null;
+      expiryDate: Date | null;
+      toWarehouseId: string;
+      fromZoneId: string | null;
+      toZoneId: string | null;
+    }> = [];
+
+    for (const line of dto.lines) {
+      const qty = new Prisma.Decimal(line.quantity);
+      const unitCost =
+        line.unitCost !== undefined ? new Prisma.Decimal(line.unitCost) : null;
+      const lotNumber = line.lotNumber?.trim() || null;
+      const expiryDate = line.expiryDate ? new Date(line.expiryDate) : null;
+      const fromZone = line.fromZoneId ?? null;
+      const toZone = line.toZoneId ?? null;
+
+      const sKey = sourceKey(line.productId, fromZone);
+      const dKey = destKey(line.productId, dto.toWarehouseId, toZone);
+      sourceDeltas.set(
+        sKey,
+        (sourceDeltas.get(sKey) ?? new Prisma.Decimal(0)).add(qty),
+      );
+      destDeltas.set(
+        dKey,
+        (destDeltas.get(dKey) ?? new Prisma.Decimal(0)).add(qty),
+      );
+
+      lineMoves.push({
+        productId: line.productId,
+        qty,
+        unitCost,
+        lotNumber,
+        expiryDate,
+        toWarehouseId: dto.toWarehouseId,
+        fromZoneId: fromZone,
+        toZoneId: toZone,
+      });
+    }
+
+    const sourceLevels = (await this.prisma.stockLevel.findMany({
+      where: {
+        OR: [...sourceDeltas.keys()].map((k) => {
+          const [productId, zone] = k.split('|');
+          return {
+            productId: Number(productId),
+            warehouseId: dto.fromWarehouseId,
+            zoneId: zone === 'null' ? null : zone,
+          };
+        }),
+      },
+    })) as StockLevel[];
+    const sourceByKey = new Map(
+      sourceLevels.map((l) => [sourceKey(l.productId, l.zoneId), l]),
+    );
+
+    for (const [key, delta] of sourceDeltas) {
+      const level = sourceByKey.get(key);
+      if (!level) {
+        const [productId, zone] = key.split('|');
+        throw new NotFoundException(
+          `Stock source introuvable pour le produit ${productId}` +
+            (zone !== 'null' ? ` (zone ${zone})` : ''),
+        );
+      }
+      if ((level.quantityOnHand as Prisma.Decimal).lessThan(delta)) {
+        const [productId] = key.split('|');
+        throw new BadRequestException(
+          `Stock insuffisant pour le produit ${productId} : ${(
+            level.quantityOnHand as Prisma.Decimal
+          ).toString()} disponible(s)`,
+        );
+      }
+    }
+
+    const destLevels = (await this.prisma.stockLevel.findMany({
+      where: {
+        OR: [...destDeltas.keys()].map((k) => {
+          const [productId, warehouseId, zone] = k.split('|');
+          return {
+            productId: Number(productId),
+            warehouseId,
+            zoneId: zone === 'null' ? null : zone,
+          };
+        }),
+      },
+    })) as StockLevel[];
+    const destByKey = new Map(
+      destLevels.map((l) => [
+        destKey(l.productId, l.warehouseId, l.zoneId),
+        l,
+      ]),
+    );
+
+    const tx: Prisma.PrismaPromise<unknown>[] = [];
+    for (const [key, delta] of sourceDeltas) {
+      const level = sourceByKey.get(key)!;
+      tx.push(
+        this.prisma.stockLevel.update({
+          where: { id: level.id },
+          data: { quantityOnHand: { decrement: delta } },
+        }),
+      );
+    }
+    for (const [key, delta] of destDeltas) {
+      const level = destByKey.get(key);
+      const [productId, warehouseId, zone] = key.split('|');
+      tx.push(
+        level
+          ? this.prisma.stockLevel.update({
+              where: { id: level.id },
+              data: { quantityOnHand: { increment: delta } },
+            })
+          : this.prisma.stockLevel.create({
+              data: {
+                id: randomUUID(),
+                productId: Number(productId),
+                warehouseId,
+                zoneId: zone === 'null' ? null : zone,
+                quantityOnHand: delta,
+                quantityReserved: new Prisma.Decimal(0),
+              },
+            }),
+      );
+    }
+    for (const mv of lineMoves) {
+      tx.push(
+        this.prisma.stockMove.create({
+          data: {
+            productId: mv.productId,
+            warehouseId: dto.fromWarehouseId,
+            userId,
+            type: 'TRANSFER',
+            quantity: mv.qty.negated(),
+            unitCost: mv.unitCost,
+            lotNumber: mv.lotNumber,
+            expiryDate: mv.expiryDate,
+            sourceType: 'transfer',
+            sourceId: transferId,
+            date: now,
+          },
+        }),
+      );
+      tx.push(
+        this.prisma.stockMove.create({
+          data: {
+            productId: mv.productId,
+            warehouseId: mv.toWarehouseId,
+            userId,
+            type: 'TRANSFER',
+            quantity: mv.qty,
+            unitCost: mv.unitCost,
+            lotNumber: mv.lotNumber,
+            expiryDate: mv.expiryDate,
+            sourceType: 'transfer',
+            sourceId: transferId,
+            date: now,
+          },
+        }),
+      );
+    }
+
+    await this.prisma.$transaction(tx);
+
+    // Rechargement des niveaux pour la réponse (une entrée par clé source).
+    const rulesMap = await this.loadRulesMap();
     const results: Array<{
       productId: number;
       from: SerializedStockLevel;
       to: SerializedStockLevel;
     }> = [];
 
-    for (const line of dto.lines) {
-      const source = sourceLevels.find(
-        (s) =>
-          s.productId === line.productId &&
-          (s.zoneId ?? null) === (line.fromZoneId ?? null),
+    for (const key of sourceDeltas.keys()) {
+      const [productId, zone] = key.split('|');
+      const from = (await this.prisma.stockLevel.findUnique({
+        where: { id: sourceByKey.get(key)!.id },
+        include: this.levelInclude(),
+      })) as StockLevel;
+      const dKey = destKey(
+        Number(productId),
+        dto.toWarehouseId,
+        zone === 'null' ? null : zone,
       );
-      if (!source) {
-        throw new NotFoundException(
-          `Stock source introuvable pour le produit ${line.productId}` +
-            (line.fromZoneId ? ` (zone ${line.fromZoneId})` : ''),
-        );
-      }
-
-      const onHand = source.quantityOnHand as Prisma.Decimal;
-      const qty = new Prisma.Decimal(line.quantity);
-      if (onHand.lessThan(qty)) {
-        throw new BadRequestException(
-          `Stock insuffisant pour le produit ${line.productId} : ${onHand.toString()} disponible(s)`,
-        );
-      }
-
-      const dest = await this.prisma.stockLevel.findFirst({
-        where: {
-          productId: line.productId,
-          warehouseId: dto.toWarehouseId,
-          zoneId: line.toZoneId ?? null,
-        },
-      });
-
-      const destOp = dest
-        ? this.prisma.stockLevel.update({
-            where: { id: dest.id },
-            data: { quantityOnHand: { increment: qty } },
-          })
-        : this.prisma.stockLevel.create({
-            data: {
-              id: randomUUID(),
-              productId: line.productId,
-              warehouseId: dto.toWarehouseId,
-              zoneId: line.toZoneId ?? null,
-              quantityOnHand: qty,
-              quantityReserved: new Prisma.Decimal(0),
-            },
-          });
-
-      const moveData = (sign: 1 | -1) => ({
-        productId: line.productId,
-        warehouseId: sign === -1 ? dto.fromWarehouseId : dto.toWarehouseId,
-        userId,
-        type: 'TRANSFER' as const,
-        quantity: sign === -1 ? qty.negated() : qty,
-        unitCost:
-          line.unitCost !== undefined
-            ? new Prisma.Decimal(line.unitCost)
-            : null,
-        lotNumber: line.lotNumber?.trim() || null,
-        expiryDate: line.expiryDate ? new Date(line.expiryDate) : null,
-        sourceType: 'transfer',
-        sourceId: transferId,
-        date: now,
-      });
-
-      await this.prisma.$transaction([
-        this.prisma.stockLevel.update({
-          where: { id: source.id },
-          data: { quantityOnHand: onHand.minus(qty) },
-        }),
-        destOp,
-        this.prisma.stockMove.create({ data: moveData(-1) }),
-        this.prisma.stockMove.create({ data: moveData(1) }),
-      ]);
-
-      // Rechargement des niveaux pour la réponse
-
-      const [from, to] = await Promise.all([
-        this.prisma.stockLevel.findUnique({
-          where: { id: source.id },
-          include: this.levelInclude(),
-        }),
-        this.prisma.stockLevel.findFirst({
-          where: {
-            productId: line.productId,
-            warehouseId: dto.toWarehouseId,
-            zoneId: line.toZoneId ?? null,
-          },
-          include: this.levelInclude(),
-        }),
-      ]);
-      const rulesMap = await this.loadRulesMap();
+      const destLevel = destByKey.get(dKey);
+      const to = destLevel
+        ? ((await this.prisma.stockLevel.findUnique({
+            where: { id: destLevel.id },
+            include: this.levelInclude(),
+          })) as StockLevel)
+        : null;
       results.push({
-        productId: line.productId,
+        productId: Number(productId),
         from: this.serializeLevel(
           from,
           rulesMap.get(this.ruleKey(from.productId, from.warehouseId)) ?? null,
         ),
-        to: this.serializeLevel(
-          to,
-          rulesMap.get(this.ruleKey(to.productId, to.warehouseId)) ?? null,
-        ),
+        to: to
+          ? this.serializeLevel(
+              to,
+              rulesMap.get(this.ruleKey(to.productId, to.warehouseId)) ?? null,
+            )
+          : (null as unknown as SerializedStockLevel),
       });
     }
 

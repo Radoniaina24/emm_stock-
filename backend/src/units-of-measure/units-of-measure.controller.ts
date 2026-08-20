@@ -16,6 +16,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RequirePermission } from '../common/decorators/require-permission.decorator.js';
 import { UnitsOfMeasureService } from './units-of-measure.service.js';
 import { CreateUnitOfMeasureDto } from './dto/create-unit-of-measure.dto.js';
 import { UpdateUnitOfMeasureDto } from './dto/update-unit-of-measure.dto.js';
@@ -28,6 +29,7 @@ export class UnitsOfMeasureController {
   constructor(private readonly units: UnitsOfMeasureService) {}
 
   @Post()
+  @RequirePermission('units-of-measure.create')
   @ApiOperation({ summary: 'Créer une unité de mesure' })
   @ApiOkResponse({ description: 'Unité de mesure créée' })
   create(@Body() dto: CreateUnitOfMeasureDto) {
@@ -35,6 +37,7 @@ export class UnitsOfMeasureController {
   }
 
   @Get()
+  @RequirePermission('units-of-measure.view')
   @ApiOperation({ summary: 'Liste des unités de mesure' })
   @ApiOkResponse({ description: 'Liste des unités de mesure' })
   findAll() {
@@ -42,6 +45,7 @@ export class UnitsOfMeasureController {
   }
 
   @Get(':id')
+  @RequirePermission('units-of-measure.view')
   @ApiOperation({ summary: "Détail d'une unité de mesure" })
   @ApiOkResponse({ description: 'Unité de mesure trouvée' })
   findOne(@Param('id', ParseIntPipe) id: number) {
@@ -49,6 +53,7 @@ export class UnitsOfMeasureController {
   }
 
   @Patch(':id')
+  @RequirePermission('units-of-measure.update')
   @ApiOperation({ summary: 'Modifier une unité de mesure' })
   @ApiOkResponse({ description: 'Unité de mesure modifiée' })
   update(
@@ -59,6 +64,7 @@ export class UnitsOfMeasureController {
   }
 
   @Delete(':id')
+  @RequirePermission('units-of-measure.delete')
   @ApiOperation({ summary: 'Supprimer une unité de mesure' })
   @ApiOkResponse({ description: 'Unité de mesure supprimée' })
   remove(@Param('id', ParseIntPipe) id: number) {

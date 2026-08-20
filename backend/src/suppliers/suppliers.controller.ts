@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RequirePermission } from '../common/decorators/require-permission.decorator.js';
 import { SuppliersService } from './suppliers.service.js';
 import { CreateSupplierDto } from './dto/create-supplier.dto.js';
 import { UpdateSupplierDto } from './dto/update-supplier.dto.js';
@@ -22,30 +23,35 @@ export class SuppliersController {
   constructor(private readonly suppliers: SuppliersService) {}
 
   @Post()
+  @RequirePermission('suppliers.create')
   @ApiOperation({ summary: 'Créer un fournisseur' })
   create(@Body() dto: CreateSupplierDto) {
     return this.suppliers.create(dto);
   }
 
   @Get()
+  @RequirePermission('suppliers.view')
   @ApiOperation({ summary: 'Liste des fournisseurs' })
   findAll() {
     return this.suppliers.findAll();
   }
 
   @Get(':id')
+  @RequirePermission('suppliers.view')
   @ApiOperation({ summary: 'Détail d’un fournisseur' })
   findOne(@Param('id') id: string) {
     return this.suppliers.findOne(id);
   }
 
   @Patch(':id')
+  @RequirePermission('suppliers.update')
   @ApiOperation({ summary: 'Modifier un fournisseur' })
   update(@Param('id') id: string, @Body() dto: UpdateSupplierDto) {
     return this.suppliers.update(id, dto);
   }
 
   @Delete(':id')
+  @RequirePermission('suppliers.delete')
   @ApiOperation({ summary: 'Supprimer un fournisseur' })
   remove(@Param('id') id: string) {
     return this.suppliers.remove(id);

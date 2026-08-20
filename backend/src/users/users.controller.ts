@@ -25,6 +25,7 @@ import {
 } from '@nestjs/swagger';
 import { memoryStorage } from 'multer';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
+import { RequirePermission } from '../common/decorators/require-permission.decorator.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
@@ -39,6 +40,7 @@ export class UsersController {
   constructor(private readonly users: UsersService) {}
 
   @Post()
+  @RequirePermission('users.create')
   @ApiOperation({ summary: 'Créer un nouvel utilisateur' })
   @ApiCreatedResponse({ description: 'Utilisateur créé' })
   create(@Body() dto: CreateUserDto) {
@@ -46,6 +48,7 @@ export class UsersController {
   }
 
   @Get()
+  @RequirePermission('users.view')
   @ApiOperation({ summary: 'Liste de tous les utilisateurs' })
   @ApiOkResponse({ description: 'Liste des utilisateurs' })
   findAll() {
@@ -53,6 +56,7 @@ export class UsersController {
   }
 
   @Get('next-employee-code')
+  @RequirePermission('users.view')
   @ApiOperation({
     summary: 'Prochain matricule disponible (format EMP-YYYY-NNNN)',
   })
@@ -70,6 +74,7 @@ export class UsersController {
   }
 
   @Get(':id')
+  @RequirePermission('users.view')
   @ApiOperation({ summary: "Détail d'un utilisateur" })
   @ApiOkResponse({ description: 'Utilisateur trouvé' })
   findOne(@Param('id') id: string) {
@@ -77,6 +82,7 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @RequirePermission('users.update')
   @ApiOperation({
     summary: 'Modifier un utilisateur (tous les champs sauf le mot de passe)',
   })
@@ -128,6 +134,7 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
+  @RequirePermission('users.delete')
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
   @ApiOkResponse({ description: 'Utilisateur supprimé' })
   remove(@Param('id') id: string, @CurrentUser('id') currentUserId: string) {

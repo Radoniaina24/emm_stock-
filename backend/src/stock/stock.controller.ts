@@ -10,10 +10,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import { RequirePermission } from '../common/decorators/require-permission.decorator.js';
-import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { StockService } from './stock.service.js';
 import { StockQueryDto } from './dto/stock-query.dto.js';
 import { StockMoveQueryDto } from './dto/stock-move-query.dto.js';
@@ -37,7 +35,6 @@ import { StockLevelResponseDto } from './dto/response/stock-level.response.js';
 
 @ApiTags('stock')
 @ApiCookieAuth('token')
-@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('stock')
 export class StockController {
   constructor(private readonly stock: StockService) {}
@@ -80,14 +77,14 @@ export class StockController {
   }
 
   @Get('receptions')
-  @RequirePermission('stocks.view')
+  @RequirePermission('entries.view')
   @ApiOperation({ summary: 'Liste des réceptions (entrées de stock)' })
   findReceptions(@Query() query: ReceptionQueryDto) {
     return this.stock.findReceptions(query);
   }
 
   @Post('receptions')
-  @RequirePermission('stocks.adjust')
+  @RequirePermission('entries.create')
   @ApiOperation({ summary: 'Enregistrer une réception fournisseur (entrée de stock)' })
   reception(
     @Body() dto: CreateReceptionDto,
@@ -97,28 +94,28 @@ export class StockController {
   }
 
   @Get('receptions/:id')
-  @RequirePermission('stocks.view')
+  @RequirePermission('entries.view')
   @ApiOperation({ summary: 'Détail d’une réception' })
   findReception(@Param('id') id: string) {
     return this.stock.findReception(id);
   }
 
   @Get('exits')
-  @RequirePermission('stocks.view')
+  @RequirePermission('exits.view')
   @ApiOperation({ summary: 'Liste des sorties de stock' })
   findExits(@Query() query: ExitQueryDto) {
     return this.stock.findExits(query);
   }
 
   @Post('exits')
-  @RequirePermission('stocks.adjust')
+  @RequirePermission('exits.create')
   @ApiOperation({ summary: 'Enregistrer une sortie de stock' })
   exit(@Body() dto: CreateExitDto, @CurrentUser('id') userId: string) {
     return this.stock.exit(dto, userId);
   }
 
   @Get('exits/:id')
-  @RequirePermission('stocks.view')
+  @RequirePermission('exits.view')
   @ApiOperation({ summary: 'Détail d’une sortie' })
   findExit(@Param('id') id: string) {
     return this.stock.findExit(id);

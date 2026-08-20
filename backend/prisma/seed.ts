@@ -4,6 +4,7 @@ import { seedSuppliers } from "./seed-suppliers"
 import { seedProductSuppliers } from "./seed-product-suppliers"
 import { seedReceptions } from "./seed-receptions"
 import { seedExits } from "./seed-exits"
+import { seedInventories } from "./seed-inventories"
 
 type DepartmentSeed = {
   code: string
@@ -982,6 +983,34 @@ const permissions: PermissionSeed[] = [
   { module: "Tableau de bord", action: "Voir", code: "dashboard.view", description: "Accéder au tableau de bord." },
   { module: "Paramètres", action: "Voir", code: "settings.view", description: "Consulter les paramètres." },
   { module: "Paramètres", action: "Modifier", code: "settings.update", description: "Modifier les paramètres de l'application." },
+  { module: "Marques", action: "Voir", code: "brands.view", description: "Consulter les marques." },
+  { module: "Marques", action: "Créer", code: "brands.create", description: "Créer une marque." },
+  { module: "Marques", action: "Modifier", code: "brands.update", description: "Modifier une marque." },
+  { module: "Marques", action: "Supprimer", code: "brands.delete", description: "Supprimer une marque." },
+  { module: "Unités de mesure", action: "Voir", code: "units-of-measure.view", description: "Consulter les unités de mesure." },
+  { module: "Unités de mesure", action: "Créer", code: "units-of-measure.create", description: "Créer une unité de mesure." },
+  { module: "Unités de mesure", action: "Modifier", code: "units-of-measure.update", description: "Modifier une unité de mesure." },
+  { module: "Unités de mesure", action: "Supprimer", code: "units-of-measure.delete", description: "Supprimer une unité de mesure." },
+  { module: "Emplacements", action: "Voir", code: "locations.view", description: "Consulter les emplacements (zones)." },
+  { module: "Emplacements", action: "Créer", code: "locations.create", description: "Créer un emplacement." },
+  { module: "Emplacements", action: "Modifier", code: "locations.update", description: "Modifier un emplacement." },
+  { module: "Emplacements", action: "Supprimer", code: "locations.delete", description: "Supprimer un emplacement." },
+  { module: "Départements", action: "Voir", code: "departments.view", description: "Consulter les départements." },
+  { module: "Départements", action: "Créer", code: "departments.create", description: "Créer un département." },
+  { module: "Départements", action: "Modifier", code: "departments.update", description: "Modifier un département." },
+  { module: "Départements", action: "Supprimer", code: "departments.delete", description: "Supprimer un département." },
+  { module: "Fonctions", action: "Voir", code: "job-titles.view", description: "Consulter les titres/fonctions." },
+  { module: "Fonctions", action: "Créer", code: "job-titles.create", description: "Créer un titre/fonction." },
+  { module: "Fonctions", action: "Modifier", code: "job-titles.update", description: "Modifier un titre/fonction." },
+  { module: "Fonctions", action: "Supprimer", code: "job-titles.delete", description: "Supprimer un titre/fonction." },
+  { module: "Codes-barres", action: "Voir", code: "product-barcodes.view", description: "Consulter les codes-barres produit." },
+  { module: "Codes-barres", action: "Créer", code: "product-barcodes.create", description: "Créer un code-barres produit." },
+  { module: "Codes-barres", action: "Modifier", code: "product-barcodes.update", description: "Modifier un code-barres produit." },
+  { module: "Codes-barres", action: "Supprimer", code: "product-barcodes.delete", description: "Supprimer un code-barres produit." },
+  { module: "Fournisseurs produit", action: "Voir", code: "product-suppliers.view", description: "Consulter les liens produit/fournisseur." },
+  { module: "Fournisseurs produit", action: "Créer", code: "product-suppliers.create", description: "Associer un fournisseur à un produit." },
+  { module: "Fournisseurs produit", action: "Modifier", code: "product-suppliers.update", description: "Modifier un lien produit/fournisseur." },
+  { module: "Fournisseurs produit", action: "Supprimer", code: "product-suppliers.delete", description: "Retirer un fournisseur d'un produit." },
 ]
 
 const roleCodeToId: Record<string, string> = {}
@@ -1014,6 +1043,13 @@ const rolePermissionsMap: RolePermissionAssignment[] = [
       "roles.view", "roles.create", "roles.update", "roles.delete", "roles.assign_permissions",
       "permissions.view", "permissions.create", "permissions.update", "permissions.delete",
       "settings.view", "settings.update",
+      "brands.view", "brands.create", "brands.update", "brands.delete",
+      "units-of-measure.view", "units-of-measure.create", "units-of-measure.update", "units-of-measure.delete",
+      "locations.view", "locations.create", "locations.update", "locations.delete",
+      "departments.view", "departments.create", "departments.update", "departments.delete",
+      "job-titles.view", "job-titles.create", "job-titles.update", "job-titles.delete",
+      "product-barcodes.view", "product-barcodes.create", "product-barcodes.update", "product-barcodes.delete",
+      "product-suppliers.view", "product-suppliers.create", "product-suppliers.update", "product-suppliers.delete",
     ],
   },
   {
@@ -1037,6 +1073,13 @@ const rolePermissionsMap: RolePermissionAssignment[] = [
       "roles.view", "roles.update",
       "permissions.view",
       "settings.view", "settings.update",
+      "brands.view", "brands.create", "brands.update", "brands.delete",
+      "units-of-measure.view", "units-of-measure.create", "units-of-measure.update", "units-of-measure.delete",
+      "locations.view", "locations.create", "locations.update", "locations.delete",
+      "departments.view", "departments.create", "departments.update", "departments.delete",
+      "job-titles.view", "job-titles.create", "job-titles.update", "job-titles.delete",
+      "product-barcodes.view", "product-barcodes.create", "product-barcodes.update", "product-barcodes.delete",
+      "product-suppliers.view", "product-suppliers.create", "product-suppliers.update", "product-suppliers.delete",
     ],
   },
   {
@@ -1054,6 +1097,10 @@ const rolePermissionsMap: RolePermissionAssignment[] = [
       "reports.view", "reports.export",
       "suppliers.view",
       "purchases.view",
+      "units-of-measure.view", "units-of-measure.create", "units-of-measure.update", "units-of-measure.delete",
+      "locations.view", "locations.create", "locations.update", "locations.delete",
+      "product-barcodes.view", "product-barcodes.create", "product-barcodes.update", "product-barcodes.delete",
+      "product-suppliers.view", "product-suppliers.create", "product-suppliers.update", "product-suppliers.delete",
     ],
   },
   {
@@ -1070,6 +1117,8 @@ const rolePermissionsMap: RolePermissionAssignment[] = [
       "movements.view",
       "suppliers.view",
       "purchases.view", "purchases.receive",
+      "units-of-measure.view", "locations.view", "locations.create", "locations.update",
+      "product-barcodes.view", "product-suppliers.view",
     ],
   },
   {
@@ -1085,6 +1134,7 @@ const rolePermissionsMap: RolePermissionAssignment[] = [
       "movements.view",
       "reports.view", "reports.export",
       "warehouses.view",
+      "product-suppliers.view", "product-suppliers.create", "product-suppliers.update", "product-suppliers.delete",
     ],
   },
   {
@@ -1149,6 +1199,8 @@ const rolePermissionsMap: RolePermissionAssignment[] = [
       "roles.view",
       "permissions.view",
       "settings.view",
+      "brands.view", "units-of-measure.view", "locations.view", "departments.view",
+      "job-titles.view", "product-barcodes.view", "product-suppliers.view",
     ],
   },
   {
@@ -1166,6 +1218,8 @@ const rolePermissionsMap: RolePermissionAssignment[] = [
       "entries.view",
       "exits.view",
       "movements.view",
+      "brands.view", "units-of-measure.view", "locations.view", "departments.view",
+      "job-titles.view", "product-barcodes.view", "product-suppliers.view",
     ],
   },
 ]
@@ -1330,6 +1384,7 @@ async function main() {
   await seedProductSuppliers(conn)
   await seedReceptions(conn)
   await seedExits(conn)
+  await seedInventories(conn)
 
   const [rows] = await conn.execute("SELECT COUNT(*) as cnt FROM roles")
   const roleCount = (rows as any)[0].cnt

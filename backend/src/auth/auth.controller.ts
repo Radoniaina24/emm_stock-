@@ -22,6 +22,12 @@ import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
+import { Public } from '../common/decorators/public.decorator.js';
+import { RequirePermission } from '../common/decorators/require-permission.decorator.js';
+
+/** Cookie JWT : sécurisé en production, lax en développement. */
+const COOKIE_SECURE = process.env.NODE_ENV === 'production';
+const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 
 @ApiTags('auth')
 @Controller('auth')
@@ -29,7 +35,11 @@ export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
   @Post('register')
-  @ApiOperation({ summary: 'Créer un compte et définir le cookie JWT' })
+  @UseGuards(JwtAuthGuard)
+  @RequirePermission('users.create')
+  @ApiOperation({
+    summary: "Créer un compte (réservé aux utilisateurs habilités 'users.create')",
+  })
   @ApiBody({ type: RegisterDto })
   @ApiOkResponse({ description: 'Utilisateur créé (cookie `token` défini)' })
   async register(
@@ -39,13 +49,14 @@ export class AuthController {
     const { user, token } = await this.auth.register(dto);
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false,
+      secure: COOKIE_SECURE,
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: COOKIE_MAX_AGE,
     });
     return user;
   }
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')
   @ApiOperation({ summary: 'Connexion et définition du cookie JWT' })
@@ -61,13 +72,14 @@ export class AuthController {
     const { user, token } = await this.auth.login(dto);
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false,
+      secure: COOKIE_SECURE,
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: COOKIE_MAX_AGE,
     });
     return user;
   }
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @Post('logout')
   @ApiOperation({ summary: 'Déconnexion — suppression du cookie JWT' })
@@ -75,7 +87,7 @@ export class AuthController {
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('token', {
       httpOnly: true,
-      secure: false,
+      secure: COOKIE_SECURE,
       sameSite: 'lax',
     });
     return { message: 'Logged out' };

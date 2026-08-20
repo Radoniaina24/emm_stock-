@@ -6,6 +6,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RequirePermission } from '../common/decorators/require-permission.decorator.js';
 import { RolePermissionsService } from './role-permissions.service.js';
 import { SyncRolePermissionsDto } from './dto/sync-role-permissions.dto.js';
 
@@ -17,6 +18,7 @@ export class RolePermissionsController {
   constructor(private readonly service: RolePermissionsService) {}
 
   @Get()
+  @RequirePermission('roles.view')
   @ApiOperation({ summary: 'Permissions du rôle' })
   @ApiOkResponse({ description: 'Permissions du rôle' })
   find(@Param('roleId') roleId: string) {
@@ -24,6 +26,7 @@ export class RolePermissionsController {
   }
 
   @Put()
+  @RequirePermission('roles.assign_permissions')
   @ApiOperation({ summary: 'Synchroniser les permissions du rôle' })
   @ApiOkResponse({ description: 'Permissions synchronisées' })
   sync(@Param('roleId') roleId: string, @Body() dto: SyncRolePermissionsDto) {

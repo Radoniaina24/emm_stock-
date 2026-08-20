@@ -16,6 +16,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RequirePermission } from '../common/decorators/require-permission.decorator.js';
 import { CategoriesService } from './categories.service.js';
 import { CreateCategoryDto } from './dto/create-category.dto.js';
 import { UpdateCategoryDto } from './dto/update-category.dto.js';
@@ -28,6 +29,7 @@ export class CategoriesController {
   constructor(private readonly categories: CategoriesService) {}
 
   @Post()
+  @RequirePermission('categories.create')
   @ApiOperation({ summary: 'Créer une catégorie' })
   @ApiOkResponse({ description: 'Catégorie créée' })
   create(@Body() dto: CreateCategoryDto) {
@@ -35,6 +37,7 @@ export class CategoriesController {
   }
 
   @Get()
+  @RequirePermission('categories.view')
   @ApiOperation({ summary: 'Liste des catégories (hiérarchie incluse)' })
   @ApiOkResponse({ description: 'Liste des catégories' })
   findAll() {
@@ -42,6 +45,7 @@ export class CategoriesController {
   }
 
   @Get(':id')
+  @RequirePermission('categories.view')
   @ApiOperation({ summary: "Détail d'une catégorie" })
   @ApiOkResponse({ description: 'Catégorie trouvée' })
   findOne(@Param('id', ParseIntPipe) id: number) {
@@ -49,6 +53,7 @@ export class CategoriesController {
   }
 
   @Patch(':id')
+  @RequirePermission('categories.update')
   @ApiOperation({ summary: 'Modifier une catégorie' })
   @ApiOkResponse({ description: 'Catégorie modifiée' })
   update(
@@ -59,6 +64,7 @@ export class CategoriesController {
   }
 
   @Delete(':id')
+  @RequirePermission('categories.delete')
   @ApiOperation({ summary: 'Supprimer une catégorie' })
   @ApiOkResponse({ description: 'Catégorie supprimée' })
   remove(@Param('id', ParseIntPipe) id: number) {
