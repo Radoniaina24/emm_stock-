@@ -31,6 +31,7 @@ import { StockDetailPage } from "@/pages/stock/StockDetailPage"
 import { StockMovesPage } from "@/pages/stock/StockMovesPage"
 import { ReorderRulesPage } from "@/pages/stock/ReorderRulesPage"
 import { ReceptionPage } from "@/pages/stock/ReceptionPage"
+import { InventoriesPage } from "@/pages/stock/inventory/InventoriesPage"
 import { ExitPage } from "@/pages/stock/ExitPage"
 import { TransferPage } from "@/pages/stock/TransferPage"
 import { AjustementPage } from "@/pages/stock/AjustementPage"
@@ -105,12 +106,12 @@ function App() {
             <Route path="mouvements/transferts" element={<TransferPage />} />
             <Route path="mouvements/ajustements" element={<AjustementPage />} />
             <Route path="mouvements/historique" element={<StockMovesPage />} />
-            <Route path="inventaire" element={<div className="text-muted-foreground">Vue d'ensemble inventaire</div>} />
-            <Route path="inventaire/nouveau" element={<div className="text-muted-foreground">Nouvel inventaire</div>} />
-            <Route path="inventaire/en-cours" element={<div className="text-muted-foreground">Inventaires en cours</div>} />
-            <Route path="inventaire/termines" element={<div className="text-muted-foreground">Inventaires terminés</div>} />
-            <Route path="inventaire/ecarts" element={<div className="text-muted-foreground">Écarts d'inventaire</div>} />
-            <Route path="inventaire/historique" element={<div className="text-muted-foreground">Historique</div>} />
+            <Route path="inventaire" element={<InventoriesPage />} />
+            <Route path="inventaire/nouveau" element={<InventoriesPage />} />
+            <Route path="inventaire/en-cours" element={<InventoriesPage />} />
+            <Route path="inventaire/termines" element={<InventoriesPage />} />
+            <Route path="inventaire/ecarts" element={<InventoriesPage />} />
+            <Route path="inventaire/historique" element={<InventoriesPage />} />
             <Route path="achats" element={<div className="text-muted-foreground">Vue d'ensemble achats</div>} />
             <Route path="achats/commandes-fournisseurs" element={<div className="text-muted-foreground">Commandes fournisseurs</div>} />
             <Route path="achats/demandes-achat" element={<div className="text-muted-foreground">Demandes d'achat</div>} />
